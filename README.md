@@ -1,4 +1,30 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/HlQKP7Zu)
-# challenge2
-The second challenge.
-You need to fill this with the description of your work.
+
+# Sparse matrix 
+
+## Important
+Matrix class implementation
+- COOmap + CSR/CSC
+- methods: compress, uncompress, is_compressed, call operator, constructor, resize (template) norm
+- friends: matrix-vector multiplication and matrix-matrix multiplication (see suggestions)
+- views (extra): diagonal and transpose (see modified compressed techniques)
+
+Reader of matrix market format
+
+Test:
+- with a given matrix
+- time with Chrono.hpp
+
+Parallelization with std algorithms 
+(or blas library: ask other teams and check pacs-examples)
+
+## Secondary
+
+Additional aspects
+- COO (standard) possible inheritance
+- Modified compressed techniques
+
+Final aspects:
+- README.md
+- check the requests
+

@@ -31,14 +31,17 @@ namespace algebra
     };
 
     /// @brief alias for the index of the matrix
-    using Index = std::pair<size_t, size_t>; // row, column
+    struct Index {
+        size_t row;
+        size_t col;
+    };
 
     /// @brief comparison operators for the index if the order is RowMajor
     struct RowMajor
     {
         bool operator()(const Index &a, const Index &b) const
         {
-            return (a.first < b.first) || (a.first == b.first && a.second < b.second);
+            return (a.row < b.row) || (a.row == b.row && a.col < b.col);
         }
     };
 
@@ -47,7 +50,7 @@ namespace algebra
     {
         bool operator()(const Index &a, const Index &b) const
         {
-            return (a.second < b.second) || (a.second == b.second && a.first < b.first);
+            return (a.col < b.col) || (a.col == b.col && a.row < b.row);
         }
     };
 

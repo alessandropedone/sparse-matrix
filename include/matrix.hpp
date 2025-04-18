@@ -48,9 +48,10 @@ namespace algebra
             }
             if (compressed)
             {
+                std::cout << "Matrix is compressed, uncompressing..." << std::endl;
                 uncompress();
             }
-            uncompressed[std::make_pair(row, col)] = value;
+            uncompressed[{row, col}] = value;
         }
 
         /// @brief check if the matrix is in a compressed format
@@ -62,26 +63,59 @@ namespace algebra
         {
             if (!compressed)
             {
+                // clear the compressed matrix
                 compressed.inner.clear();
                 compressed.outer.clear();
                 compressed.values.clear();
 
-                // resize the vectors of the compressed format
-                compressed_format.inner.resize(rows+1);
-                compressed_format.outer.resize(cols+1);
-                compressed_format.values.resize(rows * cols);
+                // reserve space for the compressed matrix
+                if constexpr (S == StorageOrder::ColumnMajor)
+                {
+                    compressed_format.inner.resize(cols + 1);
+                }
+                else
+                {
+                    compressed_format.inner.resize(rows + 1);
+                }
+                std::fill(compressed_format.inner.begin(), compressed_format.inner.end(), 0);
 
+                // fill the compressed matrix
+                size_t index = 0;
                 for (const auto &it : uncompressed)
                 {
-                    compressed.inner.push_back(it.first.first);
-                    compressed.outer.push_back(it.first.second);
+                    if constexpr (S == StorageOrder::ColumnMajor)
+                    {
+                        if (it.first.col > index)
+                        {
+                            index = it.first.col;
+                            compressed_format.inner[index] = compressed.outer.size();
+                        }
+                        compressed.outer.push_back(it.first.row);
+                    }
+                    else
+                    {
+                        if (it.first.row > index)
+                        {
+                            index = it.first.row;
+                            compressed_format.inner[index] = compressed.outer.size();
+                        }
+                        compressed.outer.push_back(it.first.col);
+                    }
                     compressed.values.push_back(it.second);
                 }
-                compressed.inner.shrink_to_fit();
-                compressed.outer.shrink_to_fit();
-                compressed.values.shrink_to_fit();
-                compressed = CompressedStorage<T>(compressed.inner, compressed.outer, compressed.values);
+                if constexpr (S == StorageOrder::ColumnMajor)
+                {
+                    compressed_format.inner[cols] = compressed.outer.size();
+                }
+                else
+                {
+                    compressed_format.inner[rows] = compressed.outer.size();
+                }
+
+                // clear the uncompressed matrix
                 uncompressed.clear();
+
+                // update the compressed flag
                 compressed = true;
             }
         };
@@ -91,20 +125,44 @@ namespace algebra
         {
             if (compressed)
             {
-                compressed.inner.clear();
-                compressed.outer.clear();
-                compressed.values.clear();
+                // clear the uncompressed matrix
+                uncompressed.clear();
 
-                for (const auto &it : uncompressed)
+                // fill the uncompressed matrix
+                if constexpr (S == StorageOrder::ColumnMajor)
                 {
-                    compressed.inner.push_back(it.first.first);
-                    compressed.outer.push_back(it.first.second);
-                    compressed.values.push_back(it.second);
+
+                    for (size_t col_idx = 0; col_idx < cols; col_idx++)
+                    {
+                        size_t start = compressed.inner[col_idx];
+                        size_t end = compressed.inner[col_idx + 1];
+                        for (size_t j = start; j < end; j++)
+                        {
+                            size_t row_idx = compressed.outer[j];
+                            uncompressed[{row_idx, col_idx}] = compressed.values[j];
+                        }
+                    }
                 }
-                compressed.inner.shrink_to_fit();
-                compressed.outer.shrink_to_fit();
-                compressed.values.shrink_to_fit();
-                compressed = CompressedStorage<T>(compressed.inner, compressed.outer, compressed.values);
+                else
+                {
+                    for (size_t row_idx = 0; row_idx < rows; row_idx++)
+                    {
+                        size_t start = compressed.inner[row_idx];
+                        size_t end = compressed.inner[row_idx + 1];
+                        for (size_t j = start; j < end; j++)
+                        {
+                            size_t col_idx = compressed.outer[j];
+                            uncompressed[{row_idx, col_idx}] = compressed.values[j];
+                        }
+                    }
+                }
+
+                // clear the compressed matrix
+                compressed_format.inner.clear();
+                compressed_format.outer.clear();
+                compressed_format.values.clear();
+
+                // update the compressed flag
                 compressed = false;
             }
         };
@@ -123,29 +181,41 @@ namespace algebra
             // check if the matrix is compressed
             if (!compressed)
             {
-                auto it = uncompressed_format.find(std::make_pair(row, col));
+                auto it = uncompressed_format.find({row, col});
                 if (it != uncompressed_format.end())
                 {
                     return it->second;
                 }
-                else
-                {
-                    return T(0);
-                }
             }
             else
             {
-                auto it = std::find(compressed.outer.begin(), compressed.outer.end(), col);
-                if (it != compressed.outer.end())
+                if constexpr (S == StorageOrder::ColumnMajor)
                 {
-                    size_t index = std::distance(compressed.outer.begin(), it);
-                    return compressed.values[index];
+
+                    size_t start = compressed.inner[col];
+                    size_t end = compressed.inner[col + 1];
+                    for (size_t j = start; j < end; j++)
+                    {
+                        if (compressed.outer[j] == row)
+                        {
+                            return compressed.values[j];
+                        }
+                    }
                 }
                 else
                 {
-                    return T(0);
+                    size_t start = compressed.inner[row];
+                    size_t end = compressed.inner[row + 1];
+                    for (size_t j = start; j < end; j++)
+                    {
+                        if (compressed.outer[j] == col)
+                        {
+                            return compressed.values[j];
+                        }
+                    }
                 }
             }
+            return T(0);
         };
 
         /// @brief call operator() non-const version
@@ -163,7 +233,7 @@ namespace algebra
             {
                 uncompress();
             }
-            return uncompressed_format[std::make_pair(row, col)];
+            return uncompressed_format[{row, col}];
         }
 
         /// @brief resize the matrix

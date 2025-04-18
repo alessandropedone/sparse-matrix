@@ -1,15 +1,13 @@
-#include <vector>
 #ifndef MATRIX_HPP
 #define MATRIX_HPP
 
+#include "storage.hpp"
+#include <vector>
+
 namespace algebra
 {
-    enum class StorageOrder
-    {
-        RowMajor,
-        ColumnMajor
-    };
 
+    /// @brief type of norm
     enum class NormType
     {
         One,
@@ -17,20 +15,10 @@ namespace algebra
         Frobenius
     };
 
-    template <typename T>
-    struct CompressedStorage
-    {
-        std::vector<size_t> inner; // Starting index for each row (for CSR) or column (for CSC)
-        std::vector<size_t> outer; // Column (for CSR) or row (for CSC) indices of non-zero elements
-        std::vector<T> values;     // Non-zero values
-    };
-
-    using UncompressedStorage = std::map<std::array<size_t, 2>, T>;
-
-    /// @brief
+    /// @brief Matrix class
     /// @tparam T type of the matrix elements
     /// @tparam S storage order of the matrix (RowMajor or ColumnMajor)
-    template <typename T, StorageOrder S = StorageOrder::RowMajor>
+    template <AddMulType T, StorageOrder S = StorageOrder::RowMajor>
     class Matrix
     {
     public:
@@ -74,12 +62,12 @@ namespace algebra
 
         // storage for the matrix
         // uncompressed matrix
-        UncompressedStorage uncompressed; // COO format
+        UncompressedStorage<T, S> uncompressed; // COO format
         // compressed matrix
-        CompressedStorage compressed;
+        CompressedStorage<T> compressed; // CSR or CSC format
     };
 
-    template <typename T, StorageOrder S>
+    template <AddMulType T, StorageOrder S>
     std::vector<T> operator*(const Matrix<T, S> &m, const std::vector<T> &v)
     {
         // check if the matrix is compressed
@@ -101,7 +89,7 @@ namespace algebra
         return result;
     }
 
-    template <typename T, StorageOrder S>
+    template <AddMulType T, StorageOrder S>
     Matrix<T, S> operator*(const Matrix<T, S> &m1, const Matrix<T, S> &m2)
     {
         // TBD

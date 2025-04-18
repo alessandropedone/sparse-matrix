@@ -1,0 +1,35 @@
+# Compiler flags
+CXX      ?= g++
+CXXFLAGS ?= -std=c++20 -Wall -O3
+CPPFLAGS ?= -I include -I include/core -I muparserx/parser # Include flags
+
+# Linker flags
+LDFLAGS ?= -L muparserx -Wl,-rpath=muparserx
+LDLIBS  ?= -lmuparserx
+
+# Variables
+EXEC    = main
+SRC_DIR = src
+SRCS 	= $(shell find $(SRC_DIR) -name '*.cpp')
+OBJS    = $(SRCS:.cpp=.o)
+HEADERS = $(shell find include -maxdepth 1 -name '*.hpp')
+
+# Default target
+all: $(EXEC)
+
+# Link object files to create executable
+$(EXEC): $(OBJS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJS) $(LDLIBS) -o $@
+
+# Compile source files
+%.o: %.cpp ../include/core/%.hpp $(HEADERS)
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $< -o $@
+
+# Remove all object files
+clean:
+	$(RM) $(OBJS)
+
+# Remove all generated files
+distclean: clean
+	$(RM) $(EXEC)
+	$(RM) $(SRC_DIR)/*~

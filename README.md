@@ -5,7 +5,7 @@
 ## Important
 Matrix class implementation
 - COOmap + CSR/CSC
-- methods: (template) norm
+- methods: (template) norm, print
 - friends: matrix-vector multiplication and matrix-matrix multiplication (see suggestions)
 - views (extra): diagonal and transpose (see modified compressed techniques)
 

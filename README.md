@@ -5,7 +5,7 @@
 ## Important
 Matrix class implementation
 - COOmap + CSR/CSC
-- methods: compress, uncompress, is_compressed, call operator, constructor, resize (template) norm
+- methods: compress, uncompress, (template) norm
 - friends: matrix-vector multiplication and matrix-matrix multiplication (see suggestions)
 - views (extra): diagonal and transpose (see modified compressed techniques)
 

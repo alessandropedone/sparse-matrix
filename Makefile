@@ -1,11 +1,11 @@
 # Compiler flags
 CXX      ?= g++
 CXXFLAGS ?= -std=c++20 -Wall -O3
-CPPFLAGS ?= -I include -I include/core -I muparserx/parser # Include flags
+CPPFLAGS ?= -I include  # Include flags
 
 # Linker flags
-LDFLAGS ?= -L muparserx -Wl,-rpath=muparserx
-LDLIBS  ?= -lmuparserx
+LDFLAGS ?=
+LDLIBS  ?=
 
 # Variables
 EXEC    = main

@@ -9,7 +9,7 @@ namespace algebra
     class DiagonalView : public Matrix<T, S>
     {
     public:
-        DiagonalView(Matrix &matrix) : matrix(matrix) {}
+        DiagonalView(Matrix<T, S> &matrix) : matrix(matrix) {}
         T &operator()(size_t row, size_t col)
         {
             return (row == col) ? matrix(row, col) : T(0);
@@ -22,14 +22,15 @@ namespace algebra
         // friend functions
         // multiply with a std::vector
         template <AddMulType U, StorageOrder V>
-        friend std::vector<U> operator*(const DiagonalView<U, V> &m, const std::vector<U> &v);
+        friend std::vector<U> operator*(DiagonalView<U, V> &m, const std::vector<U> &v);
 
     private:
-        Matrix &matrix;
+        Matrix<T,S> &matrix;
     };
 
     template <AddMulType T, StorageOrder V>
-    std::vector<T> operator*(const DiagonalView<T, V> &m, const std::vector<T> &v){
+    std::vector<T> operator*(DiagonalView<T, V> &m, const std::vector<T> &v)
+    {
         std::vector<T> result(m.rows, 0);
         for (size_t i = 0; i < m.rows; i++)
         {
@@ -42,7 +43,7 @@ namespace algebra
     class TransposeView : public Matrix<T, S>
     {
     public:
-        TransposeView(Matrix &matrix) : matrix(matrix) {}
+        TransposeView(Matrix<T, S> &matrix) : matrix(matrix) {}
         T operator()(size_t row, size_t col)
         {
             return matrix(col, row);
@@ -53,7 +54,7 @@ namespace algebra
         }
 
     private:
-        Matrix &matrix;
+        Matrix<T,S> &matrix;
     };
 }
 

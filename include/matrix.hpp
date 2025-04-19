@@ -312,10 +312,10 @@ namespace algebra
         // friend functions
         // multiply with a std::vector
         template <AddMulType U, StorageOrder V>
-        friend std::vector<U> operator*(const Matrix<U, V> &m, const std::vector<U> &v);
+        friend std::vector<U> operator*(Matrix<U, V> &m, const std::vector<U> &v);
         // multiply with another matrix
         template <AddMulType U, StorageOrder V>
-        friend Matrix<U, V> operator*(const Matrix<U, V> &m1, const Matrix<U, V> &m2);
+        friend Matrix<U, V> operator*(Matrix<U, V> &m1, const Matrix<U, V> &m2);
 
     protected:
         size_t rows;             // number of rows
@@ -339,7 +339,7 @@ namespace algebra
     /// @note the vector must have the same number of rows as the matrix
     /// @note the matrix must be compressed (if not, it will be compressed)
     template <AddMulType T, StorageOrder S>
-    std::vector<T> operator*(const Matrix<T, S> &m, const std::vector<T> &v)
+    std::vector<T> operator*(Matrix<T, S> &m, const std::vector<T> &v)
     {
         if (!m.is_compressed())
         {
@@ -390,7 +390,7 @@ namespace algebra
     /// @return matrix result
     /// @note the result matrix will be compressed
     template <AddMulType T, StorageOrder S>
-    Matrix<T, S> operator*(const Matrix<T, S> &m1, const Matrix<T, S> &m2)
+    Matrix<T, S> operator*(Matrix<T, S> &m1, const Matrix<T, S> &m2)
     {
         if (!m1.is_compressed())
         {

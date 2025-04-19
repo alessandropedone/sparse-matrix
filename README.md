@@ -4,7 +4,8 @@
 
 ## Important
 Matrix class implementation
-- friends: matrix-vector multiplication and matrix-matrix multiplication (see suggestions)
+- friend functions: write the products in the uncompressed case
+- matrix-matrix product: there's an example from which we can tke inspiration (but i think this is already a very good solution)
 - views (extra): diagonal and transpose (see modified compressed techniques)
 
 Reader of matrix market format

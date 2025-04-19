@@ -505,6 +505,10 @@ namespace algebra
             std::cout << "Second matrix is uncompressed, compressing..." << std::endl;
             m2.compress();
         }
+        if (m1.cols != m2.rows)
+        {
+            throw std::invalid_argument("Matrix dimensions do not match for multiplication");
+        }
 
         Matrix<T, S> result(m1.rows, m2.cols);
         if constexpr (S == StorageOrder::ColumnMajor)

@@ -24,5 +24,4 @@ Additional aspects
 
 Final aspects:
 - README.md (need of TBB)
-- check the requests
 

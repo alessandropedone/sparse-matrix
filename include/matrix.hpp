@@ -91,8 +91,11 @@ namespace algebra
                     {
                         if (it.first.col > index)
                         {
-                            index = it.first.col;
-                            compressed_format.inner[index] = compressed_format.outer.size();
+                            while (it.first.col > index)
+                            {
+                                index++;
+                                compressed_format.inner[index] = compressed_format.outer.size();
+                            }
                         }
                         compressed_format.outer.push_back(it.first.row);
                     }
@@ -100,8 +103,11 @@ namespace algebra
                     {
                         if (it.first.row > index)
                         {
-                            index = it.first.row;
-                            compressed_format.inner[index] = compressed_format.outer.size();
+                            while (it.first.row > index)
+                            {
+                                index++;
+                                compressed_format.inner[index] = compressed_format.outer.size();
+                            }
                         }
                         compressed_format.outer.push_back(it.first.col);
                     }
@@ -109,11 +115,19 @@ namespace algebra
                 }
                 if constexpr (S == StorageOrder::ColumnMajor)
                 {
-                    compressed_format.inner[cols] = compressed_format.outer.size();
+                    while (cols > index)
+                    {
+                        index++;
+                        compressed_format.inner[index] = compressed_format.outer.size();
+                    }
                 }
                 else
                 {
-                    compressed_format.inner[rows] = compressed_format.outer.size();
+                    while (rows > index)
+                    {
+                        index++;
+                        compressed_format.inner[index] = compressed_format.outer.size();
+                    }
                 }
 
                 // clear the uncompressed matrix
@@ -273,40 +287,45 @@ namespace algebra
         void reader(const std::string &filename)
         {
             std::ifstream file(filename);
-            if (!file.is_open()) {
+            if (!file.is_open())
+            {
                 throw std::runtime_error("Unable to open file: " + filename);
             }
 
             std::string line;
             // Skip Matrix Market header and comments (first lines starting with %%)
-            while (std::getline(file, line)) {
-                if (line.substr(0, 2) == "%%" or line.substr(0, 1) == "%") {
+            while (std::getline(file, line))
+            {
+                if (line.substr(0, 2) == "%%" or line.substr(0, 1) == "%")
+                {
                     continue; // Skip comment lines
-                } else {
+                }
+                else
+                {
                     break;
                 }
             }
 
-                // Read matrix dimensions (rows, columns) and number of non-zero elements
-                std::istringstream sizes(line);
-                size_t row_read, col_read, nnz;
-                sizes >> row_read >> col_read >> nnz;
-                // Resize the matrix
-                resize_and_clear(row_read, col_read);
+            // Read matrix dimensions (rows, columns) and number of non-zero elements
+            std::istringstream sizes(line);
+            size_t row_read, col_read, nnz;
+            sizes >> row_read >> col_read >> nnz;
+            // Resize the matrix
+            resize_and_clear(row_read, col_read);
 
-            // Read matrix values            
-            while (std::getline(file, line)) {
+            // Read matrix values
+            while (std::getline(file, line))
+            {
                 std::istringstream iss(line);
                 T value;
                 size_t row, col;
                 iss >> row >> col >> value;
-                //I traslate the row and column indices to 0-based format and set the element
-                // in the matrix
-                set(row-1, col-1, value);
+                // I traslate the row and column indices to 0-based format and set the element
+                //  in the matrix
+                set(row - 1, col - 1, value);
             }
-        
-            file.close();
 
+            file.close();
         };
 
         // friend functions
@@ -315,7 +334,7 @@ namespace algebra
         friend std::vector<U> operator*(Matrix<U, V> &m, const std::vector<U> &v);
         // multiply with another matrix
         template <AddMulType U, StorageOrder V>
-        friend Matrix<U, V> operator*(Matrix<U, V> &m1, const Matrix<U, V> &m2);
+        friend Matrix<U, V> operator*(Matrix<U, V> &m1, Matrix<U, V> &m2);
 
     protected:
         size_t rows;             // number of rows
@@ -328,7 +347,6 @@ namespace algebra
         // compressed matrix
         CompressedStorage<T> compressed_format; // CSR or CSC format
     };
-    
 
     /// @brief multiply a matrix with a vector
     /// @tparam T type of the matrix elements
@@ -390,7 +408,7 @@ namespace algebra
     /// @return matrix result
     /// @note the result matrix will be compressed
     template <AddMulType T, StorageOrder S>
-    Matrix<T, S> operator*(Matrix<T, S> &m1, const Matrix<T, S> &m2)
+    Matrix<T, S> operator*(Matrix<T, S> &m1, Matrix<T, S> &m2)
     {
         if (!m1.is_compressed())
         {
@@ -454,7 +472,6 @@ namespace algebra
         result.compress();
         return result;
     }
-
 
 }
 

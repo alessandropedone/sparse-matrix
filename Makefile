@@ -22,7 +22,7 @@ $(EXEC): $(OBJS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJS) $(LDLIBS) -o $@
 
 # Compile source files
-%.o: %.cpp ../include/core/%.hpp $(HEADERS)
+%.o: %.cpp $(HEADERS)
 	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $< -o $@
 
 # Remove all object files

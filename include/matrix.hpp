@@ -2,9 +2,12 @@
 #define MATRIX_HPP
 
 #include "storage.hpp"
+
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <sstream>
+#include <type_traits>
 namespace algebra
 {
 
@@ -267,41 +270,44 @@ namespace algebra
         /// @param filename input file name
         void reader(const std::string &filename)
         {
-            std::ifstream file(filename);
-            if (!file.is_open()) {
-                throw std::runtime_error("Unable to open file: " + filename);
-            }
-
-            std::string line;
-            // Skip Matrix Market header and comments (first lines starting with %%)
-            while (std::getline(file, line)) {
-                if (line.substr(0, 2) == "%%" or line.substr(0, 1) == "%") {
-                    continue; // Skip comment lines
-                } else {
-                    break;
+            //reading real matrix
+            if constexpr (std::is_same_v<T, double>)            {
+                std::ifstream file(filename);
+                if (!file.is_open()) {
+                    throw std::runtime_error("Unable to open file: " + filename);
                 }
-            }
 
-            // Read matrix dimensions (rows, columns) and number of non-zero elements
-            std::istringstream sizes(line);
-            size_t row_read, col_read, nnz;
-            sizes >> row_read >> col_read >> nnz;
-            // Resize the matrix
-            rows = row_read;
-            cols = col_read;
+                std::string line;
+                // Skip Matrix Market header and comments (first lines starting with %%)
+                while (std::getline(file, line)) {
+                    if (line.substr(0, 2) == "%%" or line.substr(0, 1) == "%") {
+                        continue; // Skip comment lines
+                    } else {
+                        break;
+                    }
+                }
 
-            // Read matrix values            
-            while (std::getline(file, line)) {
-                std::istringstream iss(line);
-                T value;
-                size_t row, col;
-                iss >> row >> col >> value;
-                //I traslate the row and column indices to 0-based format and set the element
-                // in the matrix
-                set(row-1, col-1, value);
+                // Read matrix dimensions (rows, columns) and number of non-zero elements
+                std::istringstream sizes(line);
+                size_t row_read, col_read, nnz;
+                sizes >> row_read >> col_read >> nnz;
+                // Resize the matrix
+                resize_and_clear(row_read, col_read);
+
+                // Read matrix values            
+                while (std::getline(file, line)) {
+                    std::istringstream iss(line);
+                    T value;
+                    size_t row, col;
+                    iss >> row >> col >> value;
+                    //I traslate the row and column indices to 0-based format and set the element
+                    // in the matrix
+                    set(row-1, col-1, value);
+                }
+            
+                file.close();
+                
             }
-        
-            file.close();
 
         };
 

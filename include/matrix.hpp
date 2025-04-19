@@ -317,7 +317,7 @@ namespace algebra
         template <AddMulType U, StorageOrder V>
         friend Matrix<U, V> operator*(const Matrix<U, V> &m1, const Matrix<U, V> &m2);
 
-    private:
+    protected:
         size_t rows;             // number of rows
         size_t cols;             // number of columns
         bool compressed = false; // flag to check if the matrix is compressed
@@ -328,6 +328,7 @@ namespace algebra
         // compressed matrix
         CompressedStorage<T> compressed_format; // CSR or CSC format
     };
+    
 
     /// @brief multiply a matrix with a vector
     /// @tparam T type of the matrix elements

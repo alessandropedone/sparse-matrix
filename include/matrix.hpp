@@ -52,7 +52,7 @@ namespace algebra
                 std::cout << "Matrix is compressed, uncompressing..." << std::endl;
                 uncompress();
             }
-            uncompressed[{row, col}] = value;
+            uncompressed_format[{row, col}] = value;
         }
 
         /// @brief check if the matrix is in a compressed format
@@ -82,7 +82,7 @@ namespace algebra
 
                 // fill the compressed matrix
                 size_t index = 0;
-                for (const auto &it : uncompressed)
+                for (const auto &it : uncompressed_format)
                 {
                     if constexpr (S == StorageOrder::ColumnMajor)
                     {
@@ -140,7 +140,7 @@ namespace algebra
                         for (size_t j = start; j < end; j++)
                         {
                             size_t row_idx = compressed_format.outer[j];
-                            uncompressed[{row_idx, col_idx}] = compressed_format.values[j];
+                            uncompressed_format[{row_idx, col_idx}] = compressed_format.values[j];
                         }
                     }
                 }
@@ -153,7 +153,7 @@ namespace algebra
                         for (size_t j = start; j < end; j++)
                         {
                             size_t col_idx = compressed_format.outer[j];
-                            uncompressed[{row_idx, col_idx}] = compressed_format.values[j];
+                            uncompressed_format[{row_idx, col_idx}] = compressed_format.values[j];
                         }
                     }
                 }

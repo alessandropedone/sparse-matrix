@@ -5,7 +5,7 @@ CPPFLAGS ?= -I include  # Include flags
 
 # Linker flags
 LDFLAGS ?=
-LDLIBS  ?=
+LDLIBS  ?= -ltbb
 
 # Variables
 EXEC    = main

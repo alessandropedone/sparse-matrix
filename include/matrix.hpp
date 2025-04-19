@@ -8,6 +8,9 @@
 #include <fstream>
 #include <sstream>
 #include <type_traits>
+#include <execution>
+#include <cmath>
+
 namespace algebra
 {
 
@@ -274,12 +277,94 @@ namespace algebra
         }
 
         /// @brief calculate the norm of the matrix
-        /// @tparam N type of the norm
+        /// @tparam N type of the norm (One, Infinity, Frobenius)
         /// @return value of the norm
         template <NormType N>
-        T norm() const {
+        double norm() {
             // be careful with complex numbers
             // smart/efficient way to calculate the norm?
+            if (!compressed)
+            {
+                std::cout << "Matrix is uncompressed, compressing..." << std::endl;
+                compress();
+            }
+            if constexpr (N == NormType::One)
+            {               
+                if constexpr (S == StorageOrder::ColumnMajor)
+                {
+                    double norm = 0;
+                    for (size_t col = 0; col < cols; col++)
+                    {
+                        double sum = 0;
+                        size_t start = compressed_format.inner[col];
+                        size_t end = compressed_format.inner[col + 1];
+                        for (size_t j = start; j < end; j++)
+                        {
+                            sum += std::abs(compressed_format.values[j]);
+                        }
+                        norm = std::max(norm, sum);
+                    }
+                    return norm;
+                }
+                else
+                {
+                    std::vector<double> col_sums(cols, 0);
+                    for (size_t row = 0; row < rows; row++) // exploit locality (cache)
+                    {
+                        size_t start = compressed_format.inner[row];
+                        size_t end = compressed_format.inner[row + 1];
+                        for (size_t j = start; j < end; j++)
+                        {
+                            size_t col = compressed_format.outer[j];
+                            col_sums[col] += std::abs(compressed_format.values[j]);
+                        }
+                    }
+                    return *std::max_element(std::execution::par_unseq, col_sums.begin(), col_sums.end());                   ;
+                }
+            }
+            else if constexpr (N == NormType::Infinity)
+            {
+                if constexpr (S == StorageOrder::ColumnMajor)
+                {
+                    std::vector<double> row_sums(rows, 0);
+                    for (size_t col = 0; col < cols; col++)
+                    {
+                        size_t start = compressed_format.inner[col];
+                        size_t end = compressed_format.inner[col + 1];
+                        for (size_t j = start; j < end; j++)
+                        {
+                            size_t row = compressed_format.outer[j];
+                            row_sums[row] += std::abs(compressed_format.values[j]);
+                        }
+                    }
+                    return *std::max_element(std::execution::par_unseq, row_sums.begin(), row_sums.end());
+                }
+                else
+                {
+                    double norm = 0;
+                    for (size_t row = 0; row < rows; row++)
+                    {
+                        double sum = 0;
+                        size_t start = compressed_format.inner[row];
+                        size_t end = compressed_format.inner[row + 1];
+                        for (size_t j = start; j < end; j++)
+                        {
+                            sum += std::abs(compressed_format.values[j]);
+                        }
+                        norm = std::max(norm, sum);
+                    }
+                    return norm;
+                }
+            }
+            else
+            {
+                double norm = 0;
+                for (const auto &it : compressed_format.values)
+                {
+                    norm += std::abs(it) * std::abs(it);
+                }
+                return std::sqrt(std::abs(norm));
+            }
         };
 
         /// @brief Function to read a matrix in Matrix Market format

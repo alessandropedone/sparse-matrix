@@ -31,6 +31,11 @@ int main()
     }
     std::cout << std::endl;
 
+    std::cout << "One norm: " << m1.norm<NormType::One>() << std::endl;
+    std::cout << "Infinity norm: " << m1.norm<NormType::Infinity>() << std::endl;
+    std::cout << "Frobenius norm: " << m1.norm<NormType::Frobenius>() << std::endl;
+    std::cout << std::endl;
+
     std::cout << "Vector v" << std::endl;
     for (size_t i = 0; i < 3; i++)
     {

@@ -20,7 +20,7 @@ namespace algebra
     concept AddMulType = requires(T a, T b) {
         { a + b } -> std::convertible_to<T>;
         { a * b } -> std::convertible_to<T>;
-        { abs(a) } -> std::convertible_to<T>;
+        { std::abs(a) };
     };
 
     /// @brief matrix storage in compressed format

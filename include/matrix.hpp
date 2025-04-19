@@ -235,6 +235,7 @@ namespace algebra
             }
             if (compressed)
             {
+                std::cout << "Matrix is compressed, uncompressing..." << std::endl;
                 uncompress();
             }
             return uncompressed_format[{row, col}];
@@ -249,6 +250,7 @@ namespace algebra
             this->cols = cols;
             if (compressed)
             {
+                std::cout << "Matrix is compressed, uncompressing..." << std::endl;
                 uncompress();
             }
             uncompressed_format.clear();
@@ -270,22 +272,20 @@ namespace algebra
         /// @param filename input file name
         void reader(const std::string &filename)
         {
-            //reading real matrix
-            if constexpr (std::is_same_v<T, double>)            {
-                std::ifstream file(filename);
-                if (!file.is_open()) {
-                    throw std::runtime_error("Unable to open file: " + filename);
-                }
+            std::ifstream file(filename);
+            if (!file.is_open()) {
+                throw std::runtime_error("Unable to open file: " + filename);
+            }
 
-                std::string line;
-                // Skip Matrix Market header and comments (first lines starting with %%)
-                while (std::getline(file, line)) {
-                    if (line.substr(0, 2) == "%%" or line.substr(0, 1) == "%") {
-                        continue; // Skip comment lines
-                    } else {
-                        break;
-                    }
+            std::string line;
+            // Skip Matrix Market header and comments (first lines starting with %%)
+            while (std::getline(file, line)) {
+                if (line.substr(0, 2) == "%%" or line.substr(0, 1) == "%") {
+                    continue; // Skip comment lines
+                } else {
+                    break;
                 }
+            }
 
                 // Read matrix dimensions (rows, columns) and number of non-zero elements
                 std::istringstream sizes(line);
@@ -294,20 +294,18 @@ namespace algebra
                 // Resize the matrix
                 resize_and_clear(row_read, col_read);
 
-                // Read matrix values            
-                while (std::getline(file, line)) {
-                    std::istringstream iss(line);
-                    T value;
-                    size_t row, col;
-                    iss >> row >> col >> value;
-                    //I traslate the row and column indices to 0-based format and set the element
-                    // in the matrix
-                    set(row-1, col-1, value);
-                }
-            
-                file.close();
-                
+            // Read matrix values            
+            while (std::getline(file, line)) {
+                std::istringstream iss(line);
+                T value;
+                size_t row, col;
+                iss >> row >> col >> value;
+                //I traslate the row and column indices to 0-based format and set the element
+                // in the matrix
+                set(row-1, col-1, value);
             }
+        
+            file.close();
 
         };
 
@@ -331,33 +329,131 @@ namespace algebra
         CompressedStorage<T> compressed_format; // CSR or CSC format
     };
 
+    /// @brief multiply a matrix with a vector
+    /// @tparam T type of the matrix elements
+    /// @tparam S storage order of the matrix (RowMajor or ColumnMajor)
+    /// @param m matrix
+    /// @param v vector
+    /// @return vector result
+    /// @note the vector must have the same number of rows as the matrix
+    /// @note the matrix must be compressed (if not, it will be compressed)
     template <AddMulType T, StorageOrder S>
     std::vector<T> operator*(const Matrix<T, S> &m, const std::vector<T> &v)
     {
-        // check if the matrix is compressed
-        if (m.is_compressed())
+        if (!m.is_compressed())
         {
-            // uncompress the matrix
-            m.uncompress();
+            std::cout << "Matrix is uncompressed, compressing..." << std::endl;
+            m.compress();
         }
-        // multiply the matrix with the vector
-        std::vector<T> result(m.rows());
-        for (size_t i = 0; i < m.rows(); i++)
+        std::vector<T> result(m.rows, 0);
+        if constexpr (S == StorageOrder::ColumnMajor)
         {
-            result[i] = 0;
-            for (size_t j = 0; j < m.cols(); j++)
+            // iterate over columns of m
+            for (size_t col = 0; col < m.col; col++)
             {
-                result[i] += m(i, j) * v[j];
+                // iterate over rows of m that are non-zero in the column "col" of m
+                for (size_t j = m.compressed_format.inner[col]; j < m.compressed_format.inner[col + 1]; j++)
+                {
+                    // row = row of m that we are currently processing
+                    size_t row = m.compressed_format.outer[j];
+
+                    // add the product of the non-zero elements to the "result" vector
+                    result[row] += m.compressed_format.values[j] * v[col];
+                }
+            }
+        }
+        else
+        {
+            // iterate over rows of m
+            for (size_t row = 0; row < m.rows; row++)
+            {
+                // iterate over columns of m that are non-zero in the row "row" of m
+                for (size_t j = m.compressed_format.inner[row]; j < m.compressed_format.inner[row + 1]; j++)
+                {
+                    // col = column of m that we are currently processing
+                    size_t col = m.compressed_format.outer[j];
+
+                    // add the product of the non-zero elements to the "result" vector
+                    result[row] += m.compressed_format.values[j] * v[col];
+                }
             }
         }
         return result;
     }
 
+    /// @brief mutliply two matrices with the same storage order
+    /// @tparam T type of the matrix elements
+    /// @tparam S storage order of the matrix (RowMajor or ColumnMajor)
+    /// @param m1 first matrix
+    /// @param m2 second matrix
+    /// @return matrix result
+    /// @note the result matrix will be compressed
     template <AddMulType T, StorageOrder S>
     Matrix<T, S> operator*(const Matrix<T, S> &m1, const Matrix<T, S> &m2)
     {
-        // TBD
+        if (!m1.is_compressed())
+        {
+            std::cout << "First matrix is uncompressed, compressing..." << std::endl;
+            m1.compress();
+        }
+        if (!m2.is_compressed())
+        {
+            std::cout << "Second matrix is uncompressed, compressing..." << std::endl;
+            m2.compress();
+        }
+
+        Matrix<T, S> result(m1.rows, m2.cols);
+        if constexpr (S == StorageOrder::ColumnMajor)
+        {
+            // iterate over columns of m2
+            for (size_t col = 0; col < m2.cols; col++)
+            {
+                // iterate over rows of m2 (and columns of m1) that are non-zero in the column "col" of m2
+                for (size_t k = m2.compressed_format.inner[col]; k < m2.compressed_format.inner[col + 1]; k++)
+                {
+                    // j = row of m2 (or column of m1) that we are currently processing
+                    size_t j = m2.compressed_format.outer[k];
+
+                    // iterate over rows of m1 that are non-zero in the column j of m1
+                    for (size_t i = m1.compressed_format.inner[j]; i < m1.compressed_format.inner[j + 1]; i++)
+                    {
+                        // row = row of m1 corresponding to the index i
+                        size_t row = m1.compressed_format.outer[i];
+
+                        // add the product of the non-zero elements to the "result" matrix
+                        result(row, col) += m1.compressed_format.values[i] * m2.compressed_format.values[k];
+                    }
+                }
+            }
+        }
+        else
+        {
+            // iterate over rows of m1
+            for (size_t row = 0; row < m1.rows; row++)
+            {
+                // iterate over columns of m1 (and rows of m2) that are non-zero in the row "row" of m1
+                for (size_t j = m1.compressed_format.inner[row]; j < m1.compressed_format.inner[row + 1]; j++)
+                {
+                    // k = column of m1 (or row of m2) that we are currently processing
+                    size_t k = m1.compressed_format.outer[j];
+
+                    // iterate over columns of m2 that are non-zero in the row k of m2
+                    for (size_t i = m2.compressed_format.inner[k]; i < m2.compressed_format.inner[k + 1]; i++)
+                    {
+                        // col = column of m2 corresponding to the index i
+                        size_t col = m2.compressed_format.outer[i];
+
+                        // add the product of the non-zero elements to the "result" matrix
+                        result(row, col) += m1.compressed_format.values[j] * m2.compressed_format.values[i];
+                    }
+                }
+            }
+        }
+        // compress the result matrix
+        result.compress();
+        return result;
     }
+
 
 }
 

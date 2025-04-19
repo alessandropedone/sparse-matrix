@@ -3,6 +3,7 @@
 
 #include "storage.hpp"
 #include <vector>
+#include <iostream>
 
 namespace algebra
 {
@@ -264,9 +265,11 @@ namespace algebra
 
         // friend functions
         // multiply with a std::vector
-        friend std::vector<T> operator*(const Matrix &m, const std::vector<T> &v);
+        template <AddMulType U, StorageOrder V>
+        friend std::vector<U> operator*(const Matrix<U, V> &m, const std::vector<U> &v);
         // multiply with another matrix
-        friend Matrix operator*(const Matrix &m1, const Matrix &m2);
+        template <AddMulType U, StorageOrder V>
+        friend Matrix<U, V> operator*(const Matrix<U, V> &m1, const Matrix<U, V> &m2);
 
     private:
         size_t rows;             // number of rows

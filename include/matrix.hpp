@@ -80,7 +80,7 @@ namespace algebra
         /// @tparam N type of the norm (One, Infinity, Frobenius)
         /// @return value of the norm
         template <NormType N>
-        double norm();
+        double norm() const;
 
         /// @brief Function to read a matrix in Matrix Market format
         /// @param filename input file name
@@ -89,10 +89,10 @@ namespace algebra
         // friend functions
         // multiply with a std::vector
         template <AddMulType U, StorageOrder V>
-        friend std::vector<U> operator*(Matrix<U, V> &m, const std::vector<U> &v);
+        friend std::vector<U> operator*(const Matrix<U, V> &m, const std::vector<U> &v);
         // multiply with another matrix
         template <AddMulType U, StorageOrder V>
-        friend Matrix<U, V> operator*(Matrix<U, V> &m1, Matrix<U, V> &m2);
+        friend Matrix<U, V> operator*(const Matrix<U, V> &m1, const Matrix<U, V> &m2);
 
     protected:
         size_t rows;             // number of rows

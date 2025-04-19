@@ -18,8 +18,6 @@ int main()
     std::vector<int> v = {1, 2, 3};
 
     std::cout << "Matrix M" << std::endl;
-    m1.compress();
-    //m1.uncompress();
     const auto &ref = m1;
     for (size_t i = 0; i < 3; i++)
     {

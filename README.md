@@ -4,7 +4,6 @@
 
 ## Important
 Matrix class implementation
-- friend functions: write the products in the uncompressed case (see doc)
 - matrix-matrix product: there's an example from which we can tke inspiration (but i think this is already a very good solution)
 - views (extra): diagonal and transpose (see modified compressed techniques)
 

@@ -4,7 +4,7 @@
 #include "storage.hpp"
 #include <vector>
 #include <iostream>
-
+#include <fstream>
 namespace algebra
 {
 
@@ -65,9 +65,9 @@ namespace algebra
             if (!compressed)
             {
                 // clear the compressed matrix
-                compressed.inner.clear();
-                compressed.outer.clear();
-                compressed.values.clear();
+                compressed_format.inner.clear();
+                compressed_format.outer.clear();
+                compressed_format.values.clear();
 
                 // reserve space for the compressed matrix
                 if constexpr (S == StorageOrder::ColumnMajor)
@@ -89,32 +89,32 @@ namespace algebra
                         if (it.first.col > index)
                         {
                             index = it.first.col;
-                            compressed_format.inner[index] = compressed.outer.size();
+                            compressed_format.inner[index] = compressed_format.outer.size();
                         }
-                        compressed.outer.push_back(it.first.row);
+                        compressed_format.outer.push_back(it.first.row);
                     }
                     else
                     {
                         if (it.first.row > index)
                         {
                             index = it.first.row;
-                            compressed_format.inner[index] = compressed.outer.size();
+                            compressed_format.inner[index] = compressed_format.outer.size();
                         }
-                        compressed.outer.push_back(it.first.col);
+                        compressed_format.outer.push_back(it.first.col);
                     }
-                    compressed.values.push_back(it.second);
+                    compressed_format.values.push_back(it.second);
                 }
                 if constexpr (S == StorageOrder::ColumnMajor)
                 {
-                    compressed_format.inner[cols] = compressed.outer.size();
+                    compressed_format.inner[cols] = compressed_format.outer.size();
                 }
                 else
                 {
-                    compressed_format.inner[rows] = compressed.outer.size();
+                    compressed_format.inner[rows] = compressed_format.outer.size();
                 }
 
                 // clear the uncompressed matrix
-                uncompressed.clear();
+                uncompressed_format.clear();
 
                 // update the compressed flag
                 compressed = true;
@@ -127,7 +127,7 @@ namespace algebra
             if (compressed)
             {
                 // clear the uncompressed matrix
-                uncompressed.clear();
+                uncompressed_format.clear();
 
                 // fill the uncompressed matrix
                 if constexpr (S == StorageOrder::ColumnMajor)
@@ -135,12 +135,12 @@ namespace algebra
 
                     for (size_t col_idx = 0; col_idx < cols; col_idx++)
                     {
-                        size_t start = compressed.inner[col_idx];
-                        size_t end = compressed.inner[col_idx + 1];
+                        size_t start = compressed_format.inner[col_idx];
+                        size_t end = compressed_format.inner[col_idx + 1];
                         for (size_t j = start; j < end; j++)
                         {
-                            size_t row_idx = compressed.outer[j];
-                            uncompressed[{row_idx, col_idx}] = compressed.values[j];
+                            size_t row_idx = compressed_format.outer[j];
+                            uncompressed[{row_idx, col_idx}] = compressed_format.values[j];
                         }
                     }
                 }
@@ -148,12 +148,12 @@ namespace algebra
                 {
                     for (size_t row_idx = 0; row_idx < rows; row_idx++)
                     {
-                        size_t start = compressed.inner[row_idx];
-                        size_t end = compressed.inner[row_idx + 1];
+                        size_t start = compressed_format.inner[row_idx];
+                        size_t end = compressed_format.inner[row_idx + 1];
                         for (size_t j = start; j < end; j++)
                         {
-                            size_t col_idx = compressed.outer[j];
-                            uncompressed[{row_idx, col_idx}] = compressed.values[j];
+                            size_t col_idx = compressed_format.outer[j];
+                            uncompressed[{row_idx, col_idx}] = compressed_format.values[j];
                         }
                     }
                 }
@@ -193,25 +193,25 @@ namespace algebra
                 if constexpr (S == StorageOrder::ColumnMajor)
                 {
 
-                    size_t start = compressed.inner[col];
-                    size_t end = compressed.inner[col + 1];
+                    size_t start = compressed_format.inner[col];
+                    size_t end = compressed_format.inner[col + 1];
                     for (size_t j = start; j < end; j++)
                     {
-                        if (compressed.outer[j] == row)
+                        if (compressed_format.outer[j] == row)
                         {
-                            return compressed.values[j];
+                            return compressed_format.values[j];
                         }
                     }
                 }
                 else
                 {
-                    size_t start = compressed.inner[row];
-                    size_t end = compressed.inner[row + 1];
+                    size_t start = compressed_format.inner[row];
+                    size_t end = compressed_format.inner[row + 1];
                     for (size_t j = start; j < end; j++)
                     {
-                        if (compressed.outer[j] == col)
+                        if (compressed_format.outer[j] == col)
                         {
-                            return compressed.values[j];
+                            return compressed_format.values[j];
                         }
                     }
                 }
@@ -261,6 +261,48 @@ namespace algebra
         T norm() const {
             // be careful with complex numbers
             // smart/efficient way to calculate the norm?
+        };
+
+        /// @brief Function to read a matrix in Matrix Market format
+        /// @param filename input file name
+        void reader(const std::string &filename)
+        {
+            std::ifstream file(filename);
+            if (!file.is_open()) {
+                throw std::runtime_error("Unable to open file: " + filename);
+            }
+
+            std::string line;
+            // Skip Matrix Market header and comments (first lines starting with %%)
+            while (std::getline(file, line)) {
+                if (line.substr(0, 2) == "%%" or line.substr(0, 1) == "%") {
+                    continue; // Skip comment lines
+                } else {
+                    break;
+                }
+            }
+
+            // Read matrix dimensions (rows, columns) and number of non-zero elements
+            std::istringstream sizes(line);
+            size_t row_read, col_read, nnz;
+            sizes >> row_read >> col_read >> nnz;
+            // Resize the matrix
+            rows = row_read;
+            cols = col_read;
+
+            // Read matrix values            
+            while (std::getline(file, line)) {
+                std::istringstream iss(line);
+                T value;
+                size_t row, col;
+                iss >> row >> col >> value;
+                //I traslate the row and column indices to 0-based format and set the element
+                // in the matrix
+                set(row-1, col-1, value);
+            }
+        
+            file.close();
+
         };
 
         // friend functions

@@ -3,6 +3,10 @@
 
 #include <utility>
 #include <cstddef>
+#include <vector>
+#include <map>
+#include <iostream>
+#include <concepts>
 namespace algebra
 {
     /// @brief type of storage order

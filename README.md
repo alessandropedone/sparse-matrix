@@ -4,8 +4,6 @@
 
 ## Important
 Matrix class implementation
-- COOmap + CSR/CSC
-- methods: (template) norm
 - friends: matrix-vector multiplication and matrix-matrix multiplication (see suggestions)
 - views (extra): diagonal and transpose (see modified compressed techniques)
 
@@ -25,6 +23,6 @@ Additional aspects
 - Modified compressed techniques
 
 Final aspects:
-- README.md
+- README.md (need of TBB)
 - check the requests
 

@@ -13,6 +13,7 @@ SRC_DIR = src
 SRCS 	= $(shell find $(SRC_DIR) -name '*.cpp')
 OBJS    = $(SRCS:.cpp=.o)
 HEADERS = $(shell find include -maxdepth 1 -name '*.hpp')
+HIMPL 	= $(shell find include -maxdepth 1 -name '*.tpp')
 
 # Default target
 all: $(EXEC)
@@ -22,7 +23,7 @@ $(EXEC): $(OBJS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJS) $(LDLIBS) -o $@
 
 # Compile source files
-%.o: %.cpp $(HEADERS)
+%.o: %.cpp $(HEADERS) $(HIMPL)
 	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $< -o $@
 
 # Remove all object files

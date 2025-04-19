@@ -5,6 +5,9 @@
             "includePath": [
                 "${workspaceFolder}/**"
             ],
+            "forcedInclude": [
+                "${workspaceFolder}/include/matrix.hpp"
+            ],
             "defines": [],
             "cStandard": "c17",
             "cppStandard": "c++20",

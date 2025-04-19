@@ -7,6 +7,7 @@
 #include <map>
 #include <iostream>
 #include <concepts>
+
 namespace algebra
 {
     /// @brief type of storage order

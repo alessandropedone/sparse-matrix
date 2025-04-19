@@ -1,9 +1,8 @@
-#include <utility>
-#include <cstddef>
-
 #ifndef STORAGE_HPP
 #define STORAGE_HPP
 
+#include <utility>
+#include <cstddef>
 namespace algebra
 {
     /// @brief type of storage order

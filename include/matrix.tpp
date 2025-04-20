@@ -153,11 +153,82 @@ namespace algebra
             compressed_format.inner.resize(rows + 1);
         }
         std::fill(std::execution::par_unseq, compressed_format.inner.begin(), compressed_format.inner.end(), 0);
+        const size_t nnz = get_nnz();
+        compressed_format.outer.resize(nnz);
+        compressed_format.values.resize(nnz);
 
-        // TODO
+        // count non‑zeros per major index
+        std::vector<size_t> counts;
+        if constexpr (S == StorageOrder::ColumnMajor)
+        {
+            // resize the counts vector to the number of columns
+            counts.resize(cols, 0);
 
-        // clear the uncompressed matrix
-        uncompressed_format.clear();
+            // count non-zeros per column using atomic operations
+            std::for_each(
+                std::execution::par_unseq,
+                uncompressed_format.begin(), uncompressed_format.end(),
+                [&](auto const &entry)
+                {
+                    size_t idx = entry.first.col;
+                    __atomic_fetch_add(&counts[idx], 1, __ATOMIC_RELAXED);
+                });
+        }
+        else
+        {
+            // resize the counts vector to the number of rows
+            counts.resize(rows, 0);
+
+            // count non-zeros per row using atomic operations
+            std::for_each(
+                std::execution::par_unseq,
+                uncompressed_format.begin(), uncompressed_format.end(),
+                [&](auto const &entry)
+                {
+                    size_t idx = entry.first.row;
+                    __atomic_fetch_add(&counts[idx], 1, __ATOMIC_RELAXED);
+                });
+        }
+
+        // exclusive prefix‐sum to build the "inner" index array
+        compressed_format.inner[0] = 0;
+        // Create a temporary vector to hold non-atomic values for the scan
+        std::vector<size_t> temp_counts(counts.size());
+        std::transform(std::execution::par, counts.begin(), counts.end(), temp_counts.begin(),
+                       [](const std::atomic<size_t> &atomic_val)
+                       { return atomic_val.load(); });
+
+        // Perform the inclusive scan on the temporary vector
+        std::inclusive_scan(std::execution::par, temp_counts.begin(), temp_counts.end(), compressed_format.inner.begin() + 1);
+
+        // allocate storage for the "outer" indices and values
+        compressed_format.outer.resize(nnz);
+        compressed_format.values.resize(nnz);
+
+        // fill the "outer" indices and values
+        std::vector<size_t> indices(uncompressed_format.size());
+        std::iota(indices.begin(), indices.end(), 0);
+        std::for_each(
+            std::execution::par,
+            indices.begin(), indices.end(),
+            [&](size_t index)
+            {
+                auto it = std::next(uncompressed_format.begin(), index);
+                if constexpr (S == StorageOrder::ColumnMajor)
+                {
+                    compressed_format.outer[index] = it->first.row;
+                }
+                else
+                {
+                    compressed_format.outer[index] = it->first.col;
+                }
+                compressed_format.values[index] = it->second;
+            });
+
+        // clear the compressed matrix
+        compressed_format.inner.clear();
+        compressed_format.outer.clear();
+        compressed_format.values.clear();
 
         // update the compressed flag
         compressed = true;

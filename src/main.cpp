@@ -27,9 +27,9 @@ int main()
     m1.set(0, 0, 1);
     m1.set(0, 1, 2);
     m1.set(0, 2, 3);
-    m1.set(1, 0, 4);
-    m1.set(1, 1, 5);
-    m1.set(1, 2, 6);
+    m1.set(1, 0, 0);
+    m1.set(1, 1, 0);
+    m1.set(1, 2, 0);
     m1.set(2, 0, 3);
     m1.set(2, 1, 3);
     m1.set(2, 2, 3);
@@ -37,6 +37,8 @@ int main()
     m1(2, 2) = m1(0, 0) + 1;
     std::vector<int> v = {1, 2, 3};
     m1.compress_parallel();
+    m1.uncompress();
+    m1.compress();
     m1.uncompress();
 
     std::cout << "Matrix M" << std::endl;

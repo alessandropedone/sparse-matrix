@@ -17,3 +17,5 @@ Modified compressed techniques (MSR, MSC)
   
 README.md (need of TBB, we didn't implement COO since COOmap is clearly more efficient)
 
+Useful:
+- Add print methods

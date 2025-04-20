@@ -21,7 +21,18 @@ namespace algebra
             std::cout << "Matrix is compressed, uncompressing..." << std::endl;
             uncompress();
         }
-        uncompressed_format[{row, col}] = value;
+        if (value != 0)
+        {
+            uncompressed_format[{row, col}] = value;
+        }
+        else
+        {
+            auto it = uncompressed_format.find({row, col});
+            if (it != uncompressed_format.end())
+            {
+                uncompressed_format.erase(it);
+            }
+        }
     }
 
     template <AddMulType T, StorageOrder S>
@@ -196,19 +207,17 @@ namespace algebra
     };
 
     template <AddMulType T, StorageOrder S>
-    T &Matrix<T, S>::operator()(size_t row, size_t col)
+    Proxy<T> Matrix<T, S>::operator()(size_t row, size_t col)
     {
-        // check if the index is in range
         if (row >= rows || col >= cols)
-        {
             throw std::out_of_range("Index out of range");
-        }
+
         if (compressed)
         {
-            std::cout << "Matrix is compressed, uncompressing..." << std::endl;
+            std::cout << "Matrix is compressed, uncompressing...\n";
             uncompress();
         }
-        return uncompressed_format[{row, col}];
+        return Proxy<T>{uncompressed_format, row, col};
     }
 
     template <AddMulType T, StorageOrder S>

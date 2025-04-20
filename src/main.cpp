@@ -16,6 +16,8 @@ int main()
     m1.set(2, 0, 3);
     m1.set(2, 1, 3);
     m1.set(2, 2, 3);
+    m1.set(2, 2, 0);
+    m1(2,2) = m1(0,0) + 1;
     std::vector<int> v = {1, 2, 3};
 
     std::cout << "Matrix M" << std::endl;

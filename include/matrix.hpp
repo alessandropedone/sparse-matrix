@@ -2,6 +2,7 @@
 #define MATRIX_HPP
 
 #include "storage.hpp"
+#include "proxy.hpp"
 
 #include <vector>
 #include <iostream>
@@ -65,11 +66,12 @@ namespace algebra
         /// @return element at (row, col)
         T operator()(size_t row, size_t col) const;
 
+
         /// @brief call operator() non-const version
         /// @param row row index
         /// @param col column index
-        /// @return reference to the element at (row, col)
-        T &operator()(size_t row, size_t col);
+        /// @return reference to the element at (row, col) with proxy (to avoid setting zero values)
+        Proxy<T> operator()(size_t row, size_t col);
 
         /// @brief resize the matrix
         /// @param rows number of rows

@@ -1,10 +1,14 @@
 #include "matrix.hpp"
 #include "matrix_views.hpp"
 
+#include <chrono>
+#include <random>
+
 using namespace algebra;
 
 int main()
 {
+    /*
     std::cout << "Test for read method" << std::endl;
 
     Matrix<double, StorageOrder::RowMajor> m_r(0, 0);
@@ -84,6 +88,41 @@ int main()
         std::cout << std::endl;
     }
     std::cout << std::endl;
+    */
+    //////////////////////////////////////////////////////////////////////////////
+    std::cout << "Test for execution time with matrix lnsp_131" << std::endl;
+
+    // Import matrix
+    Matrix<double, StorageOrder::RowMajor> testMatrix(0, 0);
+    testMatrix.reader(static_cast<std::string>("lnsp_131.mtx"));
+
+    // Generate vector
+    std::vector<double> vec(testMatrix.get_rows(), 0), res(testMatrix.get_rows(), 0);
+    std::random_device seed;
+    std::default_random_engine gen(seed());
+    std::uniform_real_distribution<double> distr(-1., 1.);
+
+    using MyClock = std::chrono::high_resolution_clock;
+    using MyTimePoint = std::chrono::time_point<MyClock>;
+
+    std::cout << "Multiplication in compressed format" << std::endl;
+    testMatrix.compress();
+    MyTimePoint startC = MyClock::now();
+    res = testMatrix * vec;
+    MyTimePoint stopC = MyClock::now();
+    auto time_spanC = std::chrono::duration_cast<std::chrono::nanoseconds>(stopC - startC);
+    std::cout << "Execution time = " << time_spanC << " nanoseconds.\n" << std::endl;
+
+    std::cout << "Multiplication in uncompressed format" << std::endl;
+    testMatrix.uncompress();
+    MyTimePoint startU = MyClock::now();
+    res = testMatrix * vec;
+    MyTimePoint stopU = MyClock::now();
+    auto time_spanU = std::chrono::duration_cast<std::chrono::nanoseconds>(stopU - startU);
+    std::cout << "Execution time = " << time_spanU << " nanoseconds.\n" << std::endl;
+
+    std::cout << "Speedup in compressed format is " << static_cast<double>(time_spanC.count())/time_spanU.count() << std::endl;
+
 
     return 0;
 }

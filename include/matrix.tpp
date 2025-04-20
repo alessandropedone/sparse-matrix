@@ -6,6 +6,7 @@
 // For more verbose error messages
 #include <cstring> // for strerror
 #include <cerrno>  // for errno
+#include <cassert>
 namespace algebra
 {
     template <AddMulType T, StorageOrder S>
@@ -64,7 +65,7 @@ namespace algebra
             if constexpr (S == StorageOrder::ColumnMajor)
             {
                 // check if you have passed the column index
-                if (it.first.col > index)
+                if (it.first.col > index) //////////// to remove?
                 {
                     // until the index reaches the value of the column index
                     while (it.first.col > index)
@@ -82,7 +83,7 @@ namespace algebra
             else
             {
                 // check if you have passed the row index
-                if (it.first.row > index)
+                if (it.first.row > index) //////////// to remove?
                 {
                     // until the index reaches the value of the row index
                     while (it.first.row > index)
@@ -290,11 +291,8 @@ namespace algebra
     {
         this->rows = rows;
         this->cols = cols;
-        if (compressed)
-        {
-            std::cout << "Matrix is compressed, uncompressing..." << std::endl;
-            uncompress();
-        }
+
+        compressed = false; //default value
         uncompressed_format.clear();
         compressed_format.inner.clear();
         compressed_format.outer.clear();
@@ -432,15 +430,13 @@ namespace algebra
         }
 
         std::string line;
-        // Skip Matrix Market header and comments (first lines starting with %%)
+        // Skip Matrix Market header and comments (first lines starting with %% or %)
         while (std::getline(file, line))
         {
-            if (line.substr(0, 2) == "%%" or line.substr(0, 1) == "%")
-            {
-                continue; // Skip comment lines
+            if (line.substr(0, 2) == "%%" or line.substr(0, 1) == "%"){
+                continue;
             }
-            else
-            {
+            else{
                 break;
             }
         }
@@ -459,6 +455,7 @@ namespace algebra
             T value;
             size_t row, col;
             iss >> row >> col >> value;
+            assert(row <= rows && col <= cols);
             // I traslate the row and column indices to 0-based format and set the element
             //  in the matrix
             set(row - 1, col - 1, value);

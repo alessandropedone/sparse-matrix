@@ -3,6 +3,9 @@
 
 #include "matrix.hpp"
 
+//For more verbose error messages
+#include <cstring>  // for strerror
+#include <cerrno>   // for errno
 namespace algebra
 {
     template <AddMulType T, StorageOrder S>
@@ -345,7 +348,8 @@ namespace algebra
         std::ifstream file(filename);
         if (!file.is_open())
         {
-            throw std::runtime_error("Unable to open file: " + filename);
+            //more verbose error message
+            throw std::runtime_error("Unable to open file '" + filename + "': " + strerror(errno));
         }
 
         std::string line;

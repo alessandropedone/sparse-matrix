@@ -5,6 +5,7 @@ using namespace algebra;
 
 int main()
 {
+    /*
     Matrix<int, StorageOrder::RowMajor> m1(3, 3);
     m1.set(0, 0, 1);
     m1.set(0, 1, 2);
@@ -28,7 +29,30 @@ int main()
         std::cout << std::endl;
     }
     std::cout << std::endl;
+*/
+///////////////////////////////////////////////////////////
+std::cout << "Test for read method" << std::endl;
 
+Matrix<double, StorageOrder::RowMajor> m_r(0, 0);
+
+m_r.reader(static_cast<std::string>("read_test_5x5.mtx"));
+
+std::cout << "Matrix M" << std::endl;
+const auto &ref = m_r;
+// Getters TBD
+size_t rows = 5, cols = 5;
+for (size_t i = 0; i < rows; i++)
+{
+    for (size_t j = 0; j < cols; j++)
+    {
+        std::cout << ref(i, j) << " ";
+    }
+    std::cout << std::endl;
+}
+std::cout << std::endl;
+
+///////////////////////////////////////////////////////////
+/*
     std::cout << "One norm: " << m1.norm<NormType::One>() << std::endl;
     std::cout << "Infinity norm: " << m1.norm<NormType::Infinity>() << std::endl;
     std::cout << "Frobenius norm: " << m1.norm<NormType::Frobenius>() << std::endl;
@@ -60,5 +84,8 @@ int main()
         std::cout << std::endl;
     }
     std::cout << std::endl;
+
+*/
+
     return 0;
 }

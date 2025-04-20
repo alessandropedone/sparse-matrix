@@ -3,9 +3,9 @@
 
 #include "matrix.hpp"
 
-//For more verbose error messages
-#include <cstring>  // for strerror
-#include <cerrno>   // for errno
+// For more verbose error messages
+#include <cstring> // for strerror
+#include <cerrno>  // for errno
 namespace algebra
 {
     template <AddMulType T, StorageOrder S>
@@ -38,125 +38,190 @@ namespace algebra
     template <AddMulType T, StorageOrder S>
     void Matrix<T, S>::compress()
     {
-        if (!compressed)
+        if (compressed)
+            return;
+
+        // clear the compressed matrix
+        compressed_format.inner.clear();
+        compressed_format.outer.clear();
+        compressed_format.values.clear();
+
+        // reserve space for the compressed matrix
+        if constexpr (S == StorageOrder::ColumnMajor)
         {
-            // clear the compressed matrix
-            compressed_format.inner.clear();
-            compressed_format.outer.clear();
-            compressed_format.values.clear();
-
-            // reserve space for the compressed matrix
-            if constexpr (S == StorageOrder::ColumnMajor)
-            {
-                compressed_format.inner.resize(cols + 1);
-            }
-            else
-            {
-                compressed_format.inner.resize(rows + 1);
-            }
-            std::fill(compressed_format.inner.begin(), compressed_format.inner.end(), 0);
-
-            // fill the compressed matrix
-            size_t index = 0;
-            for (const auto &it : uncompressed_format)
-            {
-                if constexpr (S == StorageOrder::ColumnMajor)
-                {
-                    if (it.first.col > index)
-                    {
-                        while (it.first.col > index)
-                        {
-                            index++;
-                            compressed_format.inner[index] = compressed_format.outer.size();
-                        }
-                    }
-                    compressed_format.outer.push_back(it.first.row);
-                }
-                else
-                {
-                    if (it.first.row > index)
-                    {
-                        while (it.first.row > index)
-                        {
-                            index++;
-                            compressed_format.inner[index] = compressed_format.outer.size();
-                        }
-                    }
-                    compressed_format.outer.push_back(it.first.col);
-                }
-                compressed_format.values.push_back(it.second);
-            }
-            if constexpr (S == StorageOrder::ColumnMajor)
-            {
-                while (cols > index)
-                {
-                    index++;
-                    compressed_format.inner[index] = compressed_format.outer.size();
-                }
-            }
-            else
-            {
-                while (rows > index)
-                {
-                    index++;
-                    compressed_format.inner[index] = compressed_format.outer.size();
-                }
-            }
-
-            // clear the uncompressed matrix
-            uncompressed_format.clear();
-
-            // update the compressed flag
-            compressed = true;
+            compressed_format.inner.resize(cols + 1);
         }
+        else
+        {
+            compressed_format.inner.resize(rows + 1);
+        }
+        std::fill(compressed_format.inner.begin(), compressed_format.inner.end(), 0);
+
+        // fill the compressed matrix
+        size_t index = 0;
+        for (const auto &it : uncompressed_format)
+        {
+            if constexpr (S == StorageOrder::ColumnMajor)
+            {
+                // check if you have passed the column index
+                if (it.first.col > index)
+                {
+                    // until the index reaches the value of the column index
+                    while (it.first.col > index)
+                    {
+                        // increment the index
+                        index++;
+
+                        // set the inner index to the size of the outer vector
+                        compressed_format.inner[index] = compressed_format.outer.size();
+                    }
+                }
+                // add the row index to the outer vector
+                compressed_format.outer.push_back(it.first.row);
+            }
+            else
+            {
+                // check if you have passed the row index
+                if (it.first.row > index)
+                {
+                    // until the index reaches the value of the row index
+                    while (it.first.row > index)
+                    {
+                        // increment the index
+                        index++;
+
+                        // set the inner index to the size of the outer vector
+                        compressed_format.inner[index] = compressed_format.outer.size();
+                    }
+                }
+                // add the column index to the outer vector
+                compressed_format.outer.push_back(it.first.col);
+            }
+            // add the value to the values vector
+            compressed_format.values.push_back(it.second);
+        }
+        if constexpr (S == StorageOrder::ColumnMajor)
+        {
+            // check if you have passed the column index
+            while (cols > index)
+            {
+                // until the index reaches the value of the column index
+                index++;
+
+                // set the inner index to the size of the outer vector
+                compressed_format.inner[index] = compressed_format.outer.size();
+            }
+        }
+        else
+        {
+            // check if you have passed the row index
+            while (rows > index)
+            {
+                // until the index reaches the value of the row index
+                index++;
+
+                // set the inner index to the size of the outer vector
+                compressed_format.inner[index] = compressed_format.outer.size();
+            }
+        }
+
+        // clear the uncompressed matrix
+        uncompressed_format.clear();
+
+        // update the compressed flag
+        compressed = true;
     };
+
+    template <AddMulType T, StorageOrder S>
+    void Matrix<T, S>::compress_parallel()
+    {
+        if (compressed)
+            return;
+
+        // clear the compressed matrix
+        compressed_format.inner.clear();
+        compressed_format.outer.clear();
+        compressed_format.values.clear();
+
+        // reserve space for the compressed matrix
+        if constexpr (S == StorageOrder::ColumnMajor)
+        {
+            compressed_format.inner.resize(cols + 1);
+        }
+        else
+        {
+            compressed_format.inner.resize(rows + 1);
+        }
+        std::fill(std::execution::par_unseq, compressed_format.inner.begin(), compressed_format.inner.end(), 0);
+
+        // TODO
+
+        // clear the uncompressed matrix
+        uncompressed_format.clear();
+
+        // update the compressed flag
+        compressed = true;
+    }
 
     template <AddMulType T, StorageOrder S>
     void Matrix<T, S>::uncompress()
     {
-        if (compressed)
+        if (!compressed)
+            return;
+
+        // clear the uncompressed matrix
+        uncompressed_format.clear();
+
+        // fill the uncompressed matrix
+        if constexpr (S == StorageOrder::ColumnMajor)
         {
-            // clear the uncompressed matrix
-            uncompressed_format.clear();
-
-            // fill the uncompressed matrix
-            if constexpr (S == StorageOrder::ColumnMajor)
+            // iterate over columns of m
+            for (size_t col_idx = 0; col_idx < cols; col_idx++)
             {
-
-                for (size_t col_idx = 0; col_idx < cols; col_idx++)
+                // iterate over rows of m that are non-zero in the column "col" of m
+                size_t start = compressed_format.inner[col_idx];
+                size_t end = compressed_format.inner[col_idx + 1];
+                for (size_t j = start; j < end; j++)
                 {
-                    size_t start = compressed_format.inner[col_idx];
-                    size_t end = compressed_format.inner[col_idx + 1];
-                    for (size_t j = start; j < end; j++)
-                    {
-                        size_t row_idx = compressed_format.outer[j];
-                        uncompressed_format[{row_idx, col_idx}] = compressed_format.values[j];
-                    }
+                    // get the row index of the non-zero element
+                    size_t row_idx = compressed_format.outer[j];
+
+                    // add the non-zero element to the uncompressed matrix
+                    uncompressed_format[{row_idx, col_idx}] = compressed_format.values[j];
                 }
             }
-            else
-            {
-                for (size_t row_idx = 0; row_idx < rows; row_idx++)
-                {
-                    size_t start = compressed_format.inner[row_idx];
-                    size_t end = compressed_format.inner[row_idx + 1];
-                    for (size_t j = start; j < end; j++)
-                    {
-                        size_t col_idx = compressed_format.outer[j];
-                        uncompressed_format[{row_idx, col_idx}] = compressed_format.values[j];
-                    }
-                }
-            }
-
-            // clear the compressed matrix
-            compressed_format.inner.clear();
-            compressed_format.outer.clear();
-            compressed_format.values.clear();
-
-            // update the compressed flag
-            compressed = false;
         }
+        else
+        {
+            // iterate over rows of m
+            for (size_t row_idx = 0; row_idx < rows; row_idx++)
+            {
+                // iterate over columns of m that are non-zero in the row "row" of m
+                size_t start = compressed_format.inner[row_idx];
+                size_t end = compressed_format.inner[row_idx + 1];
+                for (size_t j = start; j < end; j++)
+                {
+                    size_t col_idx = compressed_format.outer[j];
+                    uncompressed_format[{row_idx, col_idx}] = compressed_format.values[j];
+                }
+            }
+        }
+
+        // clear the compressed matrix
+        compressed_format.inner.clear();
+        compressed_format.outer.clear();
+        compressed_format.values.clear();
+
+        // update the compressed flag
+        compressed = false;
     };
+
+    template <AddMulType T, StorageOrder S>
+    void Matrix<T, S>::uncompress_parallel()
+    {
+        if (!compressed)
+            return;
+    }
 
     template <AddMulType T, StorageOrder S>
     T Matrix<T, S>::operator()(size_t row, size_t col) const
@@ -240,8 +305,6 @@ namespace algebra
     template <NormType N>
     double Matrix<T, S>::norm() const
     {
-        // be careful with complex numbers
-        // smart/efficient way to calculate the norm?
         if (!compressed)
         {
             if constexpr (N == NormType::One)
@@ -352,12 +415,19 @@ namespace algebra
     };
 
     template <AddMulType T, StorageOrder S>
+    template <NormType N>
+    double Matrix<T, S>::norm_parallel() const
+    {
+        return 0.0; // TODO
+    };
+
+    template <AddMulType T, StorageOrder S>
     void Matrix<T, S>::reader(const std::string &filename)
     {
         std::ifstream file(filename);
         if (!file.is_open())
         {
-            //more verbose error message
+            // more verbose error message
             throw std::runtime_error("Unable to open file '" + filename + "': " + strerror(errno));
         }
 

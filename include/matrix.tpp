@@ -363,7 +363,7 @@ namespace algebra
         this->rows = rows;
         this->cols = cols;
 
-        compressed = false; //default value
+        compressed = false; // default value
         uncompressed_format.clear();
         compressed_format.inner.clear();
         compressed_format.outer.clear();
@@ -504,10 +504,12 @@ namespace algebra
         // Skip Matrix Market header and comments (first lines starting with %% or %)
         while (std::getline(file, line))
         {
-            if (line.substr(0, 2) == "%%" or line.substr(0, 1) == "%"){
+            if (line.substr(0, 2) == "%%" or line.substr(0, 1) == "%")
+            {
                 continue;
             }
-            else{
+            else
+            {
                 break;
             }
         }
@@ -556,11 +558,16 @@ namespace algebra
         {
             if constexpr (S == StorageOrder::ColumnMajor)
             {
+                size_t start;
+                size_t end = m.compressed_format.inner[0];
                 // iterate over columns of m
-                for (size_t col = 0; col < m.col; col++)
+                for (size_t col = 0; col < m.cols; col++)
                 {
+                    start = end;
+                    end = m.compressed_format.inner[col + 1];
+                    
                     // iterate over rows of m that are non-zero in the column "col" of m
-                    for (size_t j = m.compressed_format.inner[col]; j < m.compressed_format.inner[col + 1]; j++)
+                    for (size_t j = start; j < end; j++)
                     {
                         // row = row of m that we are currently processing
                         size_t row = m.compressed_format.outer[j];
@@ -572,11 +579,15 @@ namespace algebra
             }
             else
             {
+                size_t start;
+                size_t end = m.compressed_format.inner[0];
                 // iterate over rows of m
                 for (size_t row = 0; row < m.rows; row++)
                 {
+                    start = end;
+                    end = m.compressed_format.inner[row + 1];
                     // iterate over columns of m that are non-zero in the row "row" of m
-                    for (size_t j = m.compressed_format.inner[row]; j < m.compressed_format.inner[row + 1]; j++)
+                    for (size_t j = start; j < end; j++)
                     {
                         // col = column of m that we are currently processing
                         size_t col = m.compressed_format.outer[j];

@@ -1,6 +1,8 @@
 #ifndef MATRIX_TPP
 #define MATRIX_TPP
 
+#include "matrix.hpp"
+
 namespace algebra
 {
     template <AddMulType T, StorageOrder S>

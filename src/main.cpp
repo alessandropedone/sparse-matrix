@@ -18,7 +18,7 @@ int main()
 
     // Import matrix
     Matrix<double, StorageOrder::RowMajor> m(0, 0);
-    m.reader(static_cast<std::string>("read_test_5x5.mtx"));
+    m.reader(static_cast<std::string>("data/read_test_5x5.mtx"));
 
     // Print the matrix
     std::cout << "Matrix M" << std::endl;
@@ -84,7 +84,7 @@ int main()
     std::cout << std::endl;
 
     Matrix<double, StorageOrder::RowMajor> testMatrix(0, 0);
-    json data = read_json(static_cast<std::string>("data.json"));
+    json data = read_json(static_cast<std::string>("data/data.json"));
     const std::vector<std::string> matrix_names = data["matrix_name"];
     for (const auto &matrix_name : matrix_names)
     {
@@ -92,7 +92,7 @@ int main()
         std::cout << std::endl;
         std::cout << "Test for execution time with matrix " << matrix_name << std::endl;
         // Import matrix
-        testMatrix.reader(matrix_name);
+        testMatrix.reader(static_cast<std::string>("data/" + matrix_name));
 
         // Generate vector
         std::vector<double> vec(testMatrix.get_cols(), 0);
@@ -106,7 +106,7 @@ int main()
         }
 
         MyTimePoint start, stop;
-        std::string filename = "execution_time.json";
+        std::string filename = "data/execution_time.json";
         json time_info = read_json(filename);
 
         // matrix - vector product in compressed format

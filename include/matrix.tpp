@@ -2,11 +2,18 @@
 #define MATRIX_TPP
 
 #include "matrix.hpp"
+#include "json_utility.hpp"
+
+using namespace json_utility;
 
 // For more verbose error messages
 #include <cstring> // for strerror
 #include <cerrno>  // for errno
 #include <cassert>
+#include <chrono>
+#include <GetPot>
+#include <type_traits> // for static_cast
+
 namespace algebra
 {
     template <AddMulType T, StorageOrder S>
@@ -64,36 +71,28 @@ namespace algebra
         {
             if constexpr (S == StorageOrder::ColumnMajor)
             {
-                // check if you have passed the column index
-                if (it.first.col > index) //////////// to remove?
+                // until the index reaches the value of the column index
+                while (it.first.col > index)
                 {
-                    // until the index reaches the value of the column index
-                    while (it.first.col > index)
-                    {
-                        // increment the index
-                        index++;
+                    // increment the index
+                    index++;
 
-                        // set the inner index to the size of the outer vector
-                        compressed_format.inner[index] = compressed_format.outer.size();
-                    }
+                    // set the inner index to the size of the outer vector
+                    compressed_format.inner[index] = compressed_format.outer.size();
                 }
                 // add the row index to the outer vector
                 compressed_format.outer.push_back(it.first.row);
             }
             else
             {
-                // check if you have passed the row index
-                if (it.first.row > index) //////////// to remove?
+                // until the index reaches the value of the row index
+                while (it.first.row > index)
                 {
-                    // until the index reaches the value of the row index
-                    while (it.first.row > index)
-                    {
-                        // increment the index
-                        index++;
+                    // increment the index
+                    index++;
 
-                        // set the inner index to the size of the outer vector
-                        compressed_format.inner[index] = compressed_format.outer.size();
-                    }
+                    // set the inner index to the size of the outer vector
+                    compressed_format.inner[index] = compressed_format.outer.size();
                 }
                 // add the column index to the outer vector
                 compressed_format.outer.push_back(it.first.col);
@@ -537,6 +536,9 @@ namespace algebra
         file.close();
     };
 
+    using MyClock = std::chrono::high_resolution_clock;
+    using MyTimePoint = std::chrono::time_point<MyClock>;
+
     /// @brief multiply a matrix with a vector
     /// @tparam T type of the matrix elements
     /// @tparam S storage order of the matrix (RowMajor or ColumnMajor)
@@ -546,16 +548,26 @@ namespace algebra
     template <AddMulType T, StorageOrder S>
     std::vector<T> operator*(const Matrix<T, S> &m, const std::vector<T> &v)
     {
+        std::string filename = "execution_time.json";
+        json data = read_json(filename);  
+        GetPot file("execution_time.txt");
         std::vector<T> result(m.rows, 0);
         if (!m.is_compressed())
         {
+            MyTimePoint start = MyClock::now();
             for (const auto &it : m.uncompressed_format)
             {
                 result[it.first.row] += it.second * v[it.first.col];
             }
+            MyTimePoint stop = MyClock::now();
+            auto time_span = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
+            // Write the execution time to a file using json
+            data["uncompressed_format_product"] = static_cast<int>(time_span.count());
+            save_json(filename, data);
         }
         else
         {
+            MyTimePoint start = MyClock::now();
             if constexpr (S == StorageOrder::ColumnMajor)
             {
                 size_t start;
@@ -565,7 +577,7 @@ namespace algebra
                 {
                     start = end;
                     end = m.compressed_format.inner[col + 1];
-                    
+
                     // iterate over rows of m that are non-zero in the column "col" of m
                     for (size_t j = start; j < end; j++)
                     {
@@ -597,6 +609,11 @@ namespace algebra
                     }
                 }
             }
+            MyTimePoint stop = MyClock::now();
+            auto time_span = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
+            // Write the execution time to a file using json
+            data["compressed_format_product"] = static_cast<int>(time_span.count());
+            save_json(filename, data);
         }
         return result;
     }

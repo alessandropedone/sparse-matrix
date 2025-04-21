@@ -1,10 +1,14 @@
 #include "matrix.hpp"
 #include "matrix_views.hpp"
 
-#include <chrono>
 #include <random>
+#include <GetPot>
+#include <iostream>
+
+#include "json_utility.hpp"
 
 using namespace algebra;
+using namespace json_utility;
 
 int main()
 {
@@ -104,27 +108,29 @@ int main()
         val = distr(gen);
     }
 
-    using MyClock = std::chrono::high_resolution_clock;
-    using MyTimePoint = std::chrono::time_point<MyClock>;
-
-    std::cout << "Multiplication in compressed format" << std::endl;
     testMatrix.compress();
-    MyTimePoint startC = MyClock::now();
     res = testMatrix * vec;
-    MyTimePoint stopC = MyClock::now();
-    auto time_spanC = std::chrono::duration_cast<std::chrono::nanoseconds>(stopC - startC);
-    std::cout << "Execution time = " << time_spanC << " nanoseconds.\n"
-              << std::endl;
 
-    std::cout << "Multiplication in uncompressed format" << std::endl;
     testMatrix.uncompress();
-    MyTimePoint startU = MyClock::now();
     res = testMatrix * vec;
-    MyTimePoint stopU = MyClock::now();
-    auto time_spanU = std::chrono::duration_cast<std::chrono::nanoseconds>(stopU - startU);
-    std::cout << "Execution time = " << time_spanU << " nanoseconds.\n"
-              << std::endl;
 
-    std::cout << "Speedup in compressed format is " << static_cast<double>(time_spanU.count()) / time_spanC.count() << std::endl;
+    std::string filename = "execution_time.json";
+    json data = read_json(filename);
+    save_json(filename, data);
+    std::cout << "Uncompressed format execution time: " << data["uncompressed_format_product"] << " nanoseconds."
+              << std::endl;
+    std::cout << "Compressed format execution time: " << data["compressed_format_product"] << " nanoseconds."
+              << std::endl;
+    // speedup
+    if (data["compressed_format_product"] == 0)
+    {
+        std::cout << "Compressed format execution time is 0, cannot calculate speedup." << std::endl;
+        return 1;
+    }
+    else
+    {
+        double speedup = static_cast<double>(data["uncompressed_format_product"]) / static_cast<double>(data["compressed_format_product"]);
+        std::cout << "Speedup: " << speedup << std::endl;
+    }
     return 0;
 }

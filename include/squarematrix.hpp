@@ -32,8 +32,16 @@ namespace algebra
                 this->compressed = false;
             };
 
+            /// @brief check if the matrix is in a compressed format
+            /// @return true if the matrix is compressed, false otherwise            bool is_compressed() const { return compressed; };
+            bool is_modified() const { return modified; };
+
+            /// @brief compress the matrix in modified format
+            void mod_compress();
+
         private:
             ModifiedCompressedStorage<T> mod_comp_format; // MSR or MSC format
+            bool modified = true; // flag to check if the matrix is in modified compressed format
         };
         
 };

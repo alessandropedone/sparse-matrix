@@ -17,7 +17,7 @@ int main()
     std::cout << "Test with 5x5 matrix" << std::endl;
 
     // Import matrix
-    Matrix<double, StorageOrder::RowMajor> m(0, 0);
+    Matrix<double, StorageOrder::ColumnMajor> m(0, 0);
     m.reader(static_cast<std::string>("data/read_test_5x5.mtx"));
 
     // Print the matrix

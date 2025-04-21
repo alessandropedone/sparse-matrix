@@ -3,12 +3,9 @@
 # Sparse matrix 
 
 Test:
-- reader() for matrix market format
-- with a given matrix
-- time with Chrono.hpp
+- rowmajor + colmajor
 
 Parallelization with std algorithms 
-(or blas library: ask other teams and check pacs-examples)
 
 Modified compressed techniques (MSR, MSC)
 - SquareMatrix: derived from Matrix, it has modified compressed formats too
@@ -17,5 +14,5 @@ Modified compressed techniques (MSR, MSC)
   
 README.md (need of TBB, we didn't implement COO since COOmap is clearly more efficient)
 
-Useful:
-- Add print methods
+Extra
+-blas library: ask other teams and check pacs-examples

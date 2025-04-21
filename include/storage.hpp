@@ -34,6 +34,20 @@ namespace algebra
         std::vector<T> values;     // Non-zero values
     };
 
+    /// @brief matrix storage in modified compressed format
+    /// @tparam T type of the matrix elements
+    template <AddMulType T>
+    struct ModifiedCompressedStorage
+    {
+        std::vector<size_t> values;
+        // from 0 to n-1-> diagonal elements
+        // from n to nnz -> off-diagonal elements in row or column major order
+
+        std::vector<size_t> bind;
+        // from 0 to n-1 -> row or column pointer (cumulative sum of nnz off the diag up to that row/col)
+        // from n+1 to nnz -> column or row index of the off-diagonal elements
+    };
+
     /// @brief alias for the index of the matrix
     struct Index {
         size_t row;

@@ -2,17 +2,12 @@
 #define MATRIX_TPP
 
 #include "matrix.hpp"
-#include "json_utility.hpp"
 
-using namespace json_utility;
 
 // For more verbose error messages
 #include <cstring> // for strerror
 #include <cerrno>  // for errno
 #include <cassert>
-#include <chrono>
-#include <GetPot>
-#include <type_traits> // for static_cast
 
 namespace algebra
 {
@@ -536,9 +531,6 @@ namespace algebra
         file.close();
     };
 
-    using MyClock = std::chrono::high_resolution_clock;
-    using MyTimePoint = std::chrono::time_point<MyClock>;
-
     /// @brief multiply a matrix with a vector
     /// @tparam T type of the matrix elements
     /// @tparam S storage order of the matrix (RowMajor or ColumnMajor)
@@ -548,26 +540,16 @@ namespace algebra
     template <AddMulType T, StorageOrder S>
     std::vector<T> operator*(const Matrix<T, S> &m, const std::vector<T> &v)
     {
-        std::string filename = "execution_time.json";
-        json data = read_json(filename);  
-        GetPot file("execution_time.txt");
         std::vector<T> result(m.rows, 0);
         if (!m.is_compressed())
         {
-            MyTimePoint start = MyClock::now();
             for (const auto &it : m.uncompressed_format)
             {
                 result[it.first.row] += it.second * v[it.first.col];
             }
-            MyTimePoint stop = MyClock::now();
-            auto time_span = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
-            // Write the execution time to a file using json
-            data["uncompressed_format_product"] = static_cast<int>(time_span.count());
-            save_json(filename, data);
         }
         else
         {
-            MyTimePoint start = MyClock::now();
             if constexpr (S == StorageOrder::ColumnMajor)
             {
                 size_t start;
@@ -609,11 +591,6 @@ namespace algebra
                     }
                 }
             }
-            MyTimePoint stop = MyClock::now();
-            auto time_span = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
-            // Write the execution time to a file using json
-            data["compressed_format_product"] = static_cast<int>(time_span.count());
-            save_json(filename, data);
         }
         return result;
     }

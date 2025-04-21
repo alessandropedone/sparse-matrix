@@ -1,4 +1,8 @@
 {
-    "compressed_format_product": 10623,
-    "uncompressed_format_product": 15957
+    "compressed_format_matrix_matrix_product_mus": 310,
+    "compressed_format_matrix_vector_product_ns": 1190,
+    "compressed_format_product": 882,
+    "uncompressed_format_matrix_matrix_product_mus": 1312,
+    "uncompressed_format_matrix_vector_product_ns": 2829,
+    "uncompressed_format_product": 14247
 }

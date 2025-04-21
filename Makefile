@@ -1,6 +1,6 @@
 # Compiler flags
 CXX      ?= g++
-CXXFLAGS ?= -std=c++20 -Wall -O0 -g --coverage -pedantic
+CXXFLAGS ?= -std=c++20 -Wall -O3 # -g --coverage -pedantic
 CPPFLAGS ?= -I include  -I json/single_include # Include flags
 
 # Linker flags

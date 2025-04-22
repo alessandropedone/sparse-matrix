@@ -17,13 +17,72 @@ namespace algebra
         mod_comp_format.bind.clear();
         
         //reserve space for modified compressed structure
-        size_t nnz = this->get_nnz();
+        const size_t nnz = this->get_nnz();
         mod_comp_format.values.resize(nnz);
         mod_comp_format.bind.resize(nnz);
         std::fill(mod_comp_format.values.begin(), mod_comp_format.values.end(), 0);
+        std::fill(mod_comp_format.bind.begin(), mod_comp_format.bind.end(), 0);
+
+        //to store correctly the pointers in the bind vector (that don't account for the diagonal elements)
+        size_t off_diag_idx = 0;
 
         if(compressed){
-            
+            if constexpr (S == StorageOrder::ColumnMajor)
+            {
+                // iterate over columns of m
+                for (size_t col_idx = 0; col_idx < this->cols; col_idx++)
+                {
+                    //set col pointer
+                    ++mod_comp_format.bind[col_idx] = off_diag_idx;
+
+                    // iterate over rows of m that are non-zero in the column "col" of m
+                    size_t start = compressed_format.inner[col_idx];
+                    size_t end = compressed_format.inner[col_idx + 1];
+                    for (size_t j = start; j < end; j++)
+                    {
+                        // get the row index of the non-zero element
+                        size_t row_idx = compressed_format.outer[j];
+    
+                        // distinguish diagonal and off-diagonal elements
+                        if(row_idx == col_idx){// diagonal element
+                            mod_comp_format.values[row_idx] = compressed_format.values[j];
+                        }
+                        else{// off-diagonal element
+                            mod_comp_format.values[this->rows + off_diag_idx] = compressed_format.values[j];
+                            mod_comp_format.bind[this->rows + off_diag_idx] = row_idx;
+                            ++off_diag_idx;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // iterate over rows of m
+                for (size_t row_idx = 0; row_idx < this->rows; row_idx++)
+                {
+                    //set row pointer
+                    ++mod_comp_format.bind[row_idx] = off_diag_idx;
+                    
+                    // iterate over columns of m that are non-zero in the row "row" of m
+                    size_t start = compressed_format.inner[row_idx];
+                    size_t end = compressed_format.inner[row_idx + 1];
+                    for (size_t j = start; j < end; j++)
+                    {
+                        size_t col_idx = compressed_format.outer[j];
+
+                        // distinguish diagonal and off-diagonal elements
+                        if(row_idx == col_idx){// diagonal element
+                            mod_comp_format.values[row_idx] = compressed_format.values[j];
+                        }
+                        else{// off-diagonal element
+                            mod_comp_format.values[this->rows + off_diag_idx] = compressed_format.values[j];
+                            mod_comp_format.bind[this->rows + off_diag_idx] = col_idx;
+                            ++off_diag_idx;
+                        }
+                    }
+                }
+            }
+    
             // clear the compressed matrix
             compressed_format.inner.clear();
             compressed_format.outer.clear();
@@ -37,8 +96,8 @@ namespace algebra
 
         
         // update flags
-        compressed = false;
-        modified = true;
+        this->compressed = false;
+        this->modified = true;
     };
 
     /// @brief set an element in the matrix (dynamic construction of the matrix)

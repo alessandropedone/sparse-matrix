@@ -37,47 +37,48 @@ namespace algebra
         /// @brief constructor with size
         /// @param rows number of rows
         /// @param cols number of columns
-        Matrix(size_t rows, size_t cols)
+        Matrix(size_t rows, size_t cols) : rows(rows), cols(cols)
         {
-            this->rows = rows;
-            this->cols = cols;
             this->compressed = false;
         };
+
+        /// @brief default destructor
+        virtual ~Matrix() = default;
 
         /// @brief set an element in the matrix (dynamic construction of the matrix)
         /// @param row row index
         /// @param col column index
         /// @param value value to set
-        void set(size_t row, size_t col, const T &value);
+        virtual void set(size_t row, size_t col, const T &value);
 
         /// @brief check if the matrix is in a compressed format
         /// @return true if the matrix is compressed, false otherwise
         bool is_compressed() const { return compressed; };
 
         /// @brief compress the matrix if it is in an uncompressed format
-        void compress();
+        virtual void compress();
 
         /// @brief compress the matrix in parallel if it is in an uncompressed format
-        void compress_parallel();
+        virtual void compress_parallel();
 
         /// @brief uncompress the matrix if it is in a compressed format
-        void uncompress();
+        virtual void uncompress();
 
         /// @brief uncompress the matrix in parallel if it is in a compressed format
-        void uncompress_parallel();
+        virtual void uncompress_parallel();
 
         /// @brief call operator() const version
         /// @param row row index
         /// @param col column index
         /// @return element at (row, col)
-        T operator()(size_t row, size_t col) const;
+        virtual T operator()(size_t row, size_t col) const;
 
 
         /// @brief call operator() non-const version
         /// @param row row index
         /// @param col column index
         /// @return reference to the element at (row, col) with proxy (to avoid setting zero values)
-        Proxy<T> operator()(size_t row, size_t col);
+        virtual Proxy<T> operator()(size_t row, size_t col);
 
         /// @brief resize the matrix
         /// @param rows number of rows
@@ -110,7 +111,7 @@ namespace algebra
 
         /// @brief get the number of non-zero elements
         /// @return number of non-zero elements
-        size_t get_nnz() const
+        virtual size_t get_nnz() const
         {
             if (compressed)
             {

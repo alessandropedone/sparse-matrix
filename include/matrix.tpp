@@ -512,6 +512,7 @@ namespace algebra
         std::istringstream sizes(line);
         size_t row_read, col_read, nnz;
         sizes >> row_read >> col_read >> nnz;
+        
         // Resize the matrix
         resize_and_clear(row_read, col_read);
 

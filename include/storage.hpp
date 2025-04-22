@@ -39,13 +39,14 @@ namespace algebra
     template <AddMulType T>
     struct ModifiedCompressedStorage
     {
-        std::vector<size_t> values;
+        //let nnz = number of non-zero elements, considering the whole principal diagonal NON-zero
+        std::vector<T> values;
         // from 0 to n-1-> diagonal elements
-        // from n to nnz -> off-diagonal elements in row or column major order
+        // from n to nnz-1 -> off-diagonal elements in row or column major order
 
         std::vector<size_t> bind;
         // from 0 to n-1 -> row or column pointer (cumulative sum of nnz off the diag up to that row/col)
-        // from n+1 to nnz -> column or row index of the off-diagonal elements
+        // from n to nnz - 1 -> column or row index of the off-diagonal elements
     };
 
     /// @brief alias for the index of the matrix

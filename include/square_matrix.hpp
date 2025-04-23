@@ -34,8 +34,8 @@ namespace algebra
             /// @brief default destructor
             virtual ~SquareMatrix() override = default;
 
-            /// @brief check if the matrix is in a compressed format
-            /// @return true if the matrix is compressed, false otherwise            bool is_compressed() const { return compressed; };
+            /// @brief check if the matrix is in a modified compressed format
+            /// @return true if the matrix is (modified) compressed, false otherwise
             bool is_modified() const { return modified; };
 
             /// @brief compress the matrix in modified format
@@ -65,7 +65,6 @@ namespace algebra
             /// @return element at (row, col)
             virtual T operator()(size_t row, size_t col) const override;
 
-
             /// @brief call operator() non-const version
             /// @param row row index
             /// @param col column index
@@ -83,7 +82,7 @@ namespace algebra
             virtual size_t get_nnz() override const{
                 if (modified)
                 {
-                    return mod_comp_format.values.size(); //this doesn't account for zeros in the diagonal
+                    return compressed_format_mod.values.size(); //this doesn't account for zeros in the diagonal
                 }
                 else
                 {

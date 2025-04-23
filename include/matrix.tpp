@@ -3,7 +3,6 @@
 
 #include "matrix.hpp"
 
-
 // For more verbose error messages
 #include <cstring> // for strerror
 #include <cerrno>  // for errno
@@ -161,7 +160,7 @@ namespace algebra
 
             // count non-zeros per column using atomic operations
             std::for_each(
-                std::execution::par_unseq,
+                std::execution::par,
                 uncompressed_format.begin(), uncompressed_format.end(),
                 [&](auto const &entry)
                 {
@@ -176,7 +175,7 @@ namespace algebra
 
             // count non-zeros per row using atomic operations
             std::for_each(
-                std::execution::par_unseq,
+                std::execution::par,
                 uncompressed_format.begin(), uncompressed_format.end(),
                 [&](auto const &entry)
                 {
@@ -221,9 +220,7 @@ namespace algebra
             });
 
         // clear the compressed matrix
-        compressed_format.inner.clear();
-        compressed_format.outer.clear();
-        compressed_format.values.clear();
+        uncompressed_format.clear();
 
         // update the compressed flag
         compressed = true;
@@ -512,7 +509,7 @@ namespace algebra
         std::istringstream sizes(line);
         size_t row_read, col_read, nnz;
         sizes >> row_read >> col_read >> nnz;
-        
+
         // Resize the matrix
         resize_and_clear(row_read, col_read);
 

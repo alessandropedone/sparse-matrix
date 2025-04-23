@@ -11,6 +11,9 @@ using namespace json_utility;
 using MyClock = std::chrono::high_resolution_clock;
 using MyTimePoint = std::chrono::time_point<MyClock>;
 
+template <StorageOrder storage_order>
+void test_storage_order(const std::vector<std::string> &matrix_names);
+
 int main()
 {
 
@@ -84,21 +87,58 @@ int main()
     }
     std::cout << std::endl;
 
-    Matrix<double, StorageOrder::RowMajor> testMatrix(0, 0);
     json data = read_json(static_cast<std::string>("data/data.json"));
     const std::vector<std::string> matrix_names = data["matrix_name"];
+
+    const std::array<StorageOrder, 2> storage_orders = {StorageOrder::RowMajor, StorageOrder::ColumnMajor};
+    for (const auto &storage_order : storage_orders)
+    {
+        if (storage_order == StorageOrder::RowMajor)
+        {
+            std::cout << "---------------------------------" << std::endl;
+            std::cout << "Test with storage order: RowMajor" << std::endl;
+            std::cout << "---------------------------------" << std::endl;
+            test_storage_order<StorageOrder::RowMajor>(matrix_names);
+        }
+        else
+        {
+            std::cout << "------------------------------------" << std::endl;
+            std::cout << "Test with storage order: ColumnMajor" << std::endl;
+            std::cout << "------------------------------------" << std::endl;
+            test_storage_order<StorageOrder::ColumnMajor>(matrix_names);
+        }
+        
+    }
+    return 0;
+}
+
+// test function with storage order
+template <StorageOrder storage_order>
+void test_storage_order(const std::vector<std::string> &matrix_names)
+{
+
     for (const auto &matrix_name : matrix_names)
     {
 
         std::cout << std::endl;
         std::cout << "Test for execution time with matrix " << matrix_name << std::endl;
+        Matrix<double, storage_order> testMatrix(0, 0);
+        std::vector<double> v(testMatrix.get_cols(), 0);
+        std::random_device seed;
+        std::default_random_engine gen(seed());
+        std::uniform_real_distribution<double> distr(-1., 1.);
+        for (auto &val : v)
+        {
+            val = distr(gen);
+        }
+
         // Import matrix
         testMatrix.reader(static_cast<std::string>("data/" + matrix_name));
 
         // Generate vector
         std::vector<double> vec(testMatrix.get_cols(), 0);
-        Matrix<double, StorageOrder::RowMajor> res1(testMatrix.get_rows(), testMatrix.get_cols());
-        Matrix<double, StorageOrder::RowMajor> res2(testMatrix.get_rows(), testMatrix.get_cols());
+        Matrix<double, storage_order> res1(testMatrix.get_rows(), testMatrix.get_cols());
+        Matrix<double, storage_order> res2(testMatrix.get_rows(), testMatrix.get_cols());
         std::vector<double> res3(testMatrix.get_rows(), 0);
         std::vector<double> res4(testMatrix.get_rows(), 0);
         for (auto &val : vec)
@@ -149,8 +189,8 @@ int main()
         int compressed_matrix_vector_time = time_info[matrix_name + " (compressed_format_matrix_vector_product_ns)"];
         int uncompressed_matrix_vector_time = time_info[matrix_name + " (uncompressed_format_matrix_vector_product_ns)"];
 
-        std::cout << "Compressed format matrix-vector product time: " << compressed_matrix_vector_time<< " ns" << std::endl;
-        std::cout << "Uncompressed format matrix-vector product time: " << uncompressed_matrix_vector_time << " ns"<< std::endl;
+        std::cout << "Compressed format matrix-vector product time: " << compressed_matrix_vector_time << " ns" << std::endl;
+        std::cout << "Uncompressed format matrix-vector product time: " << uncompressed_matrix_vector_time << " ns" << std::endl;
         std::cout << "Matrix-vector product speedup: "
                   << static_cast<double>(uncompressed_matrix_vector_time) / compressed_matrix_vector_time << std::endl;
 
@@ -183,5 +223,4 @@ int main()
 
         std::cout << std::endl;
     }
-    return 0;
 }

@@ -1,5 +1,5 @@
-#ifndef SQUAREMATRIX_HPP
-#define SQUAREMATRIX_HPP
+#ifndef SQUARE_MATRIX_HPP
+#define SQUARE_MATRIX_HPP
 
 #include "storage.hpp"
 #include "matrix.hpp"
@@ -39,7 +39,7 @@ namespace algebra
             bool is_modified() const { return modified; };
 
             /// @brief compress the matrix in modified format
-            void mod_compress();
+            void compress_mod();
 
             /// @brief set an element in the matrix (dynamic construction of the matrix)
             /// @param row row index
@@ -95,11 +95,11 @@ namespace algebra
             bool modified = false; // flag to check if the matrix is in modified compressed format
 
             // storage for the matrix
-            ModifiedCompressedStorage<T> mod_comp_format; // MSR or MSC format
+            ModifiedCompressedStorage<T> compressed_format_mod; // MSR or MSC format
         };
         
 };
 
-#include "squarematrix.tpp"
+#include "square_matrix.tpp"
 
-#endif // SQUAREMATRIX_HPP
+#endif // SQUARE_MATRIX_HPP

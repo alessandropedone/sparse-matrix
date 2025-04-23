@@ -45,7 +45,7 @@ namespace algebra
         // from n to nnz-1 -> off-diagonal elements in row or column major order
 
         std::vector<size_t> bind;
-        // from 0 to n-1 -> row or column pointer (cumulative sum of nnz that are off the diagonal up to that row/col)
+        // from 0 to n-1 -> row or column pointer (cumulative sum of nnz that are OFF the diagonal up to that row/col)
         // from n to nnz - 1 -> column or row index of the off-diagonal elements
     };
 

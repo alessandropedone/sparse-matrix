@@ -70,7 +70,7 @@ namespace algebra
             /// @param row row index
             /// @param col column index
             /// @return reference to the element at (row, col) with proxy (to avoid setting zero values)
-            virtual Proxy<T> operator()(size_t row, size_t col) override;
+          //  virtual Proxy<T> operator()(size_t row, size_t col) override;
 
             /// @brief resize the matrix
             /// @param rows number of rows

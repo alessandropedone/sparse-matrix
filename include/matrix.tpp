@@ -338,7 +338,7 @@ namespace algebra
     };
 
     template <AddMulType T, StorageOrder S>
-    Proxy<T> Matrix<T, S>::operator()(size_t row, size_t col)
+    Proxy<T, S> Matrix<T, S>::operator()(size_t row, size_t col)
     {
         if (row >= rows || col >= cols)
             throw std::out_of_range("Index out of range");
@@ -348,7 +348,7 @@ namespace algebra
             std::cout << "Matrix is compressed, uncompressing...\n";
             uncompress();
         }
-        return Proxy<T>{uncompressed_format, row, col};
+        return Proxy<T, S>{uncompressed_format, row, col};
     }
 
     template <AddMulType T, StorageOrder S>

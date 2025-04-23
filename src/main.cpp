@@ -14,11 +14,17 @@ using MyTimePoint = std::chrono::time_point<MyClock>;
 template <StorageOrder storage_order>
 void test_storage_order(const std::vector<std::string> &matrix_names);
 
+template <StorageOrder storage_order>
+void test_square_matrix(const std::vector<std::string> &matrix_name);
+
+template <typename T, StorageOrder S>
+void print_matrix(const Matrix<T, S> &m);
+
 int main()
 {
 
     std::cout << "Test with 5x5 matrix" << std::endl;
-
+    /*
     // Import matrix
     Matrix<double, StorageOrder::ColumnMajor> m(0, 0);
     m.reader(static_cast<std::string>("data/read_test_5x5.mtx"));
@@ -108,7 +114,12 @@ int main()
             test_storage_order<StorageOrder::ColumnMajor>(matrix_names);
         }
         
-    }
+    }*/
+
+    test_square_matrix<StorageOrder::RowMajor>({"data/read_test_5x5.mtx"});
+
+    test_square_matrix<StorageOrder::ColumnMajor>({"data/read_test_5x5.mtx"});
+
     return 0;
 }
 
@@ -222,5 +233,45 @@ void test_storage_order(const std::vector<std::string> &matrix_names)
         std::cout << "Time for compress parallel (μs): " << time_span.count() << std::endl;
 
         std::cout << std::endl;
+    };
+
+}
+
+template <StorageOrder storage_order>
+void test_square_matrix(const std::vector<std::string> &matrix_name){
+    // Read matrix
+    SquareMatrix<double, storage_order> m(0);
+    m.reader(static_cast<std::string>(matrix_name));
+    print_matrix(m);
+
+    // See all the data structures
+    m.compress_mod();
+    std::cout << "From uncompressed to modified compressed format\n" << std::endl;
+    print_matrix(m);
+
+    m.compress();
+    std::cout << "From modified compressed to compressed format" << std::endl;
+    print_matrix(m);
+
+    m.uncompress();
+    std::cout << "From compressed to uncompressed format" << std::endl;
+    print_matrix(m);
+
+    m.compress_mod();
+    std::cout << "From uncompressed to modified compressed format" << std::endl;
+    print_matrix(m);
+}
+
+
+template <typename T, StorageOrder S>
+void print_matrix(const Matrix<T, S> &m){
+    for (size_t i = 0; i < m.get_rows(); i++)
+    {
+        for (size_t j = 0; j < m.get_rows(); j++)
+        {
+            std::cout << std::setw(5) << m(i, j) << " ";
+        }
+        std::cout << std::endl;
     }
+    std::cout << std::endl;
 }

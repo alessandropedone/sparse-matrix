@@ -254,8 +254,6 @@ namespace algebra
     /// @brief uncompress the matrix if it is in a compressed format
     template <AddMulType T, StorageOrder S>
     void SquareMatrix<T, S>::uncompress(){
-        if(!compressed)
-            return;
         if(modified){
             // clear the uncompressed format
             this->uncompressed_format.clear();

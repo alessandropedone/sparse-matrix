@@ -177,8 +177,8 @@ namespace algebra
                     bool flag = 0; // flag to check if the diagonal element has been inserted
                     size_t start = mod_comp_format.bind[i];
                     size_t end = mod_comp_format.bind[i + 1];
-                    // handle last row
-                    if (i+1) == this->rows){
+                    // handle last column
+                    if (i+1 == this->rows){
                         end = mod_comp_format.values.size() - 1;
                     }
                     for(size_t j = start; j < end; ++j){
@@ -192,7 +192,7 @@ namespace algebra
                                 compressed_format.values.push_back(mod_comp_format.values[i]);
                                 compressed_format.outer.push_back(rowidx);
                                 ++index;
-                                flag = 1;
+                                flag = true;
                             }
                         compressed_format.values.push_back(mod_comp_format.values[j]);
                         compressed_format.outer.push_back(rowidx);
@@ -203,7 +203,34 @@ namespace algebra
                 }
             }
             else{
-
+                for(size_t i = 0; i < this->rows; ++i){
+                    bool flag = 0; // flag to check if the diagonal element has been inserted
+                    size_t start = mod_comp_format.bind[i];
+                    size_t end = mod_comp_format.bind[i + 1];
+                    // handle last row
+                    if (i+1 == this->rows){
+                        end = mod_comp_format.values.size() - 1;
+                    }
+                    for(size_t j = start; j < end; ++j){
+                        size_t colidx = mod_comp_format.bind[j];
+                        if(colidx < i){
+                            compressed_format_values.push_back(mod_comp_format.values[j]);
+                            compressed_format.outer.push_back(colidx);
+                        }
+                        else{
+                            if(!flag && mod_comp_format.values[i]!= 0){
+                                compressed_format.values.push_back(mod_comp_format.values[i]);
+                                compressed_format.outer.push_back(colidx);
+                                ++index;
+                                flag = true;
+                            }
+                        compressed_format.values.push_back(mod_comp_format.values[j]);
+                        compressed_format.outer.push_back(colidx);
+                        }
+                    }
+                    index += end - start;
+                    compressed_format.inner[i + 1] = index;
+                }
             }
 
             // clear the modified compressed matrix
@@ -211,7 +238,7 @@ namespace algebra
             mod_comp_format.bind.clear();
 
             // update the compressed flag
-            compressed = true;
+            this->compressed = true;
             return;
         }
         Matrix<T, S>::compress();
@@ -227,7 +254,14 @@ namespace algebra
     /// @brief uncompress the matrix if it is in a compressed format
     template <AddMulType T, StorageOrder S>
     void SquareMatrix<T, S>::uncompress(){
-
+        if(!compressed)
+            return;
+        if(modified){
+            
+            return;
+        }
+        Matrix<T, S>::uncompress();
+        return;
     };
 
     /// @brief uncompress the matrix in parallel if it is in a compressed format

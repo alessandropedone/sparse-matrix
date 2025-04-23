@@ -26,7 +26,7 @@ namespace algebra
 
             /// @brief constructor with size
             /// @param size number of rows and columns
-            SquareMatrix(int size) : Matrix<T, S>(size, size) : rows(size), cols(size) {
+            SquareMatrix(int size) : Matrix<T, S>(size, size){
                 this->compressed = false;
                 this->modified = false;
             };
@@ -79,7 +79,7 @@ namespace algebra
 
             /// @brief get the number of non-zero elements
             /// @return number of non-zero elements
-            virtual size_t get_nnz() override const{
+            virtual size_t get_nnz() const override {
                 if (modified)
                 {
                     return compressed_format_mod.values.size(); //this doesn't account for zeros in the diagonal

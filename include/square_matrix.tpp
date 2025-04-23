@@ -26,7 +26,7 @@ namespace algebra
         //to store correctly the pointers in the bind vector (that don't account for the diagonal elements)
         size_t off_diag_idx = 0;
 
-        if(compressed){
+        if(this->compressed){
             if constexpr (S == StorageOrder::ColumnMajor)
             {
                 // iterate over columns of m
@@ -36,19 +36,19 @@ namespace algebra
                     compressed_format_mod.bind[col_idx] = off_diag_idx + this->rows;
 
                     // iterate over rows of m that are non-zero in the column "col" of m
-                    size_t start = compressed_format.inner[col_idx];
-                    size_t end = compressed_format.inner[col_idx + 1];
+                    size_t start = this->compressed_format.inner[col_idx];
+                    size_t end = this->compressed_format.inner[col_idx + 1];
                     for (size_t j = start; j < end; j++)
                     {
                         // get the row index of the non-zero element
-                        size_t row_idx = compressed_format.outer[j];
+                        size_t row_idx = this->compressed_format.outer[j];
     
                         // distinguish diagonal and off-diagonal elements
                         if(row_idx == col_idx){// diagonal element
-                            compressed_format_mod.values[row_idx] = compressed_format.values[j];
+                            compressed_format_mod.values[row_idx] = this->compressed_format.values[j];
                         }
                         else{// off-diagonal element
-                            compressed_format_mod.values[this->rows + off_diag_idx] = compressed_format.values[j];
+                            compressed_format_mod.values[this->rows + off_diag_idx] = this->compressed_format.values[j];
                             compressed_format_mod.bind[this->rows + off_diag_idx] = row_idx;
                             ++off_diag_idx;
                         }
@@ -64,19 +64,19 @@ namespace algebra
                     compressed_format_mod.bind[row_idx] = off_diag_idx + this->rows;
                     
                     // iterate over columns of m that are non-zero in the row "row" of m
-                    size_t start = compressed_format.inner[row_idx];
-                    size_t end = compressed_format.inner[row_idx + 1];
+                    size_t start = this->compressed_format.inner[row_idx];
+                    size_t end = this->compressed_format.inner[row_idx + 1];
                     for (size_t j = start; j < end; j++)
                     {
                         // get the col index of the non-zero element
-                        size_t col_idx = compressed_format.outer[j];
+                        size_t col_idx = this->compressed_format.outer[j];
 
                         // distinguish diagonal and off-diagonal elements
                         if(row_idx == col_idx){// diagonal element
-                            compressed_format_mod.values[row_idx] = compressed_format.values[j];
+                            compressed_format_mod.values[row_idx] = this->compressed_format.values[j];
                         }
                         else{// off-diagonal element
-                            compressed_format_mod.values[this->rows + off_diag_idx] = compressed_format.values[j];
+                            compressed_format_mod.values[this->rows + off_diag_idx] = this->compressed_format.values[j];
                             compressed_format_mod.bind[this->rows + off_diag_idx] = col_idx;
                             ++off_diag_idx;
                         }
@@ -85,9 +85,9 @@ namespace algebra
             }
     
             // clear the compressed matrix
-            compressed_format.inner.clear();
-            compressed_format.outer.clear();
-            compressed_format.values.clear();
+            this->compressed_format.inner.clear();
+            this->compressed_format.outer.clear();
+            this->compressed_format.values.clear();
         }
         else{
             for (const auto &it : this->uncompressed_format)
@@ -125,7 +125,7 @@ namespace algebra
                         ++off_diag_idx; }
                 }
             // clear the uncompressed matrix
-            uncompressed_format.clear();
+            this->uncompressed_format.clear();
             }
         }
         
@@ -153,7 +153,7 @@ namespace algebra
     /// @brief compress the matrix if it is in an uncompressed format
     template <AddMulType T, StorageOrder S>
     void SquareMatrix<T, S>::compress(){
-        if(compressed)
+        if(this->compressed)
             return;
         if(modified){
             //clear the compressed matrix
@@ -163,12 +163,12 @@ namespace algebra
 
             // reserve space for the compressed matrix
             if constexpr (S == StorageOrder::ColumnMajor){
-                compressed_format.inner.resize(cols + 1);
+                this->compressed_format.inner.resize(this->cols + 1);
             }
             else{
-                compressed_format.inner.resize(rows + 1);
+                this->compressed_format.inner.resize(this->rows + 1);
             }
-            std::fill(compressed_format.inner.begin(), compressed_format.inner.end(), 0);
+            std::fill(this->compressed_format.inner.begin(), this->compressed_format.inner.end(), 0);
             
             // fill the compressed matrix
             size_t index = 0; //keeps track of nnz elements
@@ -184,22 +184,22 @@ namespace algebra
                     for(size_t j = start; j < end; ++j){
                         size_t rowidx = compressed_format_mod.bind[j];
                         if(rowidx < i){
-                            compressed_format_values.push_back(compressed_format_mod.values[j]);
-                            compressed_format.outer.push_back(rowidx);
+                            this->compressed_format.values.push_back(compressed_format_mod.values[j]);
+                            this->compressed_format.outer.push_back(rowidx);
                         }
                         else{
                             if(!flag && compressed_format_mod.values[i]!= 0){
-                                compressed_format.values.push_back(compressed_format_mod.values[i]);
-                                compressed_format.outer.push_back(rowidx);
+                                this->compressed_format.values.push_back(compressed_format_mod.values[i]);
+                                this->compressed_format.outer.push_back(rowidx);
                                 ++index;
                                 flag = true;
                             }
-                        compressed_format.values.push_back(compressed_format_mod.values[j]);
-                        compressed_format.outer.push_back(rowidx);
+                            this->compressed_format.values.push_back(compressed_format_mod.values[j]);
+                            this->compressed_format.outer.push_back(rowidx);
                         }
                     }
                     index += end - start;
-                    compressed_format.inner[i + 1] = index;
+                    this->compressed_format.inner[i + 1] = index;
                 }
             }
             else{
@@ -214,22 +214,22 @@ namespace algebra
                     for(size_t j = start; j < end; ++j){
                         size_t colidx = compressed_format_mod.bind[j];
                         if(colidx < i){
-                            compressed_format_values.push_back(compressed_format_mod.values[j]);
-                            compressed_format.outer.push_back(colidx);
+                            this->compressed_format.values.push_back(compressed_format_mod.values[j]);
+                            this->compressed_format.outer.push_back(colidx);
                         }
                         else{
                             if(!flag && compressed_format_mod.values[i]!= 0){
-                                compressed_format.values.push_back(compressed_format_mod.values[i]);
-                                compressed_format.outer.push_back(colidx);
+                                this->compressed_format.values.push_back(compressed_format_mod.values[i]);
+                                this->compressed_format.outer.push_back(colidx);
                                 ++index;
                                 flag = true;
                             }
-                        compressed_format.values.push_back(compressed_format_mod.values[j]);
-                        compressed_format.outer.push_back(colidx);
+                            this->compressed_format.values.push_back(compressed_format_mod.values[j]);
+                            this->compressed_format.outer.push_back(colidx);
                         }
                     }
                     index += end - start;
-                    compressed_format.inner[i + 1] = index;
+                    this->compressed_format.inner[i + 1] = index;
                 }
             }
 
@@ -331,7 +331,7 @@ namespace algebra
         this->rows = dim;
         this->cols = dim;
         this->compressed = false;
-        this->modified = false
+        this->modified = false;
         this->uncompressed_format.clear();
         this->compressed_format.inner.clear();
         this->compressed_format.outer.clear();

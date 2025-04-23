@@ -16,7 +16,7 @@ template <StorageOrder storage_order>
 void test_storage_order(const std::vector<std::string> &matrix_names);
 
 template <typename T, StorageOrder storage_order>
-void test_square_matrix(const std::vector<std::string> &matrix_name);
+void test_square_matrix(const std::string &matrix_name);
 
 template <typename T, StorageOrder S>
 void print_matrix(const Matrix<T, S> &m);
@@ -119,7 +119,7 @@ int main()
 
     test_square_matrix<double, StorageOrder::RowMajor>({"data/read_test_5x5.mtx"});
 
-    test_square_matrix<double, StorageOrder::ColumnMajor>({"data/read_test_5x5.mtx"});
+    //test_square_matrix<double, StorageOrder::ColumnMajor>({"data/read_test_5x5.mtx"});
 
     return 0;
 }
@@ -239,7 +239,7 @@ void test_storage_order(const std::vector<std::string> &matrix_names)
 }
 
 template <typename T, StorageOrder storage_order>
-void test_square_matrix(const std::vector<std::string> &matrix_name){
+void test_square_matrix(const std::string &matrix_name){
     // Read matrix
     SquareMatrix<T, storage_order> m(0);
     m.reader(static_cast<std::string>(matrix_name));

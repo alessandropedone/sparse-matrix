@@ -20,6 +20,7 @@ int main()
     Matrix<double, StorageOrder::ColumnMajor> m(0, 0);
     m.reader(static_cast<std::string>("data/read_test_5x5.mtx"));
 
+    m.compress_parallel();
     // Print the matrix
     std::cout << "Matrix M" << std::endl;
     const auto &ref = m;
@@ -116,13 +117,13 @@ int main()
         res1 = testMatrix * testMatrix;
         stop = MyClock::now();
         auto time_span_mu = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-        time_info["compressed_format_matrix_matrix_product_mus"] = time_span_mu.count();
+        time_info[matrix_name + " (compressed_format_matrix_matrix_product_mus)"] = time_span_mu.count();
 
         start = MyClock::now();
         res3 = testMatrix * vec;
         stop = MyClock::now();
         auto time_span_n = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
-        time_info["compressed_format_matrix_vector_product_ns"] = time_span_n.count();
+        time_info[matrix_name + " (compressed_format_matrix_vector_product_ns)"] = time_span_n.count();
 
         // matrix - vector product in uncompressed format
         testMatrix.uncompress();
@@ -131,35 +132,54 @@ int main()
         res2 = testMatrix * testMatrix;
         stop = MyClock::now();
         time_span_mu = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-        time_info["uncompressed_format_matrix_matrix_product_mus"] = time_span_mu.count();
+        time_info[matrix_name + " (uncompressed_format_matrix_matrix_product_mus)"] = time_span_mu.count();
 
         start = MyClock::now();
         res4 = testMatrix * vec;
         stop = MyClock::now();
         time_span_n = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
-        time_info["uncompressed_format_matrix_vector_product_ns"] = time_span_n.count();
+        time_info[matrix_name + " (uncompressed_format_matrix_vector_product_ns)"] = time_span_n.count();
 
         // save json
         save_json(filename, time_info);
 
         // Print execution times and speedups
-        std::cout << "Execution times and speedups:" << std::endl;
+        std::cout << std::endl;
 
-        int compressed_matrix_vector_time = time_info["compressed_format_matrix_vector_product_ns"];
-        int uncompressed_matrix_vector_time = time_info["uncompressed_format_matrix_vector_product_ns"];
+        int compressed_matrix_vector_time = time_info[matrix_name + " (compressed_format_matrix_vector_product_ns)"];
+        int uncompressed_matrix_vector_time = time_info[matrix_name + " (uncompressed_format_matrix_vector_product_ns)"];
 
-        std::cout << "Compressed format matrix-vector product time (ns): " << compressed_matrix_vector_time << std::endl;
-        std::cout << "Uncompressed format matrix-vector product time (ns): " << uncompressed_matrix_vector_time << std::endl;
+        std::cout << "Compressed format matrix-vector product time: " << compressed_matrix_vector_time<< " ns" << std::endl;
+        std::cout << "Uncompressed format matrix-vector product time: " << uncompressed_matrix_vector_time << " ns"<< std::endl;
         std::cout << "Matrix-vector product speedup: "
                   << static_cast<double>(uncompressed_matrix_vector_time) / compressed_matrix_vector_time << std::endl;
 
-        int compressed_matrix_matrix_time = time_info["compressed_format_matrix_matrix_product_mus"];
-        int uncompressed_matrix_matrix_time = time_info["uncompressed_format_matrix_matrix_product_mus"];
+        std::cout << std::endl;
 
-        std::cout << "Compressed format matrix-matrix product time (µs): " << compressed_matrix_matrix_time << std::endl;
-        std::cout << "Uncompressed format matrix-matrix product time (µs): " << uncompressed_matrix_matrix_time << std::endl;
+        int compressed_matrix_matrix_time = time_info[matrix_name + " (compressed_format_matrix_matrix_product_mus)"];
+        int uncompressed_matrix_matrix_time = time_info[matrix_name + " (uncompressed_format_matrix_matrix_product_mus)"];
+
+        std::cout << "Compressed format matrix-matrix product time: " << compressed_matrix_matrix_time << " µs" << std::endl;
+        std::cout << "Uncompressed format matrix-matrix product time: " << uncompressed_matrix_matrix_time << " µs" << std::endl;
         std::cout << "Matrix-matrix product speedup: "
                   << static_cast<double>(uncompressed_matrix_matrix_time) / compressed_matrix_matrix_time << std::endl;
+
+        std::cout << std::endl;
+
+        // compress parallel vs compress
+        testMatrix.uncompress();
+        start = MyClock::now();
+        testMatrix.compress();
+        stop = MyClock::now();
+        auto time_span = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+        std::cout << "Time for compress (μs): " << time_span.count() << std::endl;
+
+        testMatrix.uncompress();
+        start = MyClock::now();
+        testMatrix.compress_parallel();
+        stop = MyClock::now();
+        time_span = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+        std::cout << "Time for compress parallel (μs): " << time_span.count() << std::endl;
 
         std::cout << std::endl;
     }

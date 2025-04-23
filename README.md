@@ -12,7 +12,7 @@ Modified compressed techniques (MSR, MSC)
 - Matrix and SquareMatrix has a transpose views 
 - SquareMatrix has a diagonal view
   
-README.md (need of TBB, we didn't implement COO since COOmap is clearly more efficient)
+README.md (need of TBB, we didn't implement COO since COOmap is clearly more efficient, explain why parallel implementation of compress is slower)
 
 Extra
 -blas library: ask other teams and check pacs-examples

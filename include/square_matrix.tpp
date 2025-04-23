@@ -262,32 +262,32 @@ namespace algebra
             if constexpr(S == StorageOrder::ColumnMajor){
                 for (size_t col_idx = 0; col_idx < this->cols; ++col_idx){
                     // add diagonal element
-                    if (mod_comp_format.values[col_idx] != 0){
-                        this->uncompressed_format[{col_idx, col_idx}] = mod_comp_format.values[col_idx];
+                    if (compressed_format_mod.values[col_idx] != 0){
+                        this->uncompressed_format[{col_idx, col_idx}] = compressed_format_mod.values[col_idx];
                     }
-                    size_t start = mod_comp_format.bind[col_idx];
-                    size_t end = mod_comp_format.bind[col_idx + 1];
+                    size_t start = compressed_format_mod.bind[col_idx];
+                    size_t end = compressed_format_mod.bind[col_idx + 1];
                     if (col_idx + 1 == this->cols)
-                        end = mod_comp_format.values.size() - 1;
+                        end = compressed_format_mod.values.size() - 1;
                     for(size_t j = start; j < end; ++j){
-                        size_t row_idx = mod_comp_format.bind[j];
-                        this->uncompressed_format[{row_idx, col_idx}] = mod_comp_format.values[j];
+                        size_t row_idx = compressed_format_mod.bind[j];
+                        this->uncompressed_format[{row_idx, col_idx}] = compressed_format_mod.values[j];
                     }
                 }
             }
             else{
                 for (size_t row_idx = 0; row_idx < this->rows; ++row_idx){
                     // add diagonal element
-                    if (mod_comp_format.values[row_idx] != 0){
-                        this->uncompressed_format[{row_idx, row_idx}] = mod_comp_format.values[row_idx];
+                    if (compressed_format_mod.values[row_idx] != 0){
+                        this->uncompressed_format[{row_idx, row_idx}] = compressed_format_mod.values[row_idx];
                     }
-                    size_t start = mod_comp_format.bind[row_idx];
-                    size_t end = mod_comp_format.bind[row_idx + 1];
+                    size_t start = compressed_format_mod.bind[row_idx];
+                    size_t end = compressed_format_mod.bind[row_idx + 1];
                     if (row_idx + 1 == this->rows)
-                        end = mod_comp_format.values.size() - 1;
+                        end = compressed_format_mod.values.size() - 1;
                     for(size_t j = start; j < end; ++j){
-                        size_t col_idx = mod_comp_format.bind[j];
-                        this->uncompressed_format[{row_idx, col_idx}] = mod_comp_format.values[j];
+                        size_t col_idx = compressed_format_mod.bind[j];
+                        this->uncompressed_format[{row_idx, col_idx}] = compressed_format_mod.values[j];
                     }
                 }
             }

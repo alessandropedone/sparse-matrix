@@ -1,4 +1,5 @@
 #include "matrix.hpp"
+#include "square_matrix.hpp"
 #include "matrix_views.hpp"
 #include "json_utility.hpp"
 
@@ -14,7 +15,7 @@ using MyTimePoint = std::chrono::time_point<MyClock>;
 template <StorageOrder storage_order>
 void test_storage_order(const std::vector<std::string> &matrix_names);
 
-template <StorageOrder storage_order>
+template <typename T, StorageOrder storage_order>
 void test_square_matrix(const std::vector<std::string> &matrix_name);
 
 template <typename T, StorageOrder S>
@@ -116,9 +117,9 @@ int main()
         
     }*/
 
-    test_square_matrix<StorageOrder::RowMajor>({"data/read_test_5x5.mtx"});
+    test_square_matrix<double, StorageOrder::RowMajor>({"data/read_test_5x5.mtx"});
 
-    test_square_matrix<StorageOrder::ColumnMajor>({"data/read_test_5x5.mtx"});
+    test_square_matrix<double, StorageOrder::ColumnMajor>({"data/read_test_5x5.mtx"});
 
     return 0;
 }
@@ -237,10 +238,10 @@ void test_storage_order(const std::vector<std::string> &matrix_names)
 
 }
 
-template <StorageOrder storage_order>
+template <typename T, StorageOrder storage_order>
 void test_square_matrix(const std::vector<std::string> &matrix_name){
     // Read matrix
-    SquareMatrix<double, storage_order> m(0);
+    SquareMatrix<T, storage_order> m(0);
     m.reader(static_cast<std::string>(matrix_name));
     print_matrix(m);
 

@@ -1,7 +1,4 @@
 {
-    "compressed_format_matrix_matrix_product_mus": 129815,
-    "compressed_format_matrix_vector_product_ns": 1431343,
-    "compressed_format_product": 882,
     "e20r0000.mtx (compressed_format_matrix_matrix_product_mus)": 131312,
     "e20r0000.mtx (compressed_format_matrix_vector_product_ns)": 1303768,
     "e20r0000.mtx (uncompressed_format_matrix_matrix_product_mus)": 5626767,
@@ -9,8 +6,5 @@
     "lnsp_131.mtx (compressed_format_matrix_matrix_product_mus)": 482,
     "lnsp_131.mtx (compressed_format_matrix_vector_product_ns)": 20377,
     "lnsp_131.mtx (uncompressed_format_matrix_matrix_product_mus)": 1619,
-    "lnsp_131.mtx (uncompressed_format_matrix_vector_product_ns)": 21699,
-    "uncompressed_format_matrix_matrix_product_mus": 4124670,
-    "uncompressed_format_matrix_vector_product_ns": 1497312,
-    "uncompressed_format_product": 14247
+    "lnsp_131.mtx (uncompressed_format_matrix_vector_product_ns)": 21699
 }

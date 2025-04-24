@@ -38,6 +38,10 @@ namespace algebra
             /// @return true if the matrix is (modified) compressed, false otherwise
             bool is_modified() const { return modified; };
 
+            /// @brief get the size of the modified compressed matrix: it comprehends also possible zero elements in the diagonal
+            /// @return size of the modified compressed matrix vectors
+            const size_t get_mod_size() const;
+
             /// @brief compress the matrix in modified format
             void compress_mod();
 
@@ -82,7 +86,14 @@ namespace algebra
             virtual size_t get_nnz() const override {
                 if (modified)
                 {
-                    return compressed_format_mod.values.size(); //this doesn't account for zeros in the diagonal
+                    size_t size = compressed_format_mod.values.size(); //this doesn't account for zeros in the diagonal
+                    for (size_t i = 0; i < this->rows; ++i)
+                    {
+                        if (compressed_format_mod.values[i] == 0){
+                            --size;
+                        }
+                    }
+                    return size;
                 }
                 else
                 {

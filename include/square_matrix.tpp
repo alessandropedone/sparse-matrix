@@ -5,6 +5,17 @@
 
 namespace algebra
 {
+    template <AddMulType T, StorageOrder S>
+    const size_t SquareMatrix<T, S>::get_mod_size() const{
+        size_t size = 0;
+        for(size_t i = 0; i<this->rows; ++i){
+            if((*this)(i, i) == 0){
+                ++size;
+            }
+        }
+        size += this->get_nnz();
+        return size;
+    };
     
     /// @brief compress the matrix in modified format
     template <AddMulType T, StorageOrder S>
@@ -17,9 +28,9 @@ namespace algebra
         compressed_format_mod.bind.clear();
         
         //reserve space for modified compressed structure
-        const size_t nnz = this->get_nnz();
-        compressed_format_mod.values.resize(nnz);
-        compressed_format_mod.bind.resize(nnz);
+        const size_t size = get_mod_size(); //nnz + extra space for possible zero diagonal elements
+        compressed_format_mod.values.resize(size);
+        compressed_format_mod.bind.resize(size);
         std::fill(compressed_format_mod.values.begin(), compressed_format_mod.values.end(), 0);
         std::fill(compressed_format_mod.bind.begin(), compressed_format_mod.bind.end(), 0);
 
@@ -90,16 +101,10 @@ namespace algebra
             this->compressed_format.values.clear();
         }
         else{
-            for (const auto &it : this->uncompressed_format)
-            {
-                if constexpr (S == StorageOrder::ColumnMajor){
-                    size_t current_col = 0;
-                    // set column pointers
-                    if(current_col == it.first.col){
-                        compressed_format_mod.bind[it.first.col] = off_diag_idx + this->rows;
-                        ++current_col;
-                    }
-
+            if constexpr (S == StorageOrder::ColumnMajor){
+                
+                 for (const auto &it : this->uncompressed_format)
+                {
                     if(it.first.col == it.first.row){// diagonal element
                         compressed_format_mod.values[it.first.row] = it.second;
                     }
@@ -107,26 +112,43 @@ namespace algebra
                         compressed_format_mod.values[this->rows + off_diag_idx] = it.second;
                         compressed_format_mod.bind[this->rows + off_diag_idx] = it.first.row;
                         ++off_diag_idx;
+                        // set column pointers
+                        if(it.first.col < this->cols - 1)
+                            ++compressed_format_mod.bind[it.first.col + 1];
                     }
                 }
-                else{
-                    size_t current_row = 0;
-                    // set row pointers
-                    if(current_row == it.first.row){
-                        compressed_format_mod.bind[it.first.row] = off_diag_idx + this->rows;
-                        ++current_row;
-                    }
+            }
+            else{
+                for (const auto &it : this->uncompressed_format)
+                {
+                    //std::cout << "\nInserting element-> Row: " << it.first.row << ", Col: " << it.first.col << ", Value: " << it.second << std::endl;                       
                     if(it.first.col == it.first.row){// diagonal element
                         compressed_format_mod.values[it.first.row] = it.second;
                     }
                     else{// off-diagonal element
+                        //std::cout << "Setting values vector[" << this->rows + off_diag_idx << "] to " << it.second << std::endl;
                         compressed_format_mod.values[this->rows + off_diag_idx] = it.second;
+                        //std::cout << "Setting bind vector[" << this->rows + off_diag_idx << "] to " << it.first.col << std::endl;
                         compressed_format_mod.bind[this->rows + off_diag_idx] = it.first.col;
-                        ++off_diag_idx; }
+                        ++off_diag_idx;
+                        if(it.first.row < this->rows - 1)
+                            // set row pointers
+                            ++compressed_format_mod.bind[it.first.row + 1];
+                            //std::cout << "Updating row pointer: " << it.first.row + 1 << " to " << compressed_format_mod.bind[it.first.row + 1] << std::endl;
+                    }
                 }
+            }
+            //std::cout << "Row pointers vector: " << std::endl;
+            for (size_t i = 1; i < this->rows; ++i){
+                compressed_format_mod.bind[i] += compressed_format_mod.bind[i - 1];
+                compressed_format_mod.bind[i - 1] += this->rows; //add shift of diagonal elements
+                //std::cout << compressed_format_mod.bind[i - 1] << "\t";
+            }
+            compressed_format_mod.bind[this->rows - 1] += this->rows;
+            //std::cout << compressed_format_mod.bind[this->rows - 1] << std::endl;
             // clear the uncompressed matrix
             this->uncompressed_format.clear();
-            }
+            
         }
         
         // update flags
@@ -145,7 +167,7 @@ namespace algebra
         {
             std::cout << "Matrix is in modified compressed format, uncompressing..." << std::endl;
             // uncompress the matrix
-            uncompress();
+            this->uncompress();
         }
         Matrix<T, S>::set(row, col, value);
     };
@@ -179,7 +201,7 @@ namespace algebra
                     size_t end = compressed_format_mod.bind[i + 1];
                     // handle last column
                     if (i+1 == this->rows){
-                        end = compressed_format_mod.values.size() - 1;
+                        end = compressed_format_mod.values.size();
                     }
                     for(size_t j = start; j < end; ++j){
                         size_t rowidx = compressed_format_mod.bind[j];
@@ -209,7 +231,7 @@ namespace algebra
                     size_t end = compressed_format_mod.bind[i + 1];
                     // handle last row
                     if (i+1 == this->rows){
-                        end = compressed_format_mod.values.size() - 1;
+                        end = compressed_format_mod.values.size();
                     }
                     for(size_t j = start; j < end; ++j){
                         size_t colidx = compressed_format_mod.bind[j];
@@ -268,7 +290,7 @@ namespace algebra
                     size_t start = compressed_format_mod.bind[col_idx];
                     size_t end = compressed_format_mod.bind[col_idx + 1];
                     if (col_idx + 1 == this->cols)
-                        end = compressed_format_mod.values.size() - 1;
+                        end = compressed_format_mod.values.size();
                     for(size_t j = start; j < end; ++j){
                         size_t row_idx = compressed_format_mod.bind[j];
                         this->uncompressed_format[{row_idx, col_idx}] = compressed_format_mod.values[j];
@@ -284,14 +306,14 @@ namespace algebra
                     size_t start = compressed_format_mod.bind[row_idx];
                     size_t end = compressed_format_mod.bind[row_idx + 1];
                     if (row_idx + 1 == this->rows)
-                        end = compressed_format_mod.values.size() - 1;
+                        end = compressed_format_mod.values.size();
                     for(size_t j = start; j < end; ++j){
                         size_t col_idx = compressed_format_mod.bind[j];
                         this->uncompressed_format[{row_idx, col_idx}] = compressed_format_mod.values[j];
                     }
                 }
             }
-
+            modified = false;
             return;
         }
         Matrix<T, S>::uncompress();
@@ -310,7 +332,39 @@ namespace algebra
     /// @return element at (row, col)
     template <AddMulType T, StorageOrder S>
     T SquareMatrix<T, S>::operator()(size_t row, size_t col) const{
-
+        // check if the index is in range
+        if (row >= this->rows || col >= this->cols)
+        {
+            throw std::out_of_range("Index out of range");
+        }
+        if(modified){
+            if(row==col){
+                return compressed_format_mod.values[row];
+            }
+            else{
+                if constexpr (S == StorageOrder::ColumnMajor){
+                    size_t start = compressed_format_mod.bind[col];
+                    size_t end = (col != this->cols - 1) ? compressed_format_mod.bind[col + 1] : compressed_format_mod.values.size();
+                    for(size_t j = start; j < end; ++j){
+                        if(compressed_format_mod.bind[j] == row){
+                            return compressed_format_mod.values[j];
+                        }
+                    }
+                }
+                else{
+                    size_t start = compressed_format_mod.bind[row];
+                    size_t end = (row != this->rows - 1) ? compressed_format_mod.bind[row + 1] : compressed_format_mod.values.size();
+                    for(size_t j = start; j < end; ++j){
+                        if(compressed_format_mod.bind[j] == col){
+                            return compressed_format_mod.values[j];
+                        }
+                    }
+                }
+                return T(0);
+            }
+        }
+        else
+            return Matrix<T, S>::operator()(row, col);
     };
 
 

@@ -119,7 +119,7 @@ int main()
 
     test_square_matrix<double, StorageOrder::RowMajor>({"data/read_test_5x5.mtx"});
 
-    //test_square_matrix<double, StorageOrder::ColumnMajor>({"data/read_test_5x5.mtx"});
+    test_square_matrix<double, StorageOrder::ColumnMajor>({"data/read_test_5x5.mtx"});
 
     return 0;
 }
@@ -243,13 +243,19 @@ void test_square_matrix(const std::string &matrix_name){
     // Read matrix
     SquareMatrix<T, storage_order> m(0);
     m.reader(static_cast<std::string>(matrix_name));
+    std::cout << "MATRIX READ FROM DATA" << std::endl;
     print_matrix(m);
 
+    /*std::cout << "Check for call operator\n" << std::endl;
+    std::cout << "m(0, 0) should be 1 and indeed is: " << m(0, 0) << std::endl;
+    std::cout << "\nm(3, 1) should be 36.7227... and indeed is: " << m(3, 1) << std::endl;
+    std::cout << "\nm(4, 3) should be 0 and indeed is: " << m(4, 3) << std::endl;
+    */
     // See all the data structures
     m.compress_mod();
-    std::cout << "From uncompressed to modified compressed format\n" << std::endl;
+    std::cout << "\nFrom uncompressed to modified compressed format" << std::endl;
     print_matrix(m);
-
+    
     m.compress();
     std::cout << "From modified compressed to compressed format" << std::endl;
     print_matrix(m);
@@ -261,6 +267,7 @@ void test_square_matrix(const std::string &matrix_name){
     m.compress_mod();
     std::cout << "From uncompressed to modified compressed format" << std::endl;
     print_matrix(m);
+    
 }
 
 

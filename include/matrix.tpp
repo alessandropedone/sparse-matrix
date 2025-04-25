@@ -538,6 +538,10 @@ namespace algebra
     template <AddMulType T, StorageOrder S>
     std::vector<T> operator*(const Matrix<T, S> &m, const std::vector<T> &v)
     {
+        if (m.cols != v.size())
+        {
+            throw std::invalid_argument("Matrix and vector dimensions do not match for multiplication");
+        }
         std::vector<T> result(m.rows, 0);
         if (!m.is_compressed())
         {

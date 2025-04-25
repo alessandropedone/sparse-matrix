@@ -117,8 +117,10 @@ int main()
         
     }*/
 
+    std::cout << "ROWMajor" << std::endl;
     test_square_matrix<double, StorageOrder::RowMajor>({"data/read_test_5x5.mtx"});
-
+    
+    std::cout << "COLMajor" << std::endl;
     test_square_matrix<double, StorageOrder::ColumnMajor>({"data/read_test_5x5.mtx"});
 
     return 0;
@@ -252,6 +254,7 @@ void test_square_matrix(const std::string &matrix_name){
     std::cout << "\nm(4, 3) should be 0 and indeed is: " << m(4, 3) << std::endl;
     */
     // See all the data structures
+    
     m.compress_mod();
     std::cout << "\nFrom uncompressed to modified compressed format" << std::endl;
     print_matrix(m);
@@ -259,15 +262,15 @@ void test_square_matrix(const std::string &matrix_name){
     m.compress();
     std::cout << "From modified compressed to compressed format" << std::endl;
     print_matrix(m);
-
+    /*
     m.uncompress();
     std::cout << "From compressed to uncompressed format" << std::endl;
     print_matrix(m);
-
+    
     m.compress_mod();
     std::cout << "From uncompressed to modified compressed format" << std::endl;
     print_matrix(m);
-    
+*/
 }
 
 

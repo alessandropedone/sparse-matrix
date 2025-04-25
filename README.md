@@ -9,8 +9,7 @@ Parallelization with std algorithms
 
 Modified compressed techniques (MSR, MSC)
 - SquareMatrix: derived from Matrix, it has modified compressed formats too
-- Matrix and SquareMatrix has a transpose views 
-- SquareMatrix has a diagonal view
+- SquareMatrix has a transpose and diagonal view
   
 README.md (need of TBB, we didn't implement COO since COOmap is clearly more efficient, explain why parallel implementation of compress is slower)
 

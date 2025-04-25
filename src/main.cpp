@@ -21,10 +21,17 @@ void test_square_matrix(const std::string &matrix_name);
 template <typename T, StorageOrder S>
 void print_matrix(const Matrix<T, S> &m);
 
+template <typename T, StorageOrder S>
+bool are_equal(const Matrix<T, S> &m1, const Matrix<T, S> &m2);
+
+template <typename T, StorageOrder S>
+void test_big_matrix(const std::string &matrix_name);
+
+
 int main()
 {
 
-    std::cout << "Test with 5x5 matrix" << std::endl;
+    //std::cout << "Test with 5x5 matrix" << std::endl;
     /*
     // Import matrix
     Matrix<double, StorageOrder::ColumnMajor> m(0, 0);
@@ -115,13 +122,18 @@ int main()
             test_storage_order<StorageOrder::ColumnMajor>(matrix_names);
         }
         
-    }*/
+    }
 
-    std::cout << "ROWMajor" << std::endl;
+    */
+
+    std::cout << "ROWMajor\n" << std::endl;
     test_square_matrix<double, StorageOrder::RowMajor>({"data/read_test_5x5.mtx"});
-    
-    std::cout << "COLMajor" << std::endl;
+
+    std::cout << "COLMajor\n" << std::endl;
     test_square_matrix<double, StorageOrder::ColumnMajor>({"data/read_test_5x5.mtx"});
+
+    std::cout << "Test with big matrix" << std::endl;
+    test_big_matrix<double, StorageOrder::RowMajor>("data/e20r0000.mtx");
 
     return 0;
 }
@@ -257,22 +269,26 @@ void test_square_matrix(const std::string &matrix_name){
     
     m.compress_mod();
     std::cout << "\nFrom uncompressed to modified compressed format" << std::endl;
-    print_matrix(m);
+    //print_matrix(m);
     
     m.compress();
     std::cout << "From modified compressed to compressed format" << std::endl;
-    print_matrix(m);
-    /*
+    //print_matrix(m);
+    
     m.uncompress();
     std::cout << "From compressed to uncompressed format" << std::endl;
-    print_matrix(m);
+    //print_matrix(m);
     
     m.compress_mod();
     std::cout << "From uncompressed to modified compressed format" << std::endl;
-    print_matrix(m);
-*/
-}
+    //print_matrix(m);
 
+    m.compress();
+    std::cout << "From modified compressed to compressed format" << std::endl;
+    print_matrix(m);
+
+    return;
+}
 
 template <typename T, StorageOrder S>
 void print_matrix(const Matrix<T, S> &m){
@@ -285,4 +301,57 @@ void print_matrix(const Matrix<T, S> &m){
         std::cout << std::endl;
     }
     std::cout << std::endl;
+}
+
+template <typename T, StorageOrder S>
+bool are_equal(const Matrix<T, S> &m1, const Matrix<T, S> &m2)
+{
+    if (m1.get_rows() != m2.get_rows() || m1.get_cols() != m2.get_cols())
+    {
+        return false;
+    }
+    for (size_t i = 0; i < m1.get_rows(); i++)
+    {
+        for (size_t j = 0; j < m1.get_cols(); j++)
+        {
+            if (m1(i, j) != m2(i, j))
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+template <typename T, StorageOrder S>
+void test_big_matrix(const std::string &matrix_name){
+    // Read matrix
+    SquareMatrix<T, S> m(0);
+    m.reader(static_cast<std::string>(matrix_name));
+
+    // Read matrix
+    SquareMatrix<T, S> compare_matrix(0);
+    compare_matrix.reader(static_cast<std::string>(matrix_name));
+
+    m.compress_mod();
+    std::cout << "\nFrom uncompressed to modified compressed format" << std::endl;
+    std::cout << are_equal(m, compare_matrix) << std::endl;
+    
+    m.compress();
+    std::cout << "From modified compressed to compressed format" << std::endl;
+    std::cout << are_equal(m, compare_matrix) << std::endl;
+
+    m.uncompress();
+    std::cout << "From compressed to uncompressed format" << std::endl;
+    std::cout << are_equal(m, compare_matrix) << std::endl;
+    
+    m.compress_mod();
+    std::cout << "From uncompressed to modified compressed format" << std::endl;
+    std::cout << are_equal(m, compare_matrix) << std::endl;
+
+    m.compress();
+    std::cout << "From modified compressed to compressed format" << std::endl;
+    std::cout << are_equal(m, compare_matrix) << std::endl;
+
+    return;
 }

@@ -7,7 +7,7 @@
 namespace algebra
 {
     template <typename T, StorageOrder S = StorageOrder::RowMajor>
-    class MatrixTransposeView : public Matrix<T, S>
+    class MatrixTransposeView
     {
     public:
         

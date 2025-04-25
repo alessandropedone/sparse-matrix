@@ -391,10 +391,18 @@ namespace algebra
     /// @param row row index
     /// @param col column index
     /// @return reference to the element at (row, col) with proxy (to avoid setting zero values)
-   // template <AddMulType T, StorageOrder S>
-   // Proxy<T> SquareMatrix<T, S>::operator()(size_t row, size_t col){
+    template <AddMulType T, StorageOrder S>
+    Proxy<T, S> SquareMatrix<T, S>::operator()(size_t row, size_t col){
+        if (row >= rows || col >= cols)
+            throw std::out_of_range("Index out of range");
 
-   // };
+        if (modified || this-> compressed)
+        {
+            std::cout << "Matrix is compressed, uncompressing..." << std::endl;
+            uncompress();
+        }
+        return Proxy<T, S>{this->uncompressed_format, row, col};
+    };
 
     /// @brief resize the matrix
     /// @param rows number of rows
@@ -413,6 +421,51 @@ namespace algebra
         this->compressed_format_mod.bind.clear();
     };
 
+    /// @brief calculate the norm of the matrix
+    /// @tparam N type of the norm (One, Infinity, Frobenius)
+    /// @return value of the norm
+    template <AddMulType T, StorageOrder S>
+    template <NormType N>
+    double SquareMatrix<T, S>::norm() const{
+        if(modified){
+            if constexpr (N == NormType::One)
+            {
+                if constexpr(S == StorageOrder::ColumnMajor){
+                    std::vector<double> col_sums(this->cols, 0);
+                    for (size_t i = 0; i < this->cols; ++i){
+                        size_t start = compressed_format_mod.bind[i];
+                        size_t end = (i != this->cols - 1) ? compressed_format_mod.bind[i + 1] : compressed_format_mod.values.size();
+                        for(size_t j = start; j < end; ++j){
+                            size_t col = compressed_format_mod.bind[j];
+                            col_sums[col] += std::abs(compressed_format_mod.values[j]);
+                        }
+                        col_sums[i] += std::abs(compressed_format_mod.values[i]);
+                    }
+                    return *std::max_element(std::execution::par_unseq, col_sums.begin(), col_sums.end());
+                }
+                else{
+                    std::vector<double> row_sums(this->rows, 0);
+                    for (size_t i = 0; i < this->rows; ++i){
+                        size_t start = compressed_format_mod.bind[i];
+                        size_t end = (i != this->rows - 1) ? compressed_format_mod.bind[i + 1] : compressed_format_mod.values.size();
+                        for(size_t j = start; j < end; ++j){
+                            size_t row = compressed_format_mod.bind[j];
+                            row_sums[row] += std::abs(compressed_format_mod.values[j]);
+                        }
+                        row_sums[i] += std::abs(compressed_format_mod.values[i]);
+                    }
+                    return *std::max_element(std::execution::par_unseq, row_sums.begin(), row_sums.end());
+                }
+            }
+            else if constexpr (N == NormType::Infinity)
+            {}
+            else //Frobenius
+            {}
+        }
+        else{
+            return Matrix<T, S>::norm();
+        }
+    };
 };
 
 #endif // SQUARE_MATRIX_TPP

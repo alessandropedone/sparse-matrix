@@ -73,13 +73,19 @@ namespace algebra
             /// @param row row index
             /// @param col column index
             /// @return reference to the element at (row, col) with proxy (to avoid setting zero values)
-          //  virtual Proxy<T> operator()(size_t row, size_t col) override;
+            virtual Proxy<T, S> operator()(size_t row, size_t col) override;
 
             /// @brief resize the matrix
             /// @param rows number of rows
             /// @param cols number of columns
             // Overload of Matrix<T, S>::resize_and_clear
             void resize_and_clear(size_t dim);
+
+            /// @brief calculate the norm of the matrix
+            /// @tparam N type of the norm (One, Infinity, Frobenius)
+            /// @return value of the norm
+            template <NormType N>
+            virtual double norm() const override;
 
             /// @brief get the number of non-zero elements
             /// @return number of non-zero elements

@@ -89,7 +89,7 @@ namespace algebra
         /// @tparam N type of the norm (One, Infinity, Frobenius)
         /// @return value of the norm
         template <NormType N>
-        double norm() const;
+        virtual double norm() const;
 
         /// @brief parallel version of the norm
         /// @tparam N type of the norm (One, Infinity, Frobenius)

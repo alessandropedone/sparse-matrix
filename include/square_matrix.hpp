@@ -84,8 +84,9 @@ namespace algebra
             /// @brief calculate the norm of the matrix
             /// @tparam N type of the norm (One, Infinity, Frobenius)
             /// @return value of the norm
+            /// @note this function HIDES the one in the base class, since it cannot be virtual, being a template function
             template <NormType N>
-            virtual double norm() const override;
+            double norm() const;
 
             /// @brief get the number of non-zero elements
             /// @return number of non-zero elements

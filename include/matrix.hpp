@@ -42,6 +42,9 @@ namespace algebra
             this->compressed = false;
         };
 
+        /// @brief default copy constructor
+        Matrix(const Matrix &other) = default;
+
         /// @brief default destructor
         virtual ~Matrix() = default;
 
@@ -99,7 +102,7 @@ namespace algebra
 
         /// @brief Function to read a matrix in Matrix Market format
         /// @param filename input file name
-        void reader(const std::string &filename);
+        virtual void reader(const std::string &filename);
 
         /// @brief get the number of rows
         /// @return number of rows

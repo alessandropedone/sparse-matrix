@@ -2,13 +2,11 @@
 
 # Sparse matrix 
 
-Test:
-- rowmajor + colmajor
+test also the product with modified compressed format for SquareMatrix
 
-Parallelization with std algorithms 
+Parallelization with std algorithms (remove parallel implementations)
 
 Modified compressed techniques (MSR, MSC)
-- SquareMatrix: derived from Matrix, it has modified compressed formats too
 - SquareMatrix has a transpose and diagonal view
 - norm method issue (matrix pointer to squareMatrix object would call matrix::norm):
     - cannot be virtual
@@ -16,7 +14,7 @@ Modified compressed techniques (MSR, MSC)
     [See here for more details on the matter and proposed solution](https://chatgpt.com/share/680cae04-c850-800c-b63c-dece2a3d7728)
     - we could also try CTRP with abstract class
   
-README.md (need of TBB, we didn't implement COO since COOmap is clearly more efficient, explain why parallel implementation of compress is slower)
-
-Extra
--blas library: ask other teams and check pacs-examples
+README.md (
+    need of TBB, 
+    we didn't implement COO since COOmap is clearly more efficient, 
+    explain why parallel implementation of compress is slower, put a test about this)

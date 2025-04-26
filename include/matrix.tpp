@@ -365,8 +365,7 @@ namespace algebra
     template <AddMulType T, StorageOrder S>
     template <NormType N>
     double Matrix<T, S>::norm() const
-{
-        std::cout << "calling matrix norm" << std::endl;
+    {
         if (!compressed)
         {
             if constexpr (N == NormType::One)

@@ -5,6 +5,7 @@
 #include <cstring> // for strerror
 #include <cerrno>  // for errno
 #include <cassert>
+#include <execution>
 
 #include "square_matrix.hpp"
 
@@ -40,8 +41,8 @@ namespace algebra
         const size_t size = get_mod_size(); // nnz + extra space for possible zero diagonal elements
         compressed_format_mod.values.resize(size);
         compressed_format_mod.bind.resize(size);
-        std::fill(compressed_format_mod.values.begin(), compressed_format_mod.values.end(), 0);
-        std::fill(compressed_format_mod.bind.begin(), compressed_format_mod.bind.end(), 0);
+        std::fill(std::execution::par_unseq, compressed_format_mod.values.begin(), compressed_format_mod.values.end(), 0);
+        std::fill(std::execution::par_unseq, compressed_format_mod.bind.begin(), compressed_format_mod.bind.end(), 0);
 
         // to store correctly the pointers in the bind vector (that don't account for the diagonal elements)
         size_t off_diag_idx = 0;
@@ -216,7 +217,7 @@ namespace algebra
             {
                 this->compressed_format.inner.resize(this->rows + 1);
             }
-            std::fill(this->compressed_format.inner.begin(), this->compressed_format.inner.end(), 0);
+            std::fill(std::execution::par_unseq, this->compressed_format.inner.begin(), this->compressed_format.inner.end(), 0);
 
             // fill the compressed matrix
             size_t index = 0; // keeps track of nnz elements

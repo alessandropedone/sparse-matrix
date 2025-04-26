@@ -427,6 +427,7 @@ namespace algebra
     template <AddMulType T, StorageOrder S>
     template <NormType N>
     double SquareMatrix<T, S>::norm() const{
+        std::cout << "calling squarematrix norm" << std::endl;
         if(modified){
             if constexpr (N == NormType::One)
             {
@@ -496,6 +497,7 @@ namespace algebra
             }
         }
         else{
+            std::cout << "calling matrix norm because not modified" << std::endl;
             return Matrix<T, S>::template norm<N>();
         }
     };

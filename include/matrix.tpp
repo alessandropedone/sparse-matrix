@@ -365,114 +365,110 @@ namespace algebra
     template <AddMulType T, StorageOrder S>
     template <NormType N>
     double Matrix<T, S>::norm() const
-    {
-        if (auto derived_ptr = dynamic_cast<SquareMatrix<T, S>*>(this) && derived_ptr->is_modified()) {
-            derived_ptr->template norm<N>();
-        }
-        else {
-            if (!compressed)
-            {
-                if constexpr (N == NormType::One)
-                {
-                    std::vector<double> col_sums(cols, 0);
-                    for (const auto &it : uncompressed_format)
-                    {
-                        col_sums[it.first.col] += std::abs(it.second);
-                    }
-                    return *std::max_element(std::execution::par_unseq, col_sums.begin(), col_sums.end());
-                }
-                else if constexpr (N == NormType::Infinity)
-                {
-                    std::vector<double> row_sums(rows, 0);
-                    for (const auto &it : uncompressed_format)
-                    {
-                        row_sums[it.first.row] += std::abs(it.second);
-                    }
-                    return *std::max_element(std::execution::par_unseq, row_sums.begin(), row_sums.end());
-                }
-                else
-                {
-                    double norm = 0;
-                    for (const auto &it : uncompressed_format)
-                    {
-                        norm += std::abs(it.second) * std::abs(it.second);
-                    }
-                    return std::sqrt(std::abs(norm));
-                }
-            }
+{
+        std::cout << "calling matrix norm" << std::endl;
+        if (!compressed)
+        {
             if constexpr (N == NormType::One)
             {
-                if constexpr (S == StorageOrder::ColumnMajor)
+                std::vector<double> col_sums(cols, 0);
+                for (const auto &it : uncompressed_format)
                 {
-                    std::vector<double> col_sums(cols, 0);
-                    for (size_t col = 0; col < cols; col++)
-                    {
-                        size_t start = compressed_format.inner[col];
-                        size_t end = compressed_format.inner[col + 1];
-                        for (size_t j = start; j < end; j++)
-                        {
-                            col_sums[col] += std::abs(compressed_format.values[j]);
-                        }
-                    }
-                    return *std::max_element(std::execution::par_unseq, col_sums.begin(), col_sums.end());
+                    col_sums[it.first.col] += std::abs(it.second);
                 }
-                else
-                {
-                    std::vector<double> col_sums(cols, 0);
-                    for (size_t row = 0; row < rows; row++) // exploit locality (cache)
-                    {
-                        size_t start = compressed_format.inner[row];
-                        size_t end = compressed_format.inner[row + 1];
-                        for (size_t j = start; j < end; j++)
-                        {
-                            size_t col = compressed_format.outer[j];
-                            col_sums[col] += std::abs(compressed_format.values[j]);
-                        }
-                    }
-                    return *std::max_element(std::execution::par_unseq, col_sums.begin(), col_sums.end());
-                }
+                return *std::max_element(std::execution::par_unseq, col_sums.begin(), col_sums.end());
             }
             else if constexpr (N == NormType::Infinity)
             {
-                if constexpr (S == StorageOrder::ColumnMajor)
+                std::vector<double> row_sums(rows, 0);
+                for (const auto &it : uncompressed_format)
                 {
-                    std::vector<double> row_sums(rows, 0);
-                    for (size_t col = 0; col < cols; col++)
-                    {
-                        size_t start = compressed_format.inner[col];
-                        size_t end = compressed_format.inner[col + 1];
-                        for (size_t j = start; j < end; j++)
-                        {
-                            size_t row = compressed_format.outer[j];
-                            row_sums[row] += std::abs(compressed_format.values[j]);
-                        }
-                    }
-                    return *std::max_element(std::execution::par_unseq, row_sums.begin(), row_sums.end());
+                    row_sums[it.first.row] += std::abs(it.second);
                 }
-                else
-                {
-                    std::vector<double> row_sums(rows, 0);
-                    for (size_t row = 0; row < rows; row++)
-                    {
-                        size_t start = compressed_format.inner[row];
-                        size_t end = compressed_format.inner[row + 1];
-                        for (size_t j = start; j < end; j++)
-                        {
-                            row_sums[row] += std::abs(compressed_format.values[j]);
-                        }
-                    }
-                    return *std::max_element(std::execution::par_unseq, row_sums.begin(), row_sums.end());
-                }
+                return *std::max_element(std::execution::par_unseq, row_sums.begin(), row_sums.end());
             }
             else
             {
                 double norm = 0;
-                for (const auto &it : compressed_format.values)
+                for (const auto &it : uncompressed_format)
                 {
-                    norm += std::abs(it) * std::abs(it);
+                    norm += std::abs(it.second) * std::abs(it.second);
                 }
-                return std::sqrt(norm);
+                return std::sqrt(std::abs(norm));
             }
+        }
+        if constexpr (N == NormType::One)
+        {
+            if constexpr (S == StorageOrder::ColumnMajor)
+            {
+                std::vector<double> col_sums(cols, 0);
+                for (size_t col = 0; col < cols; col++)
+                {
+                    size_t start = compressed_format.inner[col];
+                    size_t end = compressed_format.inner[col + 1];
+                    for (size_t j = start; j < end; j++)
+                    {
+                        col_sums[col] += std::abs(compressed_format.values[j]);
+                    }
+                }
+                return *std::max_element(std::execution::par_unseq, col_sums.begin(), col_sums.end());
+            }
+            else
+            {
+                std::vector<double> col_sums(cols, 0);
+                for (size_t row = 0; row < rows; row++) // exploit locality (cache)
+                {
+                    size_t start = compressed_format.inner[row];
+                    size_t end = compressed_format.inner[row + 1];
+                    for (size_t j = start; j < end; j++)
+                    {
+                        size_t col = compressed_format.outer[j];
+                        col_sums[col] += std::abs(compressed_format.values[j]);
+                    }
+                }
+                return *std::max_element(std::execution::par_unseq, col_sums.begin(), col_sums.end());
+            }
+        }
+        else if constexpr (N == NormType::Infinity)
+        {
+            if constexpr (S == StorageOrder::ColumnMajor)
+            {
+                std::vector<double> row_sums(rows, 0);
+                for (size_t col = 0; col < cols; col++)
+                {
+                    size_t start = compressed_format.inner[col];
+                    size_t end = compressed_format.inner[col + 1];
+                    for (size_t j = start; j < end; j++)
+                    {
+                        size_t row = compressed_format.outer[j];
+                        row_sums[row] += std::abs(compressed_format.values[j]);
+                    }
+                }
+                return *std::max_element(std::execution::par_unseq, row_sums.begin(), row_sums.end());
+            }
+            else
+            {
+                std::vector<double> row_sums(rows, 0);
+                for (size_t row = 0; row < rows; row++)
+                {
+                    size_t start = compressed_format.inner[row];
+                    size_t end = compressed_format.inner[row + 1];
+                    for (size_t j = start; j < end; j++)
+                    {
+                        row_sums[row] += std::abs(compressed_format.values[j]);
+                    }
+                }
+                return *std::max_element(std::execution::par_unseq, row_sums.begin(), row_sums.end());
+            }
+        }
+        else
+        {
+            double norm = 0;
+            for (const auto &it : compressed_format.values)
+            {
+                norm += std::abs(it) * std::abs(it);
+            }
+            return std::sqrt(norm);
         }
     };
 

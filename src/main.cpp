@@ -2,6 +2,7 @@
 #include "square_matrix.hpp"
 #include "matrix_views.hpp"
 #include "json_utility.hpp"
+#include "square_matrix.hpp" // Ensure SquareMatrix is fully defined
 
 #include <random>
 #include <iostream>
@@ -124,8 +125,6 @@ int main()
         
     }
 
-    */
-
     std::cout << "ROWMajor\n" << std::endl;
     test_square_matrix<double, StorageOrder::RowMajor>({"data/read_test_5x5.mtx"});
 
@@ -134,6 +133,49 @@ int main()
 
     std::cout << "Test with big matrix" << std::endl;
     test_big_matrix<double, StorageOrder::RowMajor>("data/e20r0000.mtx");
+    */
+
+    std::cout << "Test for norm method" << std::endl;
+
+    std::unique_ptr<Matrix<double, StorageOrder::ColumnMajor>> ptr_b2b = std::make_unique<Matrix<double, StorageOrder::ColumnMajor>>(0, 0);
+    ptr_b2b->reader(static_cast<std::string>("data/read_test_5x5.mtx"));
+    std::cout << "\nMatrix ptr B2B" << std::endl;
+    std::cout << "One norm:       " << std::setw(14) << ptr_b2b->norm<NormType::One>() << std::endl;
+    std::cout << "Infinity norm:  " << std::setw(14) << ptr_b2b->norm<NormType::Infinity>() << std::endl;
+    std::cout << "Frobenius norm: " << std::setw(14) << ptr_b2b->norm<NormType::Frobenius>() << std::endl;
+
+    std::unique_ptr<SquareMatrix<double, StorageOrder::ColumnMajor>> ptr_d2d = std::make_unique<SquareMatrix<double, StorageOrder::ColumnMajor>>(0);
+    ptr_d2d->reader(static_cast<std::string>("data/read_test_5x5.mtx"));
+    std::cout << "\nMatrix ptr D2D for uncompressed format" << std::endl;
+    std::cout << "One norm:       " << std::setw(14) << ptr_d2d->norm<NormType::One>() << std::endl;
+    std::cout << "Infinity norm:  " << std::setw(14) << ptr_d2d->norm<NormType::Infinity>() << std::endl;   
+    std::cout << "Frobenius norm: " << std::setw(14) << ptr_d2d->norm<NormType::Frobenius>() << std::endl;
+
+    std::unique_ptr<SquareMatrix<double, StorageOrder::ColumnMajor>> ptr_d2d1 = std::make_unique<SquareMatrix<double, StorageOrder::ColumnMajor>>(0);
+    ptr_d2d1->reader(static_cast<std::string>("data/read_test_5x5.mtx"));
+    std::cout << "\nMatrix ptr D2D for modified format" << std::endl;
+    ptr_d2d1->compress_mod();
+    std::cout << "One norm:       " << std::setw(14) << ptr_d2d1->norm<NormType::One>() << std::endl;
+    std::cout << "Infinity norm:  " << std::setw(14) << ptr_d2d1->norm<NormType::Infinity>() << std::endl;   
+    std::cout << "Frobenius norm: " << std::setw(14) << ptr_d2d1->norm<NormType::Frobenius>() << std::endl;
+
+    std::unique_ptr<Matrix<double, StorageOrder::ColumnMajor>> ptr_b2d = std::make_unique<SquareMatrix<double, StorageOrder::ColumnMajor>>(0);
+    ptr_b2d->reader(static_cast<std::string>("data/read_test_5x5.mtx"));
+    std::cout << "\nMatrix ptr B2D for uncompressed format" << std::endl;
+    std::cout << "One norm:       " << std::setw(14) << ptr_b2d->norm<NormType::One>() << std::endl;
+    std::cout << "Infinity norm:  " << std::setw(14) << ptr_b2d->norm<NormType::Infinity>() << std::endl;
+    std::cout << "Frobenius norm: " << std::setw(14) << ptr_b2d->norm<NormType::Frobenius>() << std::endl;
+
+    /*
+    std::unique_ptr<Matrix<double, StorageOrder::ColumnMajor>> ptr_b2d1 = std::make_unique<SquareMatrix<double, StorageOrder::ColumnMajor>>(0);
+    ptr_b2d->reader(static_cast<std::string>("data/read_test_5x5.mtx"));
+    std::cout << "\nMatrix ptr B2D for modified format" << std::endl;
+    static_cast<SquareMatrix<double, StorageOrder::ColumnMajor>*>(ptr_b2d1)->compress_mod();
+    std::cout << "One norm:       " << std::setw(14) << ptr_b2d1->norm<NormType::One>() << std::endl;
+    std::cout << "Infinity norm:  " << std::setw(14) << ptr_b2d1->norm<NormType::Infinity>() << std::endl;
+    std::cout << "Frobenius norm: " << std::setw(14) << ptr_b2d1->norm<NormType::Frobenius>() << std::endl;
+    */
+
 
     return 0;
 }

@@ -12,9 +12,9 @@ Modified compressed techniques (MSR, MSC)
 - SquareMatrix has a transpose and diagonal view
 - norm method issue (matrix pointer to squareMatrix object would call matrix::norm):
     - cannot be virtual
-    - CTRP is not fine for our purposes
     - try to overcome the problem with dynamic_cast
     [See here for more details on the matter and proposed solution](https://chatgpt.com/share/680cae04-c850-800c-b63c-dece2a3d7728)
+    - we could also try CTRP with abstract class
   
 README.md (need of TBB, we didn't implement COO since COOmap is clearly more efficient, explain why parallel implementation of compress is slower)
 

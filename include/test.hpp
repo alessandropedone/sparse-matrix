@@ -39,7 +39,7 @@ namespace algebra
     {
         for (size_t i = 0; i < m.get_rows(); i++)
         {
-            for (size_t j = 0; j < m.get_rows(); j++)
+            for (size_t j = 0; j < m.get_cols(); j++)
             {
                 std::cout << std::setw(15) << m(i, j) << " ";
             }

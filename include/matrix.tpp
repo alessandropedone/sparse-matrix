@@ -366,7 +366,7 @@ namespace algebra
     template <NormType N>
     double Matrix<T, S>::norm() const
     {
-        if (auto derived_ptr = dynamic_cast<SquareMatrix<T, S>*>(this) && derived_ptr->modified) {
+        if (auto derived_ptr = dynamic_cast<SquareMatrix<T, S>*>(this) && derived_ptr->is_modified()) {
             derived_ptr->template norm<N>();
         }
         else {

@@ -101,7 +101,7 @@ namespace algebra
             MatrixDiagonalView() = delete;
 
             /// @brief constructor
-            /// @param matrix the matrix to see as diagonal
+            /// @param matrix the matrix to see as diagonal: all off-diagonal elements are ignored
             MatrixDiagonalView(SquareMatrix<T, S> &matrix) : matrix(matrix) {}
         
             /// @brief call operator non-const version
@@ -109,7 +109,7 @@ namespace algebra
             /// @return a proxy to the matrix element at (idx, idx)
             Proxy<T,S> operator()(size_t idx)
             {
-                return Proxy(matrix.uncompress(), idx, idx);
+                return matrix(idx, idx);
             }
 
             /// @brief call operator const version
@@ -163,7 +163,7 @@ namespace algebra
                     }
                     return std::sqrt(sum);
                 }
-                else{
+                else{ // One or Infinity are equivalent for diagonal matrices
                     std::vector<double> diag(matrix.get_rows(), 0);
                     for(size_t i = 0; i < matrix.get_rows(); i++)
                     {
@@ -179,7 +179,7 @@ namespace algebra
             friend std::vector<U> operator*(const MatrixDiagonalView<U, V> &m, const std::vector<U> &v);
             // multiply with another matrix
             template <AddMulType U, StorageOrder V>
-            friend Matrix<U, V> operator*(const MatrixDiagonalView<U, V> &m1, const Matrix<U, V> &m2);
+            friend Matrix<U, V> operator*(const Matrix<U, V> &m1, const MatrixDiagonalView<U, V> &m2);
 
         private:
             SquareMatrix<T, S> &matrix;
@@ -253,5 +253,46 @@ namespace algebra
     {
         return MatrixTransposeView<T,S>(m2.matrix * m1.matrix);
     }
+
+    template <AddMulType T, StorageOrder S>
+    std::vector<T> operator*(const MatrixDiagonalView<T, S> &m, const std::vector<T> &v)
+    {
+        if (m.get_size() != v.size())
+        {
+            throw std::invalid_argument("Matrix and vector dimensions do not match for multiplication");
+        }
+        std::vector<T> result(m.get_size(), 0);
+
+        if (m.is_modified()){
+            for (size_t i = 0; i < m.get_size(); i++)
+            {
+                result[i] = m.compressed_format_mod.values[i] * v[i];
+            }
+            return result;
+        }
+        else if (m.is_compressed()){
+            for (size_t i = 0; i < m.get_size(); i++)
+            {
+                // for this format the call operator is the best option, we are forced to go by each stored row/column
+                result[i] = m(i, i) * v[i];
+            }
+            return result;
+        }
+        else{
+            for (size_t i = 0; i < m.get_size(); i++)
+            {
+                result[i] = m.uncompressed_format[{i,i}] * v[i];
+            }
+            return result;
+        }
+    };
+
+    template <AddMulType T, StorageOrder S>
+    Matrix<T, S> operator*(const Matrix<T, S> &m1, const MatrixDiagonalView<T, S> &m2)
+    {
+
+    };
+
+
 }
 #endif // MATRIX_VIEWS_HPP

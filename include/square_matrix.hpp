@@ -60,14 +60,8 @@ namespace algebra
         /// @brief compress the matrix if it is in an uncompressed format
         virtual void compress() override;
 
-        /// @brief compress the matrix in parallel if it is in an uncompressed format
-        virtual void compress_parallel() override;
-
         /// @brief uncompress the matrix if it is in a compressed format
         virtual void uncompress() override;
-
-        /// @brief uncompress the matrix in parallel if it is in a compressed format
-        virtual void uncompress_parallel() override;
 
         /// @brief call operator() const version
         /// @param row row index
@@ -100,25 +94,7 @@ namespace algebra
 
         /// @brief get the number of non-zero elements
         /// @return number of non-zero elements
-        virtual size_t get_nnz() const override
-        {
-            if (modified)
-            {
-                size_t size = compressed_format_mod.values.size(); // this doesn't account for zeros in the diagonal
-                for (size_t i = 0; i < this->rows; ++i)
-                {
-                    if (compressed_format_mod.values[i] == 0)
-                    {
-                        --size;
-                    }
-                }
-                return size;
-            }
-            else
-            {
-                return Matrix<T, S>::get_nnz();
-            }
-        };
+        virtual size_t get_nnz() const override;
 
     private:
         bool modified = false; // flag to check if the matrix is in modified compressed format

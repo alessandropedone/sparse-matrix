@@ -325,12 +325,6 @@ namespace algebra
         return;
     };
 
-    /// @brief compress the matrix in parallel if it is in an uncompressed format
-    template <AddMulType T, StorageOrder S>
-    void SquareMatrix<T, S>::compress_parallel() {
-
-    };
-
     /// @brief uncompress the matrix if it is in a compressed format
     template <AddMulType T, StorageOrder S>
     void SquareMatrix<T, S>::uncompress()
@@ -386,12 +380,6 @@ namespace algebra
         }
         Matrix<T, S>::uncompress();
         return;
-    };
-
-    /// @brief uncompress the matrix in parallel if it is in a compressed format
-    template <AddMulType T, StorageOrder S>
-    void SquareMatrix<T, S>::uncompress_parallel() {
-
     };
 
     /// @brief call operator() const version
@@ -570,7 +558,6 @@ namespace algebra
         }
         else
         {
-            std::cout << "calling matrix norm because not modified" << std::endl;
             return Matrix<T, S>::template norm<N>();
         }
     };
@@ -628,6 +615,27 @@ namespace algebra
         }
 
         file.close();
+    };
+
+    template <AddMulType T, StorageOrder S>
+    size_t SquareMatrix<T, S>::get_nnz() const
+    {
+        if (modified)
+        {
+            size_t size = compressed_format_mod.values.size(); // this doesn't account for zeros in the diagonal
+            for (size_t i = 0; i < this->rows; ++i)
+            {
+                if (compressed_format_mod.values[i] == 0)
+                {
+                    --size;
+                }
+            }
+            return size;
+        }
+        else
+        {
+            return Matrix<T, S>::get_nnz();
+        }
     };
 
 };

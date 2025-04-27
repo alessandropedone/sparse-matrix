@@ -106,11 +106,23 @@ namespace algebra
         /// @return number of non-zero elements
         virtual size_t get_nnz() const;
 
-        // friend functions
-        // multiply with a std::vector
+        /// @brief multiply with a std::vector
+        /// @tparam U type of the vector elements
+        /// @tparam V type of the storage order
+        /// @param m matrix
+        /// @param v vector
+        /// @return the result of the multiplication
+        /// @note this function is a friend of the Matrix class, so it can access the private members
         template <AddMulType U, StorageOrder V>
         friend std::vector<U> operator*(const Matrix<U, V> &m, const std::vector<U> &v);
-        // multiply with another matrix
+
+        /// @brief multiply with another matrix
+        /// @tparam U type of the matrix elements
+        /// @tparam V type of the storage order
+        /// @param m1 first matrix
+        /// @param m2 second matrix
+        /// @return the result of the multiplication
+        /// @note this function is a friend of the Matrix class, so it can access the private members
         template <AddMulType U, StorageOrder V>
         friend Matrix<U, V> operator*(const Matrix<U, V> &m1, const Matrix<U, V> &m2);
 

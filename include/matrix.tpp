@@ -15,7 +15,7 @@ namespace algebra
     void Matrix<T, S>::set(size_t row, size_t col, const T &value)
     {
         // check if the index is out of range
-        if (row >= rows || col >= cols)
+        if (row >= rows or col >= cols)
         {
             throw std::out_of_range("Index out of range");
         }
@@ -230,7 +230,7 @@ namespace algebra
     template <AddMulType T, StorageOrder S>
     void Matrix<T, S>::uncompress()
     {
-        if (!compressed)
+        if (not compressed)
             return;
 
         // clear the uncompressed matrix
@@ -284,12 +284,12 @@ namespace algebra
     T Matrix<T, S>::operator()(size_t row, size_t col) const
     {
         // check if the index is in range
-        if (row >= rows || col >= cols)
+        if (row >= rows or col >= cols)
         {
             throw std::out_of_range("Index out of range");
         }
         // check if the matrix is compressed
-        if (!compressed)
+        if (not compressed)
         {
             auto it = uncompressed_format.find({row, col});
             if (it != uncompressed_format.end())
@@ -331,7 +331,7 @@ namespace algebra
     template <AddMulType T, StorageOrder S>
     Proxy<T, S> Matrix<T, S>::operator()(size_t row, size_t col)
     {
-        if (row >= rows || col >= cols)
+        if (row >= rows or col >= cols)
             throw std::out_of_range("Index out of range");
 
         if (compressed)
@@ -367,7 +367,7 @@ namespace algebra
                 return this_square->template norm<N>();
             }
         }
-        if (!compressed)
+        if (not compressed)
         {
             if constexpr (N == NormType::One)
             {
@@ -476,7 +476,7 @@ namespace algebra
     void Matrix<T, S>::reader(const std::string &filename)
     {
         std::ifstream file(filename);
-        if (!file.is_open())
+        if (nbt file.is_open())
         {
             // more verbose error message
             throw std::runtime_error("Unable to open file '" + filename + "': " + strerror(errno));
@@ -511,7 +511,7 @@ namespace algebra
             T value;
             size_t row, col;
             iss >> row >> col >> value;
-            assert(row <= rows && col <= cols);
+            assert(row <= rows and col <= cols);
             // I traslate the row and column indices to 0-based format and set the element
             //  in the matrix
             set(row - 1, col - 1, value);
@@ -520,12 +520,6 @@ namespace algebra
         file.close();
     };
 
-    /// @brief multiply a matrix with a vector
-    /// @tparam T type of the matrix elements
-    /// @tparam S storage order of the matrix (RowMajor or ColumnMajor)
-    /// @param m matrix
-    /// @param v vector
-    /// @return vector result
     template <AddMulType T, StorageOrder S>
     std::vector<T> operator*(const Matrix<T, S> &m, const std::vector<T> &v)
     {
@@ -534,7 +528,7 @@ namespace algebra
             throw std::invalid_argument("Matrix and vector dimensions do not match for multiplication");
         }
         std::vector<T> result(m.rows, 0);
-        if (!m.is_compressed())
+        if (not m.is_compressed())
         {
             for (const auto &it : m.uncompressed_format)
             {
@@ -588,15 +582,6 @@ namespace algebra
         return result;
     }
 
-    /// @brief mutliply two matrices with the same storage order
-    /// @tparam T type of the matrix elements
-    /// @tparam S storage order of the matrix (RowMajor or ColumnMajor)
-    /// @param m1 first matrix
-    /// @param m2 second matrix
-    /// @return matrix result
-    /// @note the two matrices must have the same storage order
-    /// @note the two matrices must have the same compression format
-    /// @note the result matrix will be in uncompressed format
     template <AddMulType T, StorageOrder S>
     Matrix<T, S> operator*(const Matrix<T, S> &m1, const Matrix<T, S> &m2)
     {
@@ -611,7 +596,7 @@ namespace algebra
 
         Matrix<T, S> result(m1.rows, m2.cols);
 
-        if (!m1.is_compressed() && !m2.is_compressed())
+        if (not m1.is_compressed() and not m2.is_compressed())
         {
             for (const auto &it1 : m1.uncompressed_format)
             {

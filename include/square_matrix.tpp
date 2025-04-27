@@ -243,7 +243,7 @@ namespace algebra
                         // std::cout << "Row index: " << rowidx << std::endl;
 
                         // Insert diagonal element if it is not already inserted, !0 and I am after the diagonal
-                        if (!flag && compressed_format_mod.values[i] != 0 && rowidx > i)
+                        if (not flag and compressed_format_mod.values[i] != 0 and rowidx > i)
                         {
                             // std::cout << "Adding diagonal element: " << compressed_format_mod.values[i] << std::endl;
                             this->compressed_format.values.push_back(compressed_format_mod.values[i]);
@@ -258,7 +258,7 @@ namespace algebra
                         // std::cout << "Adding off-diagonal element after diagonal: " << compressed_format_mod.values[j] << std::endl;
                     }
                     // if there are no other elements in the col or no elements after the diagonal one, add the diagonal element
-                    if (!flag && compressed_format_mod.values[i] != 0)
+                    if (not flag and compressed_format_mod.values[i] != 0)
                     {
                         // std::cout << "Adding diagonal element: " << compressed_format_mod.values[i] << std::endl;
                         this->compressed_format.values.push_back(compressed_format_mod.values[i]);
@@ -288,7 +288,7 @@ namespace algebra
                         size_t colidx = compressed_format_mod.bind[j];
 
                         // Insert diagonal element if it is not already inserted, !0 and I am after the diagonal
-                        if (!flag && compressed_format_mod.values[i] != 0 && colidx > i)
+                        if (not flag and compressed_format_mod.values[i] != 0 and colidx > i)
                         {
                             this->compressed_format.values.push_back(compressed_format_mod.values[i]);
                             this->compressed_format.outer.push_back(i);
@@ -301,7 +301,7 @@ namespace algebra
                         this->compressed_format.outer.push_back(colidx);
                     }
                     // if there are no other elements in the row, add the diagonal element
-                    if (!flag && compressed_format_mod.values[i] != 0)
+                    if (not flag and compressed_format_mod.values[i] != 0)
                     {
                         this->compressed_format.values.push_back(compressed_format_mod.values[i]);
                         this->compressed_format.outer.push_back(i);
@@ -390,7 +390,7 @@ namespace algebra
     T SquareMatrix<T, S>::operator()(size_t row, size_t col) const
     {
         // check if the index is in range
-        if (row >= this->rows || col >= this->cols)
+        if (row >= this->rows or col >= this->cols)
         {
             throw std::out_of_range("Index out of range");
         }
@@ -440,10 +440,10 @@ namespace algebra
     template <AddMulType T, StorageOrder S>
     Proxy<T, S> SquareMatrix<T, S>::operator()(size_t row, size_t col)
     {
-        if (row >= this->rows || col >= this->cols)
+        if (row >= this->rows or col >= this->cols)
             throw std::out_of_range("Index out of range");
 
-        if (modified || this->compressed)
+        if (modified or this->compressed)
         {
             std::cout << "Matrix is compressed, uncompressing..." << std::endl;
             uncompress();
@@ -567,7 +567,7 @@ namespace algebra
     void SquareMatrix<T, S>::reader(const std::string &filename)
     {
         std::ifstream file(filename);
-        if (!file.is_open())
+        if (not file.is_open())
         {
             // more verbose error message
             throw std::runtime_error("Unable to open file '" + filename + "': " + strerror(errno));
@@ -608,7 +608,7 @@ namespace algebra
             T value;
             size_t row, col;
             iss >> row >> col >> value;
-            assert(row <= this->rows && col <= this->cols);
+            assert(row <= this->rows and col <= this->cols);
             // I traslate the row and column indices to 0-based format and set the element
             //  in the matrix
             set(row - 1, col - 1, value);
@@ -638,6 +638,42 @@ namespace algebra
         }
     };
 
+    /// @brief multiply with a std::vector
+    /// @param m matrix
+    /// @param v vector
+    /// @return the result of the multiplication
+    /// @note this function is a friend of the Matrix class, so it can access the private members
+    template <AddMulType T, StorageOrder S>
+    std::vector<T> operator*(const SquareMatrix<T, S> &m, const std::vector<T> &v)
+    {
+        if (m.modified)
+        {
+            // TBD
+        }
+        return Matrix<U, V>::operator*(m, v);
+    };
+
+    /// @brief multiply with another matrix
+    /// @param m1 first matrix
+    /// @param m2 second matrix
+    /// @return the result of the multiplication
+    /// @note this function is a friend of the Matrix class, so it can access the private members
+    template <AddMulType T, StorageOrder S>
+    SquareMatrix<T, S> operator*(const SquareMatrix<T, S> &m1, const SquareMatrix<T, S> &m2)
+    {
+        if (m1.modified or m2.modified)
+        {
+            if (not m1.modified or not m2.modified)
+            {
+                std::runtime_error("Matrix multiplication between compressed and uncompressed matrix is not supported");
+            }
+            else
+            {
+                // TBD
+            }
+        }
+        return Matrix<U, V>::operator*(m1, m2);
+    };
 };
 
 #endif // SQUARE_MATRIX_TPP

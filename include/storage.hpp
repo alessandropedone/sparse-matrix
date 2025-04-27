@@ -61,7 +61,7 @@ namespace algebra
     {
         bool operator()(const Index &a, const Index &b) const
         {
-            return (a.row < b.row) || (a.row == b.row && a.col < b.col);
+            return (a.row < b.row) or (a.row == b.row and a.col < b.col);
         }
     };
 
@@ -70,7 +70,7 @@ namespace algebra
     {
         bool operator()(const Index &a, const Index &b) const
         {
-            return (a.col < b.col) || (a.col == b.col && a.row < b.row);
+            return (a.col < b.col) or (a.col == b.col and a.row < b.row);
         }
     };
 

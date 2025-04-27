@@ -194,7 +194,7 @@ namespace algebra
             throw std::invalid_argument("Matrix and vector dimensions do not match for multiplication");
         }
         std::vector<T> result(m.cols, 0);
-        if (!m.is_compressed())
+        if (not m.is_compressed())
         {
             for (const auto &it : m.uncompressed_format)
             {

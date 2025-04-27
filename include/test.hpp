@@ -57,7 +57,7 @@ namespace algebra
     template <AddMulType T, StorageOrder S>
     bool are_equal(const Matrix<T, S> &m1, const Matrix<T, S> &m2)
     {
-        if (m1.get_rows() != m2.get_rows() || m1.get_cols() != m2.get_cols())
+        if (m1.get_rows() != m2.get_rows() or m1.get_cols() != m2.get_cols())
         {
             return false;
         }
@@ -86,35 +86,35 @@ namespace algebra
         SquareMatrix<T, S> compare_matrix(m);
 
         compare_matrix.compress_mod();
-        if (!are_equal(m, compare_matrix))
+        if (not are_equal(m, compare_matrix))
         {
             throw std::runtime_error("Error passing from uncompressed to modified compressed format");
             return false;
         }
 
         compare_matrix.compress();
-        if (!are_equal(m, compare_matrix))
+        if (not are_equal(m, compare_matrix))
         {
             throw std::runtime_error("Error passing from modified compressed to compressed format");
             return false;
         }
 
         compare_matrix.uncompress();
-        if (!are_equal(m, compare_matrix))
+        if (not are_equal(m, compare_matrix))
         {
             throw std::runtime_error("Error passing from compressed to uncompressed format");
             return false;
         }
 
         compare_matrix.compress_mod();
-        if (!are_equal(m, compare_matrix))
+        if (not are_equal(m, compare_matrix))
         {
             throw std::runtime_error("Error passing from uncompressed to modified compressed format");
             return false;
         }
 
         compare_matrix.compress();
-        if (!are_equal(m, compare_matrix))
+        if (not are_equal(m, compare_matrix))
         {
             throw std::runtime_error("Error passing from modified compressed to compressed format");
             return false;
@@ -137,14 +137,14 @@ namespace algebra
         Matrix<T, S> compare_matrix(m);
 
         compare_matrix.compress();
-        if (!are_equal(m, compare_matrix))
+        if (not are_equal(m, compare_matrix))
         {
             throw std::runtime_error("Error passing from uncompressed to compressed format");
             return false;
         }
 
         compare_matrix.uncompress();
-        if (!are_equal(m, compare_matrix))
+        if (not are_equal(m, compare_matrix))
         {
             throw std::runtime_error("Error passing from compressed to uncompressed format");
             return false;

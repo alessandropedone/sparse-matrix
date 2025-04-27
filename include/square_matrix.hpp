@@ -96,6 +96,26 @@ namespace algebra
         /// @return number of non-zero elements
         virtual size_t get_nnz() const override;
 
+        /// @brief multiply with a std::vector
+        /// @tparam U type of the vector elements
+        /// @tparam T type of the storage order
+        /// @param m matrix
+        /// @param v vector
+        /// @return the result of the multiplication
+        /// @note this function is a friend of the Matrix class, so it can access the private members
+        template <AddMulType U, StorageOrder T>
+        friend std::vector<U> operator*(const SquareMatrix<U, T> &m, const std::vector<U> &v);
+
+        /// @brief multiply with another matrix
+        /// @tparam U type of the matrix elements
+        /// @tparam T type of the storage order
+        /// @param m1 first matrix
+        /// @param m2 second matrix
+        /// @return the result of the multiplication
+        /// @note this function is a friend of the Matrix class, so it can access the private members
+        template <AddMulType U, StorageOrder T>
+        friend SquareMatrix<U, T> operator*(const SquareMatrix<U, T> &m1, const SquareMatrix<U, T> &m2);
+
     private:
         bool modified = false; // flag to check if the matrix is in modified compressed format
 

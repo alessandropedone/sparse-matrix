@@ -281,13 +281,6 @@ namespace algebra
     };
 
     template <AddMulType T, StorageOrder S>
-    void Matrix<T, S>::uncompress_parallel()
-    {
-        if (!compressed)
-            return;
-    }
-
-    template <AddMulType T, StorageOrder S>
     T Matrix<T, S>::operator()(size_t row, size_t col) const
     {
         // check if the index is in range
@@ -477,13 +470,6 @@ namespace algebra
             }
             return std::sqrt(norm);
         }
-    };
-
-    template <AddMulType T, StorageOrder S>
-    template <NormType N>
-    double Matrix<T, S>::norm_parallel() const
-    {
-        return 0.0; // TODO
     };
 
     template <AddMulType T, StorageOrder S>
@@ -689,6 +675,19 @@ namespace algebra
         }
         return result;
     }
+
+    template <AddMulType T, StorageOrder S>
+    size_t Matrix<T, S>::get_nnz() const
+    {
+        if (compressed)
+        {
+            return compressed_format.values.size();
+        }
+        else
+        {
+            return uncompressed_format.size();
+        }
+    };
 
 }
 

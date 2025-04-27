@@ -11,7 +11,9 @@ how do i manage to compute products (views and SquareMatrix)
 
 test also the product with modified compressed format for SquareMatrix
 
-Parallelization with std algorithms (remove parallel implementations)
+Parallelization with std algorithms
+- keep compress_parallel in order to see the parallelization overhead
+- review normal algorithms and add parallel execution policies where possibile
   
 README.md (
     need of TBB, 

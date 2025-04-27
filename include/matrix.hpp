@@ -67,15 +67,11 @@ namespace algebra
         /// @brief uncompress the matrix if it is in a compressed format
         virtual void uncompress();
 
-        /// @brief uncompress the matrix in parallel if it is in a compressed format
-        virtual void uncompress_parallel();
-
         /// @brief call operator() const version
         /// @param row row index
         /// @param col column index
         /// @return element at (row, col)
         virtual T operator()(size_t row, size_t col) const;
-
 
         /// @brief call operator() non-const version
         /// @param row row index
@@ -94,12 +90,6 @@ namespace algebra
         template <NormType N>
         double norm() const;
 
-        /// @brief parallel version of the norm
-        /// @tparam N type of the norm (One, Infinity, Frobenius)
-        /// @return value of the norm
-        template <NormType N>
-        double norm_parallel() const;
-
         /// @brief Function to read a matrix in Matrix Market format
         /// @param filename input file name
         virtual void reader(const std::string &filename);
@@ -114,17 +104,7 @@ namespace algebra
 
         /// @brief get the number of non-zero elements
         /// @return number of non-zero elements
-        virtual size_t get_nnz() const
-        {
-            if (compressed)
-            {
-                return compressed_format.values.size();
-            }
-            else
-            {
-                return uncompressed_format.size();
-            }
-        };
+        virtual size_t get_nnz() const;
 
         // friend functions
         // multiply with a std::vector

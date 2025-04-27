@@ -4,6 +4,8 @@
 #include "matrix.hpp"
 #include "proxy.hpp"
 
+#include <execution>
+
 namespace algebra
 {
     template <typename T, StorageOrder S = StorageOrder::RowMajor>
@@ -44,6 +46,41 @@ namespace algebra
             return matrix;
         }
 
+        /// @brief check if the matrix is in a compressed format
+        /// @return true if the matrix is compressed, false otherwise
+        bool is_compressed() const { return matrix.is_compressed(); };
+
+        /// @brief get the number of rows
+        /// @return number of rows
+        size_t get_rows() const { return matrix.get_cols(); };
+        
+        /// @brief get the number of columns
+        /// @return number of columns
+        size_t get_cols() const { return matrix.get_rows(); };
+
+        /// @brief get the number of non-zero elements
+        /// @return number of non-zero elements
+        virtual size_t get_nnz() const { return matrix.get_nnz(); };
+
+        /// @brief calculate the norm of the matrix
+        /// @tparam N type of the norm (One, Infinity, Frobenius)
+        /// @return value of the norm
+        template <NormType N>
+        double norm() const{
+            if constexpr (N == NormType::One)
+            {
+                return matrix.template norm<NormType::Infinity>();
+            }
+            else if constexpr (N == NormType::Infinity)
+            {
+                return matrix.template norm<NormType::One>();
+            }
+            else
+            {
+                return matrix.template norm<N>();
+            }
+        };
+
         // friend functions
         // multiply with a std::vector
         template <AddMulType U, StorageOrder V>
@@ -68,18 +105,16 @@ namespace algebra
             MatrixDiagonalView(SquareMatrix<T, S> &matrix) : matrix(matrix) {}
         
             /// @brief call operator non-const version
-            /// @param row row index
-            /// @param col column index
-            /// @return a proxy to the matrix element at (row, col)
+            /// @param idx row and column index
+            /// @return a proxy to the matrix element at (idx, idx)
             Proxy<T,S> operator()(size_t idx)
             {
-                return Proxy(matrix, idx, idx);
+                return Proxy(matrix.uncompress(), idx, idx);
             }
 
             /// @brief call operator const version
-            /// @param row row index
-            /// @param col column index
-            /// @return the matrix element at (row, col)
+            /// @param idx row and column index
+            /// @return the matrix element at (idx, idx)
             T operator()(size_t idx) const
             {
                 return matrix(idx, idx);
@@ -92,6 +127,52 @@ namespace algebra
                 return matrix;
             }
             
+            /// @brief check if the matrix is in a compressed format
+            /// @return true if the matrix is compressed, false otherwise
+            bool is_compressed() const { return matrix.is_compressed(); };
+
+            /// @brief check if the matrix is in a modified compressed format
+            /// @return true if the matrix is modified compressed, false otherwise 
+            bool is_modified() const { return matrix.is_modified(); };
+
+            /// @brief get the matrix dimension
+            /// @return number of rows or columns (the matrix is square)
+            size_t get_size() const { return matrix.get_rows(); };
+
+            /// @brief get the number of non-zero elements in the diagonal
+            /// @return number of non-zero elements in the diagonal
+            virtual size_t get_nnz() const {
+                T sum = 0;
+                for(size_t i = 0; i < matrix.get_rows(); i++)
+                {
+                    sum += matrix(i,i);
+                }
+                return sum;
+            };
+
+            /// @brief calculate the norm of the matrix
+            /// @tparam N type of the norm (One, Infinity, Frobenius)
+            /// @return value of the norm
+            template <NormType N>
+            double norm() const {
+                if constexpr (N = NormType::Frobenius){
+                    T sum{0};
+                    for(size_t i = 0; i < matrix.get_rows(); i++)
+                    {
+                        sum += matrix(i,i) * matrix(i,i);
+                    }
+                    return std::sqrt(sum);
+                }
+                else{
+                    std::vector<T> diag(matrix.get_rows(), 0);
+                    for(size_t i = 0; i < matrix.get_rows(); i++)
+                    {
+                        diag[i] = matrix(i,i);
+                    }
+                    return *std::max_element(std::execution::par_unseq, diag.begin(), diag.end());
+                }
+            };
+
             // friend functions
             // multiply with a std::vector
             template <AddMulType U, StorageOrder V>

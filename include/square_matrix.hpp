@@ -34,7 +34,7 @@ namespace algebra
         };
 
         /// @brief default copy constructor
-        /// @param other
+        /// @param other matrix to copy
         SquareMatrix(const SquareMatrix &other) = default;
 
         /// @brief default destructor

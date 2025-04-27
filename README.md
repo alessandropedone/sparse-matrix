@@ -5,6 +5,7 @@
 test also the product with modified compressed format for SquareMatrix
 
 how do i manage to compute products (views and SquareMatrix)
+- for diagonalview, what matrix-matrix product shall we implement? (diag-diag, diag-matrix, matrix-diag)
 
 Parallelization with std algorithms (remove parallel implementations)
 

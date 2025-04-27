@@ -290,6 +290,18 @@ namespace algebra
     template <AddMulType T, StorageOrder S>
     Matrix<T, S> operator*(const Matrix<T, S> &m1, const MatrixDiagonalView<T, S> &m2)
     {
+        if (m1.get_cols() != m2.get_size())
+        {
+            throw std::invalid_argument("Matrix dimensions do not match for multiplication");
+        }
+        if (m1.is_compressed() != m2.is_compressed())
+        {
+            throw std::invalid_argument("Matrix compression formats do not match");
+        }
+
+        Matrix<T, S> result(m1.get_rows(), m2.get_size());
+
+        return result;
 
     };
 

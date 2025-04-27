@@ -37,6 +37,18 @@ namespace algebra
         /// @param other matrix to copy
         SquareMatrix(const SquareMatrix &other) = default;
 
+        /// @brief constructor from a matrix
+        /// @param other matrix to copy
+        SquareMatrix(const Matrix<T, S> &other) : Matrix<T, S>(other)
+        {
+            if (other.get_rows() != other.get_cols())
+            {
+                throw std::runtime_error("Matrix is not square");
+            }
+            this->compressed = false;
+            this->modified = false;
+        };
+
         /// @brief default destructor
         virtual ~SquareMatrix() override = default;
 

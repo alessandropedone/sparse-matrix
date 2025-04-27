@@ -80,22 +80,22 @@ namespace algebra
     /// @param m matrix
     /// @return true if the test passed, false otherwise
     template <AddMulType T, StorageOrder S>
-    bool test_compression_square_matrix(const Matrix<T, S> &m)
+    bool test_compression_square_matrix(const SquareMatrix<T, S> &m)
     {
         // Read matrix
         SquareMatrix<T, S> compare_matrix(m);
 
-        compare_matrix.compress_mod();
-        if (not are_equal(m, compare_matrix))
-        {
-            throw std::runtime_error("Error passing from uncompressed to modified compressed format");
-            return false;
-        }
-
         compare_matrix.compress();
         if (not are_equal(m, compare_matrix))
         {
-            throw std::runtime_error("Error passing from modified compressed to compressed format");
+            throw std::runtime_error("Error passing from uncompressed to compressed format");
+            return false;
+        }
+
+        compare_matrix.compress_mod();
+        if (not are_equal(m, compare_matrix))
+        {
+            throw std::runtime_error("Error passing from compressed to modified compressed format");
             return false;
         }
 
@@ -117,6 +117,13 @@ namespace algebra
         if (not are_equal(m, compare_matrix))
         {
             throw std::runtime_error("Error passing from modified compressed to compressed format");
+            return false;
+        }
+
+        compare_matrix.uncompress();
+        if (not are_equal(m, compare_matrix))
+        {
+            throw std::runtime_error("Error passing from modified compressed to uncompressed format");
             return false;
         }
 
@@ -155,6 +162,24 @@ namespace algebra
         return true;
     }
 
+    /// @brief test compression of a matrix
+    /// @tparam T type of the matrix elements
+    /// @tparam S type of the storage order (RowMajor or ColumnMajor)
+    /// @param m matrix
+    /// @note this function is a friend of the Matrix class, so it can access the private members
+    template <AddMulType T, StorageOrder S>
+    void test_compression(const Matrix<T, S> &m)
+    {
+        if (typeid(m) == typeid(SquareMatrix<T, S>))
+        {
+            test_compression_square_matrix(static_cast<const SquareMatrix<T, S> &>(m));
+        }
+        else
+        {
+            test_compression_matrix(m);
+        }
+    }
+
     /// @brief compute the norm of a matrix
     /// @tparam T type of the matrix elements
     /// @tparam S type of the storage order (RowMajor or ColumnMajor)
@@ -169,6 +194,71 @@ namespace algebra
         std::cout << "Frobenius norm: " << std::setw(14) << m.template norm<NormType::Frobenius>() << std::endl;
         std::cout << std::endl;
         return;
+    }
+
+    /// @brief 5x5 matrix for testing
+    /// @tparam T type of the matrix elements
+    /// @tparam S type of the storage order (RowMajor or ColumnMajor)
+    template <AddMulType T, StorageOrder S>
+    void test5x5(Matrix<T, S> &m)
+    {
+        m.reader(static_cast<std::string>("data/read_test_5x5.mtx"));
+
+        // Print the matrix
+        std::cout << "Test 5x5 matrix" << std::endl;
+        print(m);
+
+        // Test compression
+        test_compression(m);
+
+        // Test norm functions
+        norm_test(m);
+
+        // Initialize a vector
+        std::vector<double> v(m.get_cols(), 0);
+        std::random_device seed;
+        unsigned int constant_seed = 42; // Set a constant seed for reproducibility
+        std::default_random_engine gen(constant_seed);
+        std::uniform_real_distribution<double> distr(-1., 1.);
+        for (auto &val : v)
+        {
+            val = distr(gen);
+        }
+
+        // Print the vector
+        std::cout << "Test vector" << std::endl;
+        print(v);
+
+        if (typeid(m) == typeid(SquareMatrix<T, S>))
+        {
+            std::cout << "Test with SquareMatrix class" << std::endl;
+            auto sm = static_cast<SquareMatrix<T, S> &>(m);
+            sm.compress_mod();
+
+            // Do the matrix - vector product
+            auto result = sm * v;
+            std::cout << "M*v" << std::endl;
+            print(result);
+
+            // Do the matrix - matrix product
+            std::cout << "M^2 " << std::endl;
+            auto m2 = sm * sm;
+            print(m2);
+        }
+        else
+        {
+            m.compress();
+
+            // Do the matrix - vector product
+            auto result = m * v;
+            std::cout << "M*v" << std::endl;
+            print(result);
+
+            // Do the matrix - matrix product
+            std::cout << "M^2 " << std::endl;
+            auto m2 = m * m;
+            print(m2);
+        }
     }
 
     /// @brief test the execution time of matrix-matrix and matrix-vector products

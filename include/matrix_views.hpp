@@ -156,18 +156,18 @@ namespace algebra
             template <NormType N>
             double norm() const {
                 if constexpr (N = NormType::Frobenius){
-                    T sum{0};
+                    double sum{0};
                     for(size_t i = 0; i < matrix.get_rows(); i++)
                     {
-                        sum += matrix(i,i) * matrix(i,i);
+                        sum += std::abs(matrix(i,i)) * std::abs(matrix(i,i));
                     }
                     return std::sqrt(sum);
                 }
                 else{
-                    std::vector<T> diag(matrix.get_rows(), 0);
+                    std::vector<double> diag(matrix.get_rows(), 0);
                     for(size_t i = 0; i < matrix.get_rows(); i++)
                     {
-                        diag[i] = matrix(i,i);
+                        diag[i] = std::abs(matrix(i,i));
                     }
                     return *std::max_element(std::execution::par_unseq, diag.begin(), diag.end());
                 }

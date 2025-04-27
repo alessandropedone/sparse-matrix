@@ -27,6 +27,11 @@ namespace algebra
         {
             return matrix(col, row);
         }
+
+        /// @brief call operator const version
+        /// @param row row index
+        /// @param col column index
+        /// @return the matrix element at (row, col)
         T operator()(size_t row, size_t col) const
         {
             return matrix(col, row);
@@ -49,6 +54,54 @@ namespace algebra
 
     private:
         Matrix<T, S> &matrix;
+    };
+
+    template <AddMulType T, StorageOrder S = StorageOrder::RowMajor>
+    class MatrixDiagonalView 
+    {
+        public:
+            /// @brief delete default constructor
+            MatrixDiagonalView() = delete;
+
+            /// @brief constructor
+            /// @param matrix the matrix to see as diagonal
+            MatrixDiagonalView(SquareMatrix<T, S> &matrix) : matrix(matrix) {}
+        
+            /// @brief call operator non-const version
+            /// @param row row index
+            /// @param col column index
+            /// @return a proxy to the matrix element at (row, col)
+            Proxy<T,S> operator()(size_t idx)
+            {
+                return Proxy(matrix, idx, idx);
+            }
+
+            /// @brief call operator const version
+            /// @param row row index
+            /// @param col column index
+            /// @return the matrix element at (row, col)
+            T operator()(size_t idx) const
+            {
+                return matrix(idx, idx);
+            }
+
+            /// @brief  get the matrix
+            /// @return the matrix
+            SquareMatrix<T, S> &get_matrix() const
+            {
+                return matrix;
+            }
+            
+            // friend functions
+            // multiply with a std::vector
+            template <AddMulType U, StorageOrder V>
+            friend std::vector<U> operator*(const MatrixDiagonalView<U, V> &m, const std::vector<U> &v);
+            // multiply with another matrix
+            template <AddMulType U, StorageOrder V>
+            friend Matrix<U, V> operator*(const MatrixDiagonalView<U, V> &m1, const Matrix<U, V> &m2);
+
+        private:
+            SquareMatrix<T, S> &matrix;
     };
 
     template <AddMulType T, StorageOrder S>

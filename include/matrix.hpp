@@ -80,7 +80,7 @@ namespace algebra
         /// @brief call operator() non-const version
         /// @param row row index
         /// @param col column index
-        /// @return reference to the element at (row, col) with proxy (to avoid setting zero values)
+        /// @return reference to the element at (row, col) with proxy (to avoid storing zero values)
         virtual Proxy<T, S> operator()(size_t row, size_t col);
 
         /// @brief resize the matrix

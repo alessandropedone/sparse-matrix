@@ -201,15 +201,6 @@ namespace algebra
     template <typename T, StorageOrder S>
     void execute_test(Matrix<T, S> &testMatrix, const std::string &matrix_name)
     {
-        std::vector<double> v(testMatrix.get_cols(), 0);
-        std::random_device seed;
-        std::default_random_engine gen(seed());
-        std::uniform_real_distribution<double> distr(-1., 1.);
-        for (auto &val : v)
-        {
-            val = distr(gen);
-        }
-
         // Import matrix
         testMatrix.reader(static_cast<std::string>("data/" + matrix_name));
 
@@ -225,16 +216,22 @@ namespace algebra
         // Test excution time of products
         std::cout << "Test for execution time of products" << std::endl;
 
-        // Generate vector
+        // Initialize random distribution to create a random filled vector
+        std::random_device seed;
+        std::default_random_engine gen(seed());
+        std::uniform_real_distribution<double> distr(-1., 1.);
+
+        // Generate vector to perform the matrix - vector product
         std::vector<double> vec(testMatrix.get_cols(), 0);
-        Matrix<double, S> res1(testMatrix.get_rows(), testMatrix.get_cols());
-        Matrix<double, S> res2(testMatrix.get_rows(), testMatrix.get_cols());
-        std::vector<double> res3(testMatrix.get_rows(), 0);
-        std::vector<double> res4(testMatrix.get_rows(), 0);
         for (auto &val : vec)
         {
             val = distr(gen);
         }
+
+        Matrix<double, S> res1(testMatrix.get_rows(), testMatrix.get_cols());
+        Matrix<double, S> res2(testMatrix.get_rows(), testMatrix.get_cols());
+        std::vector<double> res3(testMatrix.get_rows(), 0);
+        std::vector<double> res4(testMatrix.get_rows(), 0);
 
         MyTimePoint start, stop;
         std::string filename = "data/execution_time.json";

@@ -570,7 +570,6 @@ namespace algebra
         }
         else
         {
-            std::cout << "calling matrix norm because not modified" << std::endl;
             return Matrix<T, S>::template norm<N>();
         }
     };

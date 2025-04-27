@@ -366,6 +366,14 @@ namespace algebra
     template <NormType N>
     double Matrix<T, S>::norm() const
     {
+        if (typeid(*this) == typeid(SquareMatrix<T, S>))
+        {
+            auto *this_square = static_cast<const SquareMatrix<T, S> *>(this);
+            if (this_square->is_modified())
+            {
+                return this_square->template norm<N>();
+            }
+        }
         if (!compressed)
         {
             if constexpr (N == NormType::One)

@@ -476,7 +476,7 @@ namespace algebra
     void Matrix<T, S>::reader(const std::string &filename)
     {
         std::ifstream file(filename);
-        if (nbt file.is_open())
+        if (not file.is_open())
         {
             // more verbose error message
             throw std::runtime_error("Unable to open file '" + filename + "': " + strerror(errno));

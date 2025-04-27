@@ -103,8 +103,8 @@ namespace algebra
         /// @param v vector
         /// @return the result of the multiplication
         /// @note this function is a friend of the Matrix class, so it can access the private members
-        template <AddMulType U, StorageOrder T>
-        friend std::vector<U> operator*(const SquareMatrix<U, T> &m, const std::vector<U> &v);
+        template <AddMulType U, StorageOrder V>
+        friend std::vector<U> operator*(const SquareMatrix<U, V> &m, const std::vector<U> &v);
 
         /// @brief multiply with another matrix
         /// @tparam U type of the matrix elements
@@ -113,8 +113,8 @@ namespace algebra
         /// @param m2 second matrix
         /// @return the result of the multiplication
         /// @note this function is a friend of the Matrix class, so it can access the private members
-        template <AddMulType U, StorageOrder T>
-        friend SquareMatrix<U, T> operator*(const SquareMatrix<U, T> &m1, const SquareMatrix<U, T> &m2);
+        template <AddMulType U, StorageOrder V>
+        friend SquareMatrix<U, V> operator*(const SquareMatrix<U, V> &m1, const SquareMatrix<U, V> &m2);
 
     private:
         bool modified = false; // flag to check if the matrix is in modified compressed format

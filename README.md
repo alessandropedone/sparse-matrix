@@ -2,6 +2,7 @@
 
 # Sparse matrix 
 
+Optimize compression in modified format (remove unnecessary ifs)
 Test
 - product with modified compressed format for SquareMatrix
 - transpose and diagonal views
@@ -9,10 +10,8 @@ Test
 how do i manage to compute products (views and SquareMatrix)
 - implement 3 cases for each view
 
-
 Parallelization with std algorithms
-- keep compr
-ess_parallel in order to see the parallelization overhead
+- keep compress_parallel in order to see the parallelization overhead
 - review normal algorithms and add parallel execution policies where possibile
   
 README.md (

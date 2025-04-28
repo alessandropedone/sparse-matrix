@@ -332,8 +332,9 @@ namespace algebra
     Proxy<T, S> Matrix<T, S>::operator()(size_t row, size_t col)
     {
         if (row >= rows or col >= cols)
+        {
             throw std::out_of_range("Index out of range");
-
+        }
         if (compressed)
         {
             std::cout << "Matrix is compressed, uncompressing...\n";

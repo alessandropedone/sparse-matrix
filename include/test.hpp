@@ -204,6 +204,18 @@ namespace algebra
     {
         m.reader(static_cast<std::string>("data/read_test_5x5.mtx"));
 
+        if (typeid(m) == typeid(SquareMatrix<T, S>))
+        {
+            std::cout << "----------------------------" << std::endl;
+            std::cout << "Test with SquareMatrix class" << std::endl;
+            std::cout << "----------------------------" << std::endl;
+        }
+        else
+        {
+            std::cout << "----------------------" << std::endl;
+            std::cout << "Test with Matrix class" << std::endl;
+            std::cout << "----------------------" << std::endl;
+        }
         // Print the matrix
         std::cout << "Test 5x5 matrix" << std::endl;
         print(m);
@@ -231,7 +243,6 @@ namespace algebra
 
         if (typeid(m) == typeid(SquareMatrix<T, S>))
         {
-            std::cout << "Test with SquareMatrix class" << std::endl;
             auto sm = static_cast<SquareMatrix<T, S> &>(m);
             sm.compress_mod();
 

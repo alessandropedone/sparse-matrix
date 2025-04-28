@@ -2,9 +2,7 @@
 
 # Sparse matrix 
 
-Optimize compression in modified format (remove unnecessary ifs)
 Test
-- product with modified compressed format for SquareMatrix
 - transpose and diagonal views
 
 how do i manage to compute products (views and SquareMatrix)
@@ -18,11 +16,14 @@ how do i manage to compute products (views and SquareMatrix)
     - create squareMatrix constructor with transposed view and diagonal view
     - since for now the views don't have public access to stored matrix data, these constructors are based on call operator
 
-Parallelization with std algorithms
+Optimization
+- optimize compression in modified format (remove unnecessary ifs)
 - keep compress_parallel in order to see the parallelization overhead
 - review normal algorithms and add parallel execution policies where possibile
   
 README.md (
     need of TBB, 
     we didn't implement COO since COOmap is clearly more efficient, 
-    explain why parallel implementation of compress is slower, put a test about this)
+    explain why parallel implementation of compress is slower, put a test about this
+    please run multiple times,
+    results interpretation)

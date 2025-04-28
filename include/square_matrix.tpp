@@ -680,6 +680,7 @@ namespace algebra
     template <AddMulType T, StorageOrder S>
     std::vector<T> operator*(const SquareMatrix<T, S> &m, const std::vector<T> &v)
     {
+
         if (m.modified)
         {
             if (v.size() != m.cols)

@@ -3,7 +3,6 @@
 
 #include "matrix.hpp"
 #include "square_matrix.hpp"
-#include "matrix_views.hpp"
 
 // For more verbose error messages
 #include <cstring> // for strerror
@@ -11,7 +10,7 @@
 #include <cassert>
 
 namespace algebra
-{
+{/*
     template <AddMulType T, StorageOrder S>
     Matrix<T, S>::Matrix(const MatrixTransposeView<T, S> &matrixView) : rows(matrixView.get_rows()), cols(matrix.get_cols()){
         for (size_t i = 0; i < rows; ++i)
@@ -23,7 +22,7 @@ namespace algebra
         }
         this->compressed = false;
     };
-
+*/
     template <AddMulType T, StorageOrder S>
     void Matrix<T, S>::set(size_t row, size_t col, const T &value)
     {

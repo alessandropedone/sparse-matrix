@@ -2,6 +2,7 @@
 #define MATRIX_VIEWS_HPP
 
 #include "matrix.hpp"
+#include "square_matrix.hpp"
 #include "proxy.hpp"
 
 #include <execution>
@@ -18,7 +19,7 @@ namespace algebra
 
         /// @brief constructor
         /// @param matrix the matrix to transpose
-        MatrixTransposeView(Matrix<T, S> &matrix) : matrix(matrix) {}
+        MatrixTransposeView(Matrix<T, S> &matrix) : matrix(matrix) {};
 
 
         /// @brief call operator non-const version
@@ -28,7 +29,7 @@ namespace algebra
         Proxy<T,S> operator()(size_t row, size_t col)
         {
             return matrix(col, row);
-        }
+        };
 
         /// @brief call operator const version
         /// @param row row index
@@ -37,14 +38,14 @@ namespace algebra
         T operator()(size_t row, size_t col) const
         {
             return matrix(col, row);
-        }
+        };
         
         /// @brief  get the matrix
         /// @return the matrix
         Matrix<T, S> &get_matrix() const
         {
             return matrix;
-        }
+        };
 
         /// @brief check if the matrix is in a compressed format
         /// @return true if the matrix is compressed, false otherwise
@@ -198,7 +199,7 @@ namespace algebra
         private:
             SquareMatrix<T, S> &matrix;
     };
-
+/*
     //FRIENDS: MULTIPLICATIONS WITH TRANSPOSED VIEWS
     template <AddMulType T, StorageOrder S>
     std::vector<T> operator*(const MatrixTransposeView<T, S> &m, const std::vector<T> &v)
@@ -376,6 +377,6 @@ namespace algebra
     {
 
     };
-
+*/
 }
 #endif // MATRIX_VIEWS_HPP

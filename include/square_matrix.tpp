@@ -10,7 +10,7 @@
 #include "square_matrix.hpp"
 
 namespace algebra
-{
+{/*
     template <AddMulType T, StorageOrder S>
     SquareMatrix<T, S>::SquareMatrix(const MatrixTransposeView<T, S> &matrixView){
         if (matrixView.get_rows() != matrixView.get_cols())
@@ -44,7 +44,7 @@ namespace algebra
             this->compressed_format_mod.bind[i] = this->rows;
         }
     };
-
+*/
     template <AddMulType T, StorageOrder S>
     const size_t SquareMatrix<T, S>::get_mod_size() const
     {

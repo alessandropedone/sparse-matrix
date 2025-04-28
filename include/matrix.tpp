@@ -597,7 +597,7 @@ namespace algebra
 
         Matrix<T, S> result(m1.rows, m2.cols);
 
-        if (not m1.is_compressed() and not m2.is_compressed())
+        if (not m1.is_compressed())
         {
             for (const auto &it1 : m1.uncompressed_format)
             {

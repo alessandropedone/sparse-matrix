@@ -85,11 +85,18 @@ namespace algebra
         // multiply with a std::vector
         template <AddMulType U, StorageOrder V>
         friend std::vector<U> operator*(const MatrixTransposeView<U, V> &m, const std::vector<U> &v);
+
         // multiply with another matrix
+        template <AddMulType U, StorageOrder V>
+        friend Matrix<U, V> operator*(const MatrixTransposeView<U, V> &m1, const MatrixTransposeView<U, V> &m2);
+        
         template <AddMulType U, StorageOrder V>
         friend Matrix<U, V> operator*(const MatrixTransposeView<U, V> &m1, const Matrix<U, V> &m2);
 
-    private:
+        template <AddMulType U, StorageOrder V>
+        friend Matrix<U, V> operator*(const Matrix<U, V> &m1, const MatrixTransposeView<U, V> &m2);
+
+        private:
         Matrix<T, S> &matrix;
     };
 
@@ -177,14 +184,22 @@ namespace algebra
             // multiply with a std::vector
             template <AddMulType U, StorageOrder V>
             friend std::vector<U> operator*(const MatrixDiagonalView<U, V> &m, const std::vector<U> &v);
+            
             // multiply with another matrix
             template <AddMulType U, StorageOrder V>
+            friend Matrix<U, V> operator*(const MatrixDiagonalView<U, V> &m1, const MatrixDiagonalView<U, V> &m2);
+
+            template <AddMulType U, StorageOrder V>
             friend Matrix<U, V> operator*(const Matrix<U, V> &m1, const MatrixDiagonalView<U, V> &m2);
+
+            template <AddMulType U, StorageOrder V>
+            friend Matrix<U, V> operator*(const MatrixDiagonalView<U, V> &m1, const Matrix<U, V> &m2);
 
         private:
             SquareMatrix<T, S> &matrix;
     };
 
+    //FRIENDS: MULTIPLICATIONS WITH TRANSPOSED VIEWS
     template <AddMulType T, StorageOrder S>
     std::vector<T> operator*(const MatrixTransposeView<T, S> &m, const std::vector<T> &v)
     {
@@ -255,6 +270,47 @@ namespace algebra
     }
 
     template <AddMulType T, StorageOrder S>
+    Matrix<T, S> operator*(const MatrixTransposeView<T, S> &m1, const Matrix<T, S> &m2)
+    {
+        // TO DO
+
+        Matrix<T,S> result(m1.get_rows, m2.get_cols);
+
+        if (m1.get_cols() != m2.get_rows())
+        {
+            throw std::invalid_argument("Matrix dimensions do not match for multiplication");
+        }
+        if (m1.is_compressed() != m2.is_compressed())
+        {
+            throw std::invalid_argument("Matrix compression formats do not match");
+        }
+
+        if (not m1.is_compressed())
+        {
+            for (const auto &it1 : m1.uncompressed_format)
+            {
+                for (const auto &it2 : m2.uncompressed_format)
+                {
+                    if (it1.first.col == it2.first.row)
+                    {
+                        result(it1.first.row, it2.first.col) += it1.second * it2.second;
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    template <AddMulType T, StorageOrder S>
+    Matrix<T, S> operator*(const Matrix<T, S> &m1, const MatrixTransposeView<T, S> &m2)
+    {
+        return Matrix<T,S>();
+    }
+
+
+    //FRIENDS: MULTIPLICATIONS WITH DIAGONAL VIEWS
+    template <AddMulType T, StorageOrder S>
     std::vector<T> operator*(const MatrixDiagonalView<T, S> &m, const std::vector<T> &v)
     {
         if (m.get_size() != v.size())
@@ -288,9 +344,9 @@ namespace algebra
     };
 
     template <AddMulType T, StorageOrder S>
-    Matrix<T, S> operator*(const Matrix<T, S> &m1, const MatrixDiagonalView<T, S> &m2)
+    Matrix<T, S> operator*(const MatrixDiagonalView<T, S> &m1, const MatrixDiagonalView<T, S> &m2)
     {
-        if (m1.get_cols() != m2.get_size())
+        if (m1.get_size() != m2.get_size())
         {
             throw std::invalid_argument("Matrix dimensions do not match for multiplication");
         }
@@ -299,12 +355,23 @@ namespace algebra
             throw std::invalid_argument("Matrix compression formats do not match");
         }
 
-        Matrix<T, S> result(m1.get_rows(), m2.get_size());
+        Matrix<T, S> result(m1.get_size(), m1.get_size());
 
         return result;
 
     };
 
+    template <AddMulType T, StorageOrder S>
+    Matrix<T, S> operator*(const Matrix<T, S> &m1, const MatrixDiagonalView<T, S> &m2)
+    {
+
+    };
+    
+    template <AddMulType T, StorageOrder S>
+    Matrix<T, S> operator*(const MatrixDiagonalView<T, S> &m1, const Matrix<T, S> &m2)  
+    {
+
+    };
 
 }
 #endif // MATRIX_VIEWS_HPP

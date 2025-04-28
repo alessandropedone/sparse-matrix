@@ -9,6 +9,7 @@ Test
 
 how do i manage to compute products (views and SquareMatrix)
 - implement 3 cases for each view
+- discuss about return types
 
 Parallelization with std algorithms
 - keep compress_parallel in order to see the parallelization overhead

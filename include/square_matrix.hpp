@@ -4,6 +4,7 @@
 #include "storage.hpp"
 #include "matrix.hpp"
 #include "proxy.hpp"
+#include "matrix_views.hpp"
 
 #include <vector>
 #include <iostream>
@@ -48,6 +49,16 @@ namespace algebra
             this->compressed = other.is_compressed();
             this->modified = false;
         };
+
+        /// @brief constructor from a MatrixTransposeView
+        /// @note the constructed matrix is in uncompressed format
+        /// @param matrix transposed view of matrix to copy
+        SquareMatrix(const MatrixTransposeView<T, S> &matrixView);
+
+        /// @brief constructor from a MatrixTransposeView
+        /// @note the constructed matrix is in modified compressed format
+        /// @param matrix transposed view of matrix to copy
+        SquareMatrix(const MatrixDiagonalView<T, S> &matrixView);
 
         /// @brief default destructor
         virtual ~SquareMatrix() override = default;

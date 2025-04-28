@@ -3,6 +3,7 @@
 
 #include "storage.hpp"
 #include "proxy.hpp"
+#include "matrix_views.hpp"
 
 #include <vector>
 #include <iostream>
@@ -41,6 +42,11 @@ namespace algebra
         {
             this->compressed = false;
         };
+
+        /// @brief constructor from a MatrixTransposeView
+        /// @note the constructed matrix is in uncompressed format
+        /// @param matrixView transposed view of matrix to copy
+        Matrix(const MatrixTransposeView<T, S> &matrixView);
 
         /// @brief default copy constructor
         Matrix(const Matrix &other) = default;

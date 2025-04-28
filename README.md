@@ -3,6 +3,7 @@
 # Sparse matrix 
 
 Optimize compression in modified format (remove unnecessary ifs)
+
 Test
 - product with modified compressed format for SquareMatrix
 - transpose and diagonal views
@@ -22,4 +23,7 @@ Parallelization with std algorithms
 README.md (
     need of TBB, 
     we didn't implement COO since COOmap is clearly more efficient, 
-    explain why parallel implementation of compress is slower, put a test about this)
+    explain why parallel implementation of compress is slower, put a test about this
+    please run multiple times,
+    matrix-vector isn't optimal and we don't know exactly why,
+    the matrix-vector product in MSC and MSR is slower and this is reasonable because the access pattern is worse, we also have that using parallelization for diagonal elements make the situation al lot worse for small matrices like lnsp_131 and better for big ones like e20r0000)

@@ -45,7 +45,7 @@ namespace algebra
             {
                 throw std::runtime_error("Matrix is not square");
             }
-            this->compressed = false;
+            this->compressed = other.is_compressed();
             this->modified = false;
         };
 

@@ -187,7 +187,7 @@ namespace algebra
             
             // multiply with another matrix
             template <AddMulType U, StorageOrder V>
-            friend Matrix<U, V> operator*(const MatrixDiagonalView<U, V> &m1, const MatrixDiagonalView<U, V> &m2);
+            friend SquareMatrix<U, V> operator*(const MatrixDiagonalView<U, V> &m1, const MatrixDiagonalView<U, V> &m2);
 
             template <AddMulType U, StorageOrder V>
             friend Matrix<U, V> operator*(const Matrix<U, V> &m1, const MatrixDiagonalView<U, V> &m2);
@@ -264,9 +264,10 @@ namespace algebra
     }
 
     template <AddMulType T, StorageOrder S>
-    MatrixTransposeView<T, S> operator*(const MatrixTransposeView<T, S> &m1, const MatrixTransposeView<T, S> &m2)
+    Matrix<T, S> operator*(const MatrixTransposeView<T, S> &m1, const MatrixTransposeView<T, S> &m2)
     {
-        return MatrixTransposeView<T,S>(m2.matrix * m1.matrix);
+        MatrixTransposeView<T,S> result(m2.matrix * m1.matrix);
+        return Matrix<T,S>(result);
     }
 
     template <AddMulType T, StorageOrder S>
@@ -344,18 +345,21 @@ namespace algebra
     };
 
     template <AddMulType T, StorageOrder S>
-    Matrix<T, S> operator*(const MatrixDiagonalView<T, S> &m1, const MatrixDiagonalView<T, S> &m2)
+    SquareMatrix<T, S> operator*(const MatrixDiagonalView<T, S> &m1, const MatrixDiagonalView<T, S> &m2)
     {
         if (m1.get_size() != m2.get_size())
         {
             throw std::invalid_argument("Matrix dimensions do not match for multiplication");
         }
-        if (m1.is_compressed() != m2.is_compressed())
+        if ((m1.is_modified() != m2.is_modified()) || (m1.is_compressed() != m2.is_compressed()))
         {
             throw std::invalid_argument("Matrix compression formats do not match");
         }
 
-        Matrix<T, S> result(m1.get_size(), m1.get_size());
+        SquareMatrix<T, S> result(m1.get_size());
+
+        if (m1.is_modified())
+        
 
         return result;
 

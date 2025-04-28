@@ -9,7 +9,11 @@ Test
 
 how do i manage to compute products (views and SquareMatrix)
 - implement 3 cases for each view
+- see use of private member of matrix in the view
+    - possibility of public getter of const & to data members of matrix
 - discuss about return types
+    - create matrix constructor with transposed view
+    - create squareMatrix constructor with transposed view and diagonal view
 
 Parallelization with std algorithms
 - keep compress_parallel in order to see the parallelization overhead

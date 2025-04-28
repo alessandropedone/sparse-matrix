@@ -21,27 +21,27 @@ int main()
     test5x5(sm);
 
     // Run the tests on all matrices provided in the json file for both storage orders
-/*     json data = read_json(static_cast<std::string>("data/data.json"));
-    const std::vector<std::string> matrix_names = data["matrix_name"];
-    const std::array<StorageOrder, 2> storage_orders = {StorageOrder::RowMajor, StorageOrder::ColumnMajor};
-    for (const auto &storage_order : storage_orders)
-    {
-        if (storage_order == StorageOrder::RowMajor)
+    /*     json data = read_json(static_cast<std::string>("data/data.json"));
+        const std::vector<std::string> matrix_names = data["matrix_name"];
+        const std::array<StorageOrder, 2> storage_orders = {StorageOrder::RowMajor, StorageOrder::ColumnMajor};
+        for (const auto &storage_order : storage_orders)
         {
-            std::cout << "---------------------------------" << std::endl;
-            std::cout << "Test with storage order: RowMajor" << std::endl;
-            std::cout << "---------------------------------" << std::endl;
-            test<StorageOrder::RowMajor>(matrix_names);
-        }
-        else
-        {
-            std::cout << "------------------------------------" << std::endl;
-            std::cout << "Test with storage order: ColumnMajor" << std::endl;
-            std::cout << "------------------------------------" << std::endl;
-            test<StorageOrder::ColumnMajor>(matrix_names);
-        }
-        
-    } */
-    
+            if (storage_order == StorageOrder::RowMajor)
+            {
+                std::cout << "---------------------------------" << std::endl;
+                std::cout << "Test with storage order: RowMajor" << std::endl;
+                std::cout << "---------------------------------" << std::endl;
+                test<StorageOrder::RowMajor>(matrix_names);
+            }
+            else
+            {
+                std::cout << "------------------------------------" << std::endl;
+                std::cout << "Test with storage order: ColumnMajor" << std::endl;
+                std::cout << "------------------------------------" << std::endl;
+                test<StorageOrder::ColumnMajor>(matrix_names);
+            }
+
+        } */
+
     return 0;
 }

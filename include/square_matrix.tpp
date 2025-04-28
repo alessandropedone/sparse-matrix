@@ -752,21 +752,24 @@ namespace algebra
             if constexpr (S == StorageOrder::ColumnMajor)
             {
                 size_t col;
-                // iterate over columns of m2
+
+                ////// ITERATE OVER COLUMNS OF m2 //////
+
                 for (col = 0; col < m2.cols - 1; ++col)
                 {
-                    // add off-diagonal elements
+                    // ADD OFF-DIAGONAL ELEMENTS OF m2 AND m1
                     size_t start = m2.compressed_format_mod.bind[col];
                     size_t end = m2.compressed_format_mod.bind[col + 1];
+                    size_t k;
                     // iterate over rows of m2 (and columns of m1) that are non-zero in the column "col" of m2
-                    for (size_t k = start; k < end; ++k)
+                    for (k = start; k < end - 1; ++k)
                     {
                         // j = row of m2 (or column of m1) that we are currently processing
                         size_t j = m2.compressed_format_mod.bind[k];
 
                         // iterate over rows of m1 that are non-zero in the column j of m1
                         size_t s = m1.compressed_format_mod.bind[j];
-                        size_t e = (j + 1 == m1.cols) ? m1.compressed_format_mod.values.size() : m1.compressed_format_mod.bind[j + 1];
+                        size_t e = m1.compressed_format_mod.bind[j + 1];
                         for (size_t i = s; i < e; ++i)
                         {
                             // row = row of m1 corresponding to the index i
@@ -776,30 +779,8 @@ namespace algebra
                             result(row, col) += m1.compressed_format_mod.values[i] * m2.compressed_format_mod.values[k];
                         }
                     }
-
-                    // add diagonal elements of m1
-                    // iterate over rows of m2 (and columns of m1) that are non-zero in the column "col" of m2
-                    for (size_t k = start; k < end; ++k)
-                    {
-                        // j = row of m2 (or column of m1) that we are currently processing
-                        size_t j = m2.compressed_format_mod.bind[k];
-
-                        // add the product between the diagonal element of m1 and current non-zero element of m2 to the "result" matrix
-                        result(j, col) += m1.compressed_format_mod.values[j] * m2.compressed_format_mod.values[k];
-                    }
-                }
-
-                // handle last column of m2
-                // add off-diagonal elements 
-                size_t start = m2.compressed_format_mod.bind[col];
-                size_t end = m2.compressed_format_mod.values.size();
-                // iterate over rows of m2 (and columns of m1) that are non-zero in the column "col" of m2
-                for (size_t k = start; k < end; ++k)
-                {
-                    // j = row of m2 (or column of m1) that we are currently processing
+                    // handle last column of m1 (last row of m2)
                     size_t j = m2.compressed_format_mod.bind[k];
-
-                    // iterate over rows of m1 that are non-zero in the column j of m1
                     size_t s = m1.compressed_format_mod.bind[j];
                     size_t e = (j + 1 == m1.cols) ? m1.compressed_format_mod.values.size() : m1.compressed_format_mod.bind[j + 1];
                     for (size_t i = s; i < e; ++i)
@@ -810,8 +791,57 @@ namespace algebra
                         // add the product of the non-zero off-diagonal elements to the "result" matrix
                         result(row, col) += m1.compressed_format_mod.values[i] * m2.compressed_format_mod.values[k];
                     }
+
+                    // ADD DIAGONAL ELEMENTS OF m1
+                    // iterate over rows of m2 (and columns of m1) that are non-zero in the column "col" of m2
+                    for (k = start; k < end; ++k)
+                    {
+                        // j = row of m2 (or column of m1) that we are currently processing
+                        size_t j = m2.compressed_format_mod.bind[k];
+
+                        // add the product between the diagonal element of m1 and current non-zero element of m2 to the "result" matrix
+                        result(j, col) += m1.compressed_format_mod.values[j] * m2.compressed_format_mod.values[k];
+                    }
                 }
-                // add diagonal elements
+
+                ////// HANDLE LAST COLUMN OF m2 //////
+
+                // ADD OFF-DIAGONAL ELEMENTS OF m2 AND m1
+                size_t start = m2.compressed_format_mod.bind[col];
+                size_t end = m2.compressed_format_mod.values.size();
+                size_t k;
+                // iterate over rows of m2 (and columns of m1) that are non-zero in the column "col" of m2
+                for (k = start; k < end - 1; ++k)
+                {
+                    // j = row of m2 (or column of m1) that we are currently processing
+                    size_t j = m2.compressed_format_mod.bind[k];
+
+                    // iterate over rows of m1 that are non-zero in the column j of m1
+                    size_t s = m1.compressed_format_mod.bind[j];
+                    size_t e = m1.compressed_format_mod.bind[j + 1];
+                    for (size_t i = s; i < e; ++i)
+                    {
+                        // row = row of m1 corresponding to the index i
+                        size_t row = m1.compressed_format_mod.bind[i];
+
+                        // add the product of the non-zero off-diagonal elements to the "result" matrix
+                        result(row, col) += m1.compressed_format_mod.values[i] * m2.compressed_format_mod.values[k];
+                    }
+                }
+                // handle last column of m1 (last row of m2)
+                size_t j = m2.compressed_format_mod.bind[k];
+                size_t s = m1.compressed_format_mod.bind[j];
+                size_t e = (j + 1 == m1.cols) ? m1.compressed_format_mod.values.size() : m1.compressed_format_mod.bind[j + 1];
+                for (size_t i = s; i < e; ++i)
+                {
+                    // row = row of m1 corresponding to the index i
+                    size_t row = m1.compressed_format_mod.bind[i];
+
+                    // add the product of the non-zero off-diagonal elements to the "result" matrix
+                    result(row, col) += m1.compressed_format_mod.values[i] * m2.compressed_format_mod.values[k];
+                }
+
+                // ADD DIAGONAL ELEMENTS OF m1
                 // iterate over rows of m2 (and columns of m1) that are non-zero in the column "col" of m2
                 for (size_t k = start; k < end; ++k)
                 {
@@ -821,25 +851,68 @@ namespace algebra
                     // add the product between the diagonal element of m1 and current non-zero element of m2 to the "result" matrix
                     result(j, col) += m1.compressed_format_mod.values[j] * m2.compressed_format_mod.values[k];
                 }
+
+                ////// ADD DIAGONAL ELEMENTS OF m2 //////
+
+                for (col = 0; col < m2.cols - 1; ++col)
+                {
+                    // multiply each column of m1 with the diagonal element of m2
+                    size_t s = m1.compressed_format_mod.bind[col];
+                    size_t e = m1.compressed_format_mod.bind[col + 1];
+                    // iterate over the non-zero elements of m1 that are in the column "col"
+                    for (size_t i = s; i < e; ++i)
+                    {
+                        // row = row of m1 corresponding to the index i
+                        size_t row = m1.compressed_format_mod.bind[i];
+
+                        // add the product between the diagonal element of m2 and current non-zero element of m1 to the "result" matrix
+                        result(row, col) += m1.compressed_format_mod.values[i] * m2.compressed_format_mod.values[col];
+                    }
+                }
+                // HANDLE LAST COLUMN OF m1
+                // multiply each column of m1 with the diagonal element of m2
+                s = m1.compressed_format_mod.bind[col];
+                e = m1.compressed_format_mod.values.size();
+                // iterate over the non-zero elements of m1 that are in the column "col"
+                for (size_t i = s; i < e; ++i)
+                {
+                    // row = row of m1 corresponding to the index i
+                    size_t row = m1.compressed_format_mod.bind[i];
+
+                    // add the product between the diagonal element of m2 and current non-zero element of m1 to the "result" matrix
+                    result(row, col) += m1.compressed_format_mod.values[i] * m2.compressed_format_mod.values[col];
+                }
+
+                ////// ADD PRODUCTS OF DIAGONAL ELEMENTS //////
+
+                // iterate over the diagonal elements of m1 and m2
+                for (size_t i = 0; i < m1.rows; ++i)
+                {
+                    // add the product between the diagonal elements of m1 and m2 to the "result" matrix
+                    result(i, i) += m1.compressed_format_mod.values[i] * m2.compressed_format_mod.values[i];
+                }
             }
             else
             {
                 size_t row;
-                // iterate over rows of m1
+
+                ////// ITERATE OVER COLUMNS OF m1 //////
+
                 for (row = 0; row < m1.rows - 1; ++row)
                 {
-                    // add off-diagonal elements
+                    // ADD OFF-DIAGONAL ELEMENTS OF m1 AND m2
                     size_t start = m1.compressed_format_mod.bind[row];
                     size_t end = m1.compressed_format_mod.bind[row + 1];
+                    size_t k;
                     // iterate over columns of m1 (and rows of m2) that are non-zero in the row "row" of m1
-                    for (size_t k = start; k < end; ++k)
+                    for (k = start; k < end - 1; ++k)
                     {
                         // j = column of m1 (or row of m2) that we are currently processing
                         size_t j = m1.compressed_format_mod.bind[k];
 
                         // iterate over columns of m2 that are non-zero in the row j of m2
                         size_t s = m2.compressed_format_mod.bind[j];
-                        size_t e = (j + 1 == m2.rows) ? m2.compressed_format_mod.values.size() : m2.compressed_format_mod.bind[j + 1];
+                        size_t e = m2.compressed_format_mod.bind[j + 1];
                         for (size_t i = s; i < e; ++i)
                         {
                             // col = column of m2 corresponding to the index i
@@ -849,10 +922,22 @@ namespace algebra
                             result(row, col) += m1.compressed_format_mod.values[k] * m2.compressed_format_mod.values[i];
                         }
                     }
+                    // handle last row of m2 (last column of m1)
+                    size_t j = m1.compressed_format_mod.bind[k];
+                    size_t s = m2.compressed_format_mod.bind[j];
+                    size_t e = (j + 1 == m2.rows) ? m2.compressed_format_mod.values.size() : m2.compressed_format_mod.bind[j + 1];
+                    for (size_t i = s; i < e; ++i)
+                    {
+                        // col = column of m2 corresponding to the index i
+                        size_t col = m2.compressed_format_mod.bind[i];
 
-                    // add diagonal elements 
+                        // add the product of the non-zero off-diagonal elements to the "result" matrix
+                        result(row, col) += m1.compressed_format_mod.values[k] * m2.compressed_format_mod.values[i];
+                    }
+
+                    // ADD DIAGONAL ELEMENTS OF m2
                     // iterate over columns of m1 (and rows of m2) that are non-zero in the row "row" of m1
-                    for (size_t k = start; k < end; ++k)
+                    for (k = start; k < end; ++k)
                     {
                         // j = column of m1 (or row of m2) that we are currently processing
                         size_t j = m1.compressed_format_mod.bind[k];
@@ -862,19 +947,21 @@ namespace algebra
                     }
                 }
 
-                // handle last row of m1
-                // add off-diagonal elements
+                ///// HANDLE LAST ROW OF m1 /////
+
+                // ADD OFF-DIAGONAL ELEMENTS OF m1 AND m2
                 size_t start = m1.compressed_format_mod.bind[row];
                 size_t end = m1.compressed_format_mod.values.size();
+                size_t k;
                 // iterate over columns of m1 (and rows of m2) that are non-zero in the row "row" of m1
-                for (size_t k = start; k < end; ++k)
+                for (k = start; k < end - 1; ++k)
                 {
                     // j = column of m1 (or row of m2) that we are currently processing
                     size_t j = m1.compressed_format_mod.bind[k];
 
                     // iterate over columns of m2 that are non-zero in the row j of m2
                     size_t s = m2.compressed_format_mod.bind[j];
-                    size_t e = (j + 1 == m2.cols) ? m2.compressed_format_mod.values.size() : m2.compressed_format_mod.bind[j + 1];
+                    size_t e = m2.compressed_format_mod.bind[j + 1];
                     for (size_t i = s; i < e; ++i)
                     {
                         // col = column of m2 corresponding to the index i
@@ -884,7 +971,20 @@ namespace algebra
                         result(row, col) += m1.compressed_format_mod.values[k] * m2.compressed_format_mod.values[i];
                     }
                 }
-                // add diagonal elements
+                // handle last row of m2 (last column of m1)
+                size_t j = m1.compressed_format_mod.bind[k];
+                size_t s = m2.compressed_format_mod.bind[j];
+                size_t e = (j + 1 == m2.rows) ? m2.compressed_format_mod.values.size() : m2.compressed_format_mod.bind[j + 1];
+                for (size_t i = s; i < e; ++i)
+                {
+                    // col = column of m2 corresponding to the index i
+                    size_t col = m2.compressed_format_mod.bind[i];
+
+                    // add the product of the non-zero off-diagonal elements to the "result" matrix
+                    result(row, col) += m1.compressed_format_mod.values[k] * m2.compressed_format_mod.values[i];
+                }
+
+                // ADD DIAGONAL ELEMENTS OF m2
                 // iterate over columns of m1 (and rows of m2) that are non-zero in the row "row" of m1
                 for (size_t k = start; k < end; ++k)
                 {
@@ -893,6 +993,46 @@ namespace algebra
 
                     // add the product between the diagonal element of m2 and current non-zero element of m1 to the "result" matrix
                     result(row, j) += m1.compressed_format_mod.values[k] * m2.compressed_format_mod.values[j];
+                }
+
+                ////// ADD DIAGONAL ELEMENTS OF m1 //////
+
+                for (row = 0; row < m1.rows - 1; ++row)
+                {
+                    // multiply each row of m2 with the diagonal element of m1
+                    size_t s = m2.compressed_format_mod.bind[row];
+                    size_t e = m2.compressed_format_mod.bind[row + 1];
+                    // iterate over the non-zero elements of m2 that are in the row "row"
+                    for (size_t i = s; i < e; ++i)
+                    {
+                        // col = column of m2 corresponding to the index i
+                        size_t col = m2.compressed_format_mod.bind[i];
+
+                        // add the product between the diagonal element of m1 and current non-zero element of m2 to the "result" matrix
+                        result(row, col) += m1.compressed_format_mod.values[row] * m2.compressed_format_mod.values[i];
+                    }
+                }
+                // HANDLE LAST ROW OF m2
+                // multiply each row of m2 with the diagonal element of m1
+                s = m2.compressed_format_mod.bind[row];
+                e = m2.compressed_format_mod.values.size();
+                // iterate over the non-zero elements of m2 that are in the row "row"
+                for (size_t i = s; i < e; ++i)
+                {
+                    // col = column of m2 corresponding to the index i
+                    size_t col = m2.compressed_format_mod.bind[i];
+
+                    // add the product between the diagonal element of m1 and current non-zero element of m2 to the "result" matrix
+                    result(row, col) += m1.compressed_format_mod.values[row] * m2.compressed_format_mod.values[i];
+                }
+
+                ////// ADD PRODUCTS OF DIAGONAL ELEMENTS //////
+
+                // iterate over the diagonal elements of m1 and m2
+                for (size_t i = 0; i < m1.rows; ++i)
+                {
+                    // add the product between the diagonal elements of m1 and m2 to the "result" matrix
+                    result(i, i) += m1.compressed_format_mod.values[i] * m2.compressed_format_mod.values[i];
                 }
             }
             return result;

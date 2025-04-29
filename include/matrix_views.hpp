@@ -207,10 +207,10 @@ namespace algebra
         /// @return number of non-zero elements in the diagonal
         size_t get_nnz() const override
         {
-            T sum = 0;
+            size_t sum{0};
             for (size_t i = 0; i < matrix.get_rows(); i++)
             {
-                sum += matrix(i, i);
+                sum += std::abs(matrix(i, i))>std::numeric_limits<double>::epsilon();
             }
             return sum;
         };

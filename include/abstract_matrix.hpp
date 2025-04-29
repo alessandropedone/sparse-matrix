@@ -4,6 +4,8 @@
 #include "storage.hpp"
 #include "proxy.hpp"
 
+#include <memory>
+
 namespace algebra
 {
 
@@ -34,6 +36,12 @@ namespace algebra
     class AbstractMatrix
     {
     public:
+
+        /// @brief clone method
+        /// @return a pointer to the cloned object
+        virtual std::unique_ptr<AbstractMatrix<T, S>> clone() const = 0;
+
+        /// @brief default destructor
         virtual ~AbstractMatrix() = default;
 
         /// @brief set an element in the matrix (dynamic construction of the matrix)

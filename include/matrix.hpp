@@ -52,6 +52,13 @@ namespace algebra
         /// @param view diagonal view of matrix to copy
         Matrix(const DiagonalView<T, S> &view);
 
+        /// @brief clone method
+        /// @return a pointer to the cloned object
+        virtual std::unique_ptr<AbstractMatrix<T, S>> clone() const override
+        {
+            return std::make_unique<Matrix<T, S>>(*this);
+        };
+
         /// @brief default destructor
         virtual ~Matrix() = default;
 

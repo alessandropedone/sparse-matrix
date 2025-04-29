@@ -29,6 +29,13 @@ namespace algebra
         /// @param matrix the matrix to transpose
         TransposeView(Matrix<T, S> &matrix) : matrix(matrix) {};
 
+                /// @brief clone method
+        /// @return a pointer to the cloned object
+        virtual std::unique_ptr<AbstractMatrix<T, S>> clone() const override
+        {
+            return std::make_unique<TransposeView<T, S>>(*this);
+        };
+
         /// @brief virtual destructor
         virtual ~TransposeView() = default;
 
@@ -48,7 +55,7 @@ namespace algebra
         /// @param row row index
         /// @param col column index
         /// @return the matrix element at (row, col)
-        T operator()(size_t row, size_t col) const override { return matrix(col, row); };
+        T operator()(size_t row, size_t col) const override { const auto temp = matrix; return temp(col, row); };
 
         /// @brief check if the matrix is in a compressed format
         virtual bool is_compressed() const override { return matrix.is_compressed(); };
@@ -122,6 +129,13 @@ namespace algebra
         /// @param matrix the matrix to see as diagonal: all off-diagonal elements are ignored
         DiagonalView(SquareMatrix<T, S> &matrix) : matrix(matrix) {}
 
+        /// @brief clone method
+        /// @return a pointer to the cloned object
+        virtual std::unique_ptr<AbstractMatrix<T, S>> clone() const override
+        {
+            return std::make_unique<DiagonalView<T, S>>(*this);
+        };
+
         /// @brief virtual destructor
         virtual ~DiagonalView() = default;
 
@@ -169,7 +183,8 @@ namespace algebra
         {
             if (row == col)
             {
-                return matrix(row, col);
+                const auto temp = matrix;
+                return temp(row, col);
             }
             else
             {
@@ -210,7 +225,7 @@ namespace algebra
             size_t sum{0};
             for (size_t i = 0; i < matrix.get_rows(); i++)
             {
-                sum += std::abs(matrix(i, i))>std::numeric_limits<double>::epsilon();
+                sum += std::abs(matrix(i, i)) > std::numeric_limits<double>::epsilon();
             }
             return sum;
         };

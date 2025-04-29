@@ -140,19 +140,19 @@ namespace algebra
     /// @param m matrix
     /// @return true if the test passed, false otherwise
     template <AddMulType T, StorageOrder S>
-    bool test_compression_matrix(AbstractMatrix<T, S> &m)
+    bool test_compression_matrix(const AbstractMatrix<T, S> &m)
     {
-        Matrix<T, S> compare_matrix(dynamic_cast<const Matrix<T, S> &>(m));
+        auto compare_matrix = m.clone();
 
-        m.compress();
-        if (not are_equal(m, compare_matrix))
+        compare_matrix->compress();
+        if (not are_equal(m, *compare_matrix))
         {
             throw std::runtime_error("Error passing from uncompressed to compressed format");
             return false;
         }
 
-        m.uncompress();
-        if (not are_equal(m, compare_matrix))
+        compare_matrix->uncompress();
+        if (not are_equal(m, *compare_matrix))
         {
             throw std::runtime_error("Error passing from compressed to uncompressed format");
             return false;
@@ -169,7 +169,7 @@ namespace algebra
     /// @param m matrix
     /// @note this function is a friend of the Matrix class, so it can access the private members
     template <AddMulType T, StorageOrder S>
-    void test_compression(AbstractMatrix<T, S> &m)
+    void test_compression(const AbstractMatrix<T, S> &m)
     {
         if (typeid(m) == typeid(SquareMatrix<T, S>))
         {
@@ -243,7 +243,7 @@ namespace algebra
         print(m);
 
         // Test compression
-        // test_compression(m);
+        test_compression(m);
 
         // Test norm functions
         norm_test(m);
@@ -277,7 +277,15 @@ namespace algebra
         else if (typeid(m) == typeid(TransposeView<T, S>))
         {
             auto tm = static_cast<const TransposeView<T, S> &>(m);
-            tm.compress();
+            if (typeid(tm.matrix) == typeid(SquareMatrix<T, S>))
+            {
+                auto sm = static_cast<const SquareMatrix<T, S> &>(tm.matrix);
+                sm.compress_mod();
+            }
+            else
+            {
+                tm.compress();
+            }
             // Do the matrix - vector product
             auto result = tm * v;
             // Do the matrix - matrix product

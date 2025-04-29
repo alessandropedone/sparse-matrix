@@ -2,7 +2,6 @@
 
 # Sparse matrix 
 
-
 how do i manage to compute products (views and SquareMatrix)
 - implement 3 cases for each view
 - see use of private member of matrix in views
@@ -17,7 +16,7 @@ how do i manage to compute products (views and SquareMatrix)
 
 Views:
 - test transpose and diagonal products
-- compression test and execute test not working
+- execute test not working
 
 Optimization
 - optimize compression in modified format (remove unnecessary ifs)

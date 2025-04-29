@@ -66,6 +66,13 @@ namespace algebra
         /// @param view DiagonalView to construct the matrix from
         SquareMatrix(const DiagonalView<T, S> &view);
 
+        /// @brief clone method
+        /// @return a pointer to the cloned object
+        virtual std::unique_ptr<AbstractMatrix<T, S>> clone() const override
+        {
+            return std::make_unique<SquareMatrix<T, S>>(*this);
+        };
+
         /// @brief default destructor
         virtual ~SquareMatrix() = default;
 

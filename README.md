@@ -7,14 +7,13 @@ Views:
 - test transpose and diagonal products
 
 Optimization
-- optimize compression in modified format (remove unnecessary ifs)
-- keep compress_parallel in order to see the parallelization overhead
+- optimize compression in modified format (remove unnecessary ifs and avoid push_back)
 - review normal algorithms and add parallel execution policies where possibile
   
 README.md (
     need of TBB, 
     we didn't implement COO since COOmap is clearly more efficient, 
-    explain why parallel implementation of compress is slower, put a test about this
+    explain why parallel implementation of compress is slower, put a test about this [keep compress_parallel in order to see the parallelization overhead]
     please run multiple times,
     results interpretation,
     strucutre of the code and the output)

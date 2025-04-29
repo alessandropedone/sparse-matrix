@@ -15,6 +15,7 @@ how do i manage to compute products (views and SquareMatrix)
     - create matrix constructor with transposed view
     - create squareMatrix constructor with transposed view and diagonal view
     - since for now the views don't have public access to stored matrix data, these constructors are based on call operator
+    This caused issues because of include order -> possible solution: create constructor of matrix inside the view
 
 Optimization
 - optimize compression in modified format (remove unnecessary ifs)

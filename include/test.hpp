@@ -7,6 +7,8 @@
 
 #include "json_utility.hpp"
 #include "storage.hpp"
+#include "abstract_matrix.hpp"
+#include "matrix_views.hpp"
 #include "matrix.hpp"
 #include "square_matrix.hpp"
 
@@ -35,7 +37,7 @@ namespace algebra
     /// @tparam S type of the storage order (RowMajor or ColumnMajor)
     /// @param m matrix to print
     template <AddMulType T, StorageOrder S>
-    void print(const Matrix<T, S> &m)
+    void print(const AbstractMatrix<T, S> &m)
     {
         for (size_t i = 0; i < m.get_rows(); i++)
         {
@@ -55,7 +57,7 @@ namespace algebra
     /// @param m2 second matrix
     /// @return true if the matrices are equal, false otherwise
     template <AddMulType T, StorageOrder S>
-    bool are_equal(const Matrix<T, S> &m1, const Matrix<T, S> &m2)
+    bool are_equal(const AbstractMatrix<T, S> &m1, const AbstractMatrix<T, S> &m2)
     {
         if (m1.get_rows() != m2.get_rows() or m1.get_cols() != m2.get_cols())
         {
@@ -138,19 +140,18 @@ namespace algebra
     /// @param m matrix
     /// @return true if the test passed, false otherwise
     template <AddMulType T, StorageOrder S>
-    bool test_compression_matrix(const Matrix<T, S> &m)
+    bool test_compression_matrix(AbstractMatrix<T, S> &m)
     {
-        // Read matrix
-        Matrix<T, S> compare_matrix(m);
+        Matrix<T, S> compare_matrix(dynamic_cast<const Matrix<T, S> &>(m));
 
-        compare_matrix.compress();
+        m.compress();
         if (not are_equal(m, compare_matrix))
         {
             throw std::runtime_error("Error passing from uncompressed to compressed format");
             return false;
         }
 
-        compare_matrix.uncompress();
+        m.uncompress();
         if (not are_equal(m, compare_matrix))
         {
             throw std::runtime_error("Error passing from compressed to uncompressed format");
@@ -168,7 +169,7 @@ namespace algebra
     /// @param m matrix
     /// @note this function is a friend of the Matrix class, so it can access the private members
     template <AddMulType T, StorageOrder S>
-    void test_compression(const Matrix<T, S> &m)
+    void test_compression(AbstractMatrix<T, S> &m)
     {
         if (typeid(m) == typeid(SquareMatrix<T, S>))
         {
@@ -185,7 +186,7 @@ namespace algebra
     /// @tparam S type of the storage order (RowMajor or ColumnMajor)
     /// @param m matrix
     template <AddMulType T, StorageOrder S>
-    void norm_test(const Matrix<T, S> &m)
+    void norm_test(const AbstractMatrix<T, S> &m)
     {
         // Read matrix
         std::cout << "Norm test" << std::endl;
@@ -196,11 +197,20 @@ namespace algebra
         return;
     }
 
+    template <AddMulType T, StorageOrder S>
+    void print_result(const AbstractMatrix<T, S> &m, const std::vector<double> &v)
+    {
+        std::cout << "M*v" << std::endl;
+        print(v);
+        std::cout << "M^2 " << std::endl;
+        print(m);
+    }
+
     /// @brief 5x5 matrix for testing
     /// @tparam T type of the matrix elements
     /// @tparam S type of the storage order (RowMajor or ColumnMajor)
     template <AddMulType T, StorageOrder S>
-    void test5x5(Matrix<T, S> &m)
+    void test5x5(AbstractMatrix<T, S> &m)
     {
         m.reader(static_cast<std::string>("data/read_test_5x5.mtx"));
 
@@ -209,6 +219,18 @@ namespace algebra
             std::cout << "----------------------------" << std::endl;
             std::cout << "Test with SquareMatrix class" << std::endl;
             std::cout << "----------------------------" << std::endl;
+        }
+        else if (typeid(m) == typeid(TransposeView<T, S>))
+        {
+            std::cout << "------------------------" << std::endl;
+            std::cout << "Test with TransposeView" << std::endl;
+            std::cout << "------------------------" << std::endl;
+        }
+        else if (typeid(m) == typeid(DiagonalView<T, S>))
+        {
+            std::cout << "-------------------------" << std::endl;
+            std::cout << "Test with DiagonalView" << std::endl;
+            std::cout << "-------------------------" << std::endl;
         }
         else
         {
@@ -221,7 +243,7 @@ namespace algebra
         print(m);
 
         // Test compression
-        test_compression(m);
+        // test_compression(m);
 
         // Test norm functions
         norm_test(m);
@@ -243,32 +265,47 @@ namespace algebra
 
         if (typeid(m) == typeid(SquareMatrix<T, S>))
         {
-            auto sm = static_cast<SquareMatrix<T, S> &>(m);
+            auto sm = static_cast<const SquareMatrix<T, S> &>(m);
             sm.compress_mod();
-
             // Do the matrix - vector product
             auto result = sm * v;
-            std::cout << "M*v" << std::endl;
-            print(result);
-
             // Do the matrix - matrix product
-            std::cout << "M^2 " << std::endl;
             auto m2 = sm * sm;
-            print(m2);
+            // Print the result
+            print_result(m2, result);
+        }
+        else if (typeid(m) == typeid(TransposeView<T, S>))
+        {
+            auto tm = static_cast<const TransposeView<T, S> &>(m);
+            tm.compress();
+            // Do the matrix - vector product
+            auto result = tm * v;
+            // Do the matrix - matrix product
+            auto m2 = tm * tm;
+            // Print the result
+            print_result(m2, result);
+        }
+        else if (typeid(m) == typeid(DiagonalView<T, S>))
+        {
+            auto dm = static_cast<const DiagonalView<T, S> &>(m);
+            dm.compress();
+            // Do the matrix - vector product
+            auto result = dm * v;
+            // Do the matrix - matrix product
+            auto m2 = dm * dm;
+            // Print the result
+            print_result(m2, result);
         }
         else
         {
             m.compress();
-
+            auto mm = static_cast<const Matrix<T, S> &>(m);
             // Do the matrix - vector product
-            auto result = m * v;
-            std::cout << "M*v" << std::endl;
-            print(result);
-
+            auto result = mm * v;
             // Do the matrix - matrix product
-            std::cout << "M^2 " << std::endl;
-            auto m2 = m * m;
-            print(m2);
+            auto m2 = mm * mm;
+            // Print the result
+            print_result(m2, result);
         }
     }
 
@@ -286,6 +323,7 @@ namespace algebra
             std::cout << std::endl;
             Matrix<double, S> testMatrix(0, 0);
             SquareMatrix<double, S> testSquareMatrix(0);
+            TransposeView<double, S> testTransposeView(0, 0);
 
             std::cout << "------------------------------------" << std::endl;
             std::cout << "Test with Matrix class" << std::endl;

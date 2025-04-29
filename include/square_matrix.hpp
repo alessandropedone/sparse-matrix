@@ -115,7 +115,7 @@ namespace algebra
 
         /// @brief Function to read a matrix in Matrix Market format
         /// @param filename input file name
-        virtual void reader(const std::string &filename);
+        virtual void reader(const std::string &filename) override;
 
         /// @brief get the size of the modified compressed matrix: it comprehends also possible zero elements in the diagonal
         /// @return size of the modified compressed matrix vectors
@@ -145,17 +145,31 @@ namespace algebra
         template <AddMulType U, StorageOrder V>
         friend SquareMatrix<U, V> operator*(const SquareMatrix<U, V> &m1, const SquareMatrix<U, V> &m2);
 
-        /// @brief TransposeView class declaration as a friend
-        /// @tparam U type of the matrix elements
-        /// @tparam V type of the storage order
+        // transpose view products friend functions
         template <AddMulType U, StorageOrder V>
-        friend class TransposeView;
+        friend std::vector<U> operator*(const TransposeView<U, V> &m, const std::vector<U> &v);
 
-        /// @brief DiagonalView class declaration as a friend
-        /// @tparam U type of the matrix elements
-        /// @tparam V type of the storage order
         template <AddMulType U, StorageOrder V>
-        friend class DiagonalView;
+        friend Matrix<U, V> operator*(const TransposeView<U, V> &m1, const TransposeView<U, V> &m2);
+
+        template <AddMulType U, StorageOrder V>
+        friend Matrix<U, V> operator*(const TransposeView<U, V> &m1, const Matrix<U, V> &m2);
+
+        template <AddMulType U, StorageOrder V>
+        friend Matrix<U, V> operator*(const Matrix<U, V> &m1, const TransposeView<U, V> &m2);
+
+        // diagonal view products friend functions
+        template <AddMulType U, StorageOrder V>
+        friend std::vector<U> operator*(const DiagonalView<U, V> &m, const std::vector<U> &v);
+
+        template <AddMulType U, StorageOrder V>
+        friend SquareMatrix<U, V> operator*(const DiagonalView<U, V> &m1, const DiagonalView<U, V> &m2);
+
+        template <AddMulType U, StorageOrder V>
+        friend Matrix<U, V> operator*(const Matrix<U, V> &m1, const DiagonalView<U, V> &m2);
+
+        template <AddMulType U, StorageOrder V>
+        friend Matrix<U, V> operator*(const DiagonalView<U, V> &m1, const Matrix<U, V> &m2);
 
     private:
         bool modified = false; // flag to check if the matrix is in modified compressed format
@@ -167,5 +181,6 @@ namespace algebra
 };
 
 #include "square_matrix.tpp"
+#include "view_products.tpp"
 
 #endif // SQUARE_MATRIX_HPP

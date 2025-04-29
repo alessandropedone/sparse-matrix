@@ -16,14 +16,6 @@
 namespace algebra
 {
 
-    /// @brief type of norm
-    enum class NormType
-    {
-        One,
-        Infinity,
-        Frobenius
-    };
-
     // forward declaration of the TransposeView class
     template <AddMulType T, StorageOrder S>
     class TransposeView;
@@ -45,10 +37,7 @@ namespace algebra
         /// @brief constructor with size
         /// @param rows number of rows
         /// @param cols number of columns
-        Matrix(size_t rows, size_t cols) : rows(rows), cols(cols)
-        {
-            this->compressed = false;
-        };
+        Matrix(size_t rows, size_t cols) : rows(rows), cols(cols) { this->compressed = false; };
 
         /// @brief default copy constructor
         Matrix(const Matrix &other) = default;
@@ -70,32 +59,32 @@ namespace algebra
         /// @param row row index
         /// @param col column index
         /// @param value value to set
-        virtual void set(size_t row, size_t col, const T &value);
+        virtual void set(size_t row, size_t col, const T &value) override;
 
         /// @brief check if the matrix is in a compressed format
         /// @return true if the matrix is compressed, false otherwise
-        virtual bool is_compressed() const { return compressed; };
+        virtual bool is_compressed() const override { return compressed; };
 
         /// @brief compress the matrix if it is in an uncompressed format
-        virtual void compress();
+        virtual void compress() override;
 
         /// @brief compress the matrix in parallel if it is in an uncompressed format
         virtual void compress_parallel();
 
         /// @brief uncompress the matrix if it is in a compressed format
-        virtual void uncompress();
+        virtual void uncompress() override;
 
         /// @brief call operator() const version
         /// @param row row index
         /// @param col column index
         /// @return element at (row, col)
-        virtual T operator()(size_t row, size_t col) const;
+        virtual T operator()(size_t row, size_t col) const override;
 
         /// @brief call operator() non-const version
         /// @param row row index
         /// @param col column index
         /// @return reference to the element at (row, col) with proxy (to avoid storing zero values)
-        virtual Proxy<T, S> operator()(size_t row, size_t col);
+        virtual Proxy<T, S> operator()(size_t row, size_t col) override;
 
         /// @brief resize the matrix
         /// @param rows number of rows
@@ -110,19 +99,19 @@ namespace algebra
 
         /// @brief Function to read a matrix in Matrix Market format
         /// @param filename input file name
-        virtual void reader(const std::string &filename);
+        virtual void reader(const std::string &filename) override;
 
         /// @brief get the number of rows
         /// @return number of rows
-        virtual size_t get_rows() const { return rows; };
+        virtual size_t get_rows() const override { return rows; };
 
         /// @brief get the number of columns
         /// @return number of columns
-        virtual size_t get_cols() const { return cols; };
+        virtual size_t get_cols() const override { return cols; };
 
         /// @brief get the number of non-zero elements
         /// @return number of non-zero elements
-        virtual size_t get_nnz() const;
+        virtual size_t get_nnz() const override;
 
         /// @brief multiply with a std::vector
         /// @tparam U type of the vector elements
@@ -144,11 +133,18 @@ namespace algebra
         template <AddMulType U, StorageOrder V>
         friend Matrix<U, V> operator*(const Matrix<U, V> &m1, const Matrix<U, V> &m2);
 
-        /// @brief TransposeView class declaration as a friend
-        /// @tparam U type of the matrix elements
-        /// @tparam V type of the storage order
+        // transpose view products friend functions
         template <AddMulType U, StorageOrder V>
-        friend class TransposeView;
+        friend std::vector<U> operator*(const TransposeView<U, V> &m, const std::vector<U> &v);
+
+        template <AddMulType U, StorageOrder V>
+        friend Matrix<U, V> operator*(const TransposeView<U, V> &m1, const TransposeView<U, V> &m2);
+
+        template <AddMulType U, StorageOrder V>
+        friend Matrix<U, V> operator*(const TransposeView<U, V> &m1, const Matrix<U, V> &m2);
+
+        template <AddMulType U, StorageOrder V>
+        friend Matrix<U, V> operator*(const Matrix<U, V> &m1, const TransposeView<U, V> &m2);
 
     protected:
         size_t rows;             // number of rows
@@ -165,5 +161,6 @@ namespace algebra
 }
 
 #include "matrix.tpp"
+#include "view_products.tpp"
 
 #endif // MATRIX_HPP

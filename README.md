@@ -16,7 +16,6 @@ how do i manage to compute products (views and SquareMatrix)
 
 Views:
 - test transpose and diagonal products
-- execute test not working
 
 Optimization
 - optimize compression in modified format (remove unnecessary ifs)

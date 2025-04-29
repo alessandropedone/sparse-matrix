@@ -2,6 +2,7 @@
 #define ABSTRACT_MATRIX_HPP
 
 #include "storage.hpp"
+#include "proxy.hpp"
 
 namespace algebra
 {

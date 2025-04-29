@@ -3,6 +3,7 @@
 
 #include "storage.hpp"
 #include "proxy.hpp"
+#include "abstract_matrix.hpp"
 
 #include <vector>
 #include <iostream>

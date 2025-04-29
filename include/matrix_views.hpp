@@ -135,21 +135,39 @@ namespace algebra
             }
         }
 
-        /// @brief call operator non-const version
-        /// @param idx row and column index
-        /// @return a proxy to the matrix element at (idx, idx)
-        Proxy<T, S> operator()(size_t idx)
-        {
-            return matrix(idx, idx);
+        /// @brief delete call operator non-const version
+        /// @param row row index
+        /// @param col column index
+        /// @return a proxy to the matrix element at (row, col)
+        /// @note this function is used to set the diagonal element at (row, col)
+        /// @note if the element is not on the diagonal, an exception is thrown
+        Proxy<T, S> operator()(size_t row, size_t col){
+            if (row == col)
+            {
+                return matrix(row, col);
+            }
+            else
+            {
+                throw std::invalid_argument("Cannot get off-diagonal elements in a diagonal matrix");
+            }
         }
 
         /// @brief call operator const version
-        /// @param idx row and column index
-        /// @return the matrix element at (idx, idx)
-        T operator()(size_t idx) const
-        {
-            return matrix(idx, idx);
-        }
+        /// @param row row index
+        /// @param col column index
+        /// @return the matrix element at (row, col)
+        /// @note this function is used to get the diagonal element at (row, col)
+        /// @note if the element is not on the diagonal, an exception is thrown
+        T operator()(size_t row, size_t col) const {
+            if (row == col)
+            {
+                return matrix(row, col);
+            }
+            else
+            {
+                throw std::invalid_argument("Cannot get off-diagonal elements in a diagonal matrix");
+            }
+        };
 
         /// @brief get the number of rows
         /// @return number of rows

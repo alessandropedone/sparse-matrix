@@ -1,3 +1,4 @@
+#include "abstract_matrix.hpp"
 #include "matrix.hpp"
 #include "square_matrix.hpp"
 #include "matrix_views.hpp"
@@ -20,7 +21,7 @@ int main()
     test5x5(m);
     test5x5(sm);
     TransposeView<double, StorageOrder::ColumnMajor> tv(m);
-    
+
 
     // Run the tests on all matrices provided in the json file for both storage orders
     json data = read_json(static_cast<std::string>("data/data.json"));

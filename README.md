@@ -2,19 +2,8 @@
 
 # Sparse matrix 
 
-how do i manage to compute products (views and SquareMatrix)
-- implement 3 cases for each view
-- see use of private member of matrix in views
-    - possibility of public getter of const & to data members of matrix -> not sure about this
-    - make views as friends is also acceptable if private data is not exposed by public methods
-    (See here for more)[https://chatgpt.com/share/680fb6ee-bd04-800c-b74b-68621084db9e]
-- discuss about return types
-    - create matrix constructor with transposed view
-    - create squareMatrix constructor with transposed view and diagonal view
-    - since for now the views don't have public access to stored matrix data, these constructors are based on call operator
-    This caused issues because of include order -> possible solution: create constructor of matrix inside the view
-
 Views:
+- implement all products
 - test transpose and diagonal products
 
 Optimization

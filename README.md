@@ -2,8 +2,6 @@
 
 # Sparse matrix 
 
-Test
-- transpose and diagonal views
 
 how do i manage to compute products (views and SquareMatrix)
 - implement 3 cases for each view
@@ -17,6 +15,10 @@ how do i manage to compute products (views and SquareMatrix)
     - since for now the views don't have public access to stored matrix data, these constructors are based on call operator
     This caused issues because of include order -> possible solution: create constructor of matrix inside the view
 
+Views:
+- test transpose and diagonal products
+- add constructor of matrix and square matrix from views
+
 Optimization
 - optimize compression in modified format (remove unnecessary ifs)
 - keep compress_parallel in order to see the parallelization overhead
@@ -27,4 +29,5 @@ README.md (
     we didn't implement COO since COOmap is clearly more efficient, 
     explain why parallel implementation of compress is slower, put a test about this
     please run multiple times,
-    results interpretation)
+    results interpretation,
+    strucutre of the code and the output)

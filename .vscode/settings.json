@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.rmd": "markdown",
         "concepts": "cpp",
         "*.tcc": "cpp",
         "string": "cpp",
@@ -76,7 +77,8 @@
         "unordered_set": "cpp",
         "regex": "cpp",
         "ranges": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "execution": "cpp"
     },
     "C_Cpp.default.compilerPath": "/usr/bin/g++",
     "cmake.sourceDirectory": "/home/ale/challenge2-male/json/tests/benchmarks"

@@ -15,7 +15,6 @@
 namespace algebra
 {
 
-    
     /// @brief type of norm
     enum class NormType
     {
@@ -23,6 +22,14 @@ namespace algebra
         Infinity,
         Frobenius
     };
+
+    // forward declaration of the TransposeView class
+    template <AddMulType T, StorageOrder S>
+    class TransposeView;
+
+    // forward declaration of the DiagonalView class
+    template <AddMulType T, StorageOrder S>
+    class DiagonalView;
 
     /// @brief Matrix class
     /// @tparam T type of the matrix elements
@@ -42,14 +49,18 @@ namespace algebra
             this->compressed = false;
         };
 
-        /*
-        /// @brief constructor from a MatrixTransposeView
-        /// @note the constructed matrix is in uncompressed format
-        /// @param matrixView transposed view of matrix to copy
-        Matrix(const MatrixTransposeView<T, S> &matrixView);
-*/
         /// @brief default copy constructor
         Matrix(const Matrix &other) = default;
+
+        /// @brief constructor from a TransposeView
+        /// @note the constructed matrix is in uncompressed format
+        /// @param view transposed view of matrix to copy
+        Matrix(const TransposeView<T, S> &view);
+
+        /// @brief constructor from a DiagonalView
+        /// @note the constructed matrix is in uncompressed format
+        /// @param view diagonal view of matrix to copy
+        Matrix(const DiagonalView<T, S> &view);
 
         /// @brief default destructor
         virtual ~Matrix() = default;
@@ -62,7 +73,7 @@ namespace algebra
 
         /// @brief check if the matrix is in a compressed format
         /// @return true if the matrix is compressed, false otherwise
-        bool is_compressed() const { return compressed; };
+        virtual bool is_compressed() const { return compressed; };
 
         /// @brief compress the matrix if it is in an uncompressed format
         virtual void compress();
@@ -88,7 +99,7 @@ namespace algebra
         /// @brief resize the matrix
         /// @param rows number of rows
         /// @param cols number of columns
-        void resize_and_clear(size_t rows, size_t cols);
+        virtual void resize_and_clear(size_t rows, size_t cols);
 
         /// @brief calculate the norm of the matrix
         /// @tparam N type of the norm (One, Infinity, Frobenius)
@@ -102,11 +113,11 @@ namespace algebra
 
         /// @brief get the number of rows
         /// @return number of rows
-        size_t get_rows() const { return rows; };
-        
+        virtual size_t get_rows() const { return rows; };
+
         /// @brief get the number of columns
         /// @return number of columns
-        size_t get_cols() const { return cols; };
+        virtual size_t get_cols() const { return cols; };
 
         /// @brief get the number of non-zero elements
         /// @return number of non-zero elements
@@ -131,6 +142,12 @@ namespace algebra
         /// @note this function is a friend of the Matrix class, so it can access the private members
         template <AddMulType U, StorageOrder V>
         friend Matrix<U, V> operator*(const Matrix<U, V> &m1, const Matrix<U, V> &m2);
+
+        /// @brief TransposeView class declaration as a friend
+        /// @tparam U type of the matrix elements
+        /// @tparam V type of the storage order
+        template <AddMulType U, StorageOrder V>
+        friend class TransposeView;
 
     protected:
         size_t rows;             // number of rows

@@ -10,41 +10,34 @@
 #include "square_matrix.hpp"
 
 namespace algebra
-{/*
+{
+
+    /// @brief constructor from a TransposeView
+    /// @param view TransposeView to construct the matrix from
     template <AddMulType T, StorageOrder S>
-    SquareMatrix<T, S>::SquareMatrix(const MatrixTransposeView<T, S> &matrixView){
-        if (matrixView.get_rows() != matrixView.get_cols())
+    SquareMatrix<T, S>::SquareMatrix(const TransposeView<T, S> &view)
+        : Matrix<T, S>(view)
+    {
+        if (view.get_rows() != view.get_cols())
         {
             throw std::runtime_error("Matrix is not square");
         }
-        this->rows = matrixView.get_rows();
-        this->cols = matrixView.get_cols();
-        this->compressed = false;
         this->modified = false;
-        for (size_t i = 0; i < this->rows; ++i)
-        {
-            for (size_t j = 0; j < this->cols; ++j)
-            {
-                this->uncompressed_format[{i, j}] = matrixView(i, j);
-            }
-        }
-    };
+    }
 
+    /// @brief constructor from a DiagonalView
+    /// @param view DiagonalView to construct the matrix from
     template <AddMulType T, StorageOrder S>
-    SquareMatrix<T, S>::SquareMatrix(const MatrixDiagonalView<T, S> &matrixView){
-        this->rows = matrixView.get_size();
-        this->cols = matrixView.get_size();
-        this->compressed = false;
-        this->modified = true;
-        this->compressed_format_mod.values.resize(this->rows, 0);
-        this->compressed_format_mod.bind.resize(this->rows, 0);
-        for (size_t i = 0; i < this->rows; ++i)
+    SquareMatrix<T, S>::SquareMatrix(const DiagonalView<T, S> &view)
+        : Matrix<T, S>(view)
+    {
+        if (view.get_rows() != view.get_cols())
         {
-            this->compressed_format_mod.values[i] = matrixView(i);
-            this->compressed_format_mod.bind[i] = this->rows;
+            throw std::runtime_error("Matrix is not square");
         }
-    };
-*/
+        this->modified = false;
+    }
+
     template <AddMulType T, StorageOrder S>
     const size_t SquareMatrix<T, S>::get_mod_size() const
     {

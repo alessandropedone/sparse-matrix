@@ -4,7 +4,7 @@
 #include "storage.hpp"
 #include "matrix.hpp"
 #include "proxy.hpp"
-//#include "matrix_views.hpp"
+// #include "matrix_views.hpp"
 
 #include <vector>
 #include <iostream>
@@ -16,6 +16,15 @@
 
 namespace algebra
 {
+
+    // forward declaration of the TransposeView class
+    template <AddMulType T, StorageOrder S>
+    class TransposeView;
+
+    // forward declaration of the DiagonalView class
+    template <AddMulType T, StorageOrder S>
+    class DiagonalView;
+
     /// @brief Square Matrix class, child of Matrix class
     /// @tparam T type of the matrix elements
     /// @tparam S storage order of the matrix (RowMajor or ColumnMajor)
@@ -46,33 +55,26 @@ namespace algebra
             {
                 throw std::runtime_error("Matrix is not square");
             }
-            this->compressed = other.is_compressed();
             this->modified = false;
         };
-/*
-        /// @brief constructor from a MatrixTransposeView
-        /// @note the constructed matrix is in uncompressed format
-        /// @param matrix transposed view of matrix to copy
-        SquareMatrix(const MatrixTransposeView<T, S> &matrixView);
 
-        /// @brief constructor from a MatrixTransposeView
-        /// @note the constructed matrix is in modified compressed format
-        /// @param matrix transposed view of matrix to copy
-        SquareMatrix(const MatrixDiagonalView<T, S> &matrixView);
-*/
+        /// @brief constructor from a TransposeView
+        /// @param view TransposeView to construct the matrix from
+        SquareMatrix(const TransposeView<T, S> &view);
+
+        /// @brief constructor from a DiagonalView
+        /// @param view DiagonalView to construct the matrix from
+        SquareMatrix(const DiagonalView<T, S> &view);
+
         /// @brief default destructor
-        virtual ~SquareMatrix() override = default;
+        virtual ~SquareMatrix() = default;
 
         /// @brief check if the matrix is in a modified compressed format
         /// @return true if the matrix is (modified) compressed, false otherwise
-        bool is_modified() const { return modified; };
-
-        /// @brief get the size of the modified compressed matrix: it comprehends also possible zero elements in the diagonal
-        /// @return size of the modified compressed matrix vectors
-        const size_t get_mod_size() const;
+        virtual bool is_modified() const { return modified; };
 
         /// @brief compress the matrix in modified format
-        void compress_mod();
+        virtual void compress_mod();
 
         /// @brief set an element in the matrix (dynamic construction of the matrix)
         /// @param row row index
@@ -102,7 +104,7 @@ namespace algebra
         /// @param rows number of rows
         /// @param cols number of columns
         // Overload of Matrix<T, S>::resize_and_clear
-        void resize_and_clear(size_t dim);
+        virtual void resize_and_clear(size_t dim);
 
         /// @brief calculate the norm of the matrix
         /// @tparam N type of the norm (One, Infinity, Frobenius)
@@ -114,6 +116,10 @@ namespace algebra
         /// @brief Function to read a matrix in Matrix Market format
         /// @param filename input file name
         virtual void reader(const std::string &filename);
+
+        /// @brief get the size of the modified compressed matrix: it comprehends also possible zero elements in the diagonal
+        /// @return size of the modified compressed matrix vectors
+        virtual const size_t get_mod_size() const;
 
         /// @brief get the number of non-zero elements
         /// @return number of non-zero elements
@@ -138,6 +144,18 @@ namespace algebra
         /// @note this function is a friend of the Matrix class, so it can access the private members
         template <AddMulType U, StorageOrder V>
         friend SquareMatrix<U, V> operator*(const SquareMatrix<U, V> &m1, const SquareMatrix<U, V> &m2);
+
+        /// @brief TransposeView class declaration as a friend
+        /// @tparam U type of the matrix elements
+        /// @tparam V type of the storage order
+        template <AddMulType U, StorageOrder V>
+        friend class TransposeView;
+
+        /// @brief DiagonalView class declaration as a friend
+        /// @tparam U type of the matrix elements
+        /// @tparam V type of the storage order
+        template <AddMulType U, StorageOrder V>
+        friend class DiagonalView;
 
     private:
         bool modified = false; // flag to check if the matrix is in modified compressed format

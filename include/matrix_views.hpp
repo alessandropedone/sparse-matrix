@@ -4,29 +4,43 @@
 #include "matrix.hpp"
 #include "square_matrix.hpp"
 #include "proxy.hpp"
+#include "abstract_matrix.hpp"
 
 #include <execution>
 
 namespace algebra
 {
-    template <typename T, StorageOrder S = StorageOrder::RowMajor>
-    class MatrixTransposeView
+    template <AddMulType T, StorageOrder S = StorageOrder::RowMajor>
+    class TransposeView final : public AbstractMatrix<T, S>
     {
     public:
-        
+        // reference to the matrix
+        Matrix<T, S> &matrix;
+
         /// @brief delete default constructor
-        MatrixTransposeView() = delete;
+        TransposeView() = delete;
 
         /// @brief constructor
         /// @param matrix the matrix to transpose
-        MatrixTransposeView(Matrix<T, S> &matrix) : matrix(matrix) {};
+        TransposeView(Matrix<T, S> &matrix) : matrix(matrix) {};
 
+        /// @brief virtual destructor
+        virtual ~TransposeView() = default;
+
+        /// @brief set an element in the matrix (dynamic construction of the matrix)
+        /// @param row row index
+        /// @param col column index
+        /// @param value value to set
+        void set(size_t row, size_t col, const T &value)
+        {
+            matrix.set(col, row, value);
+        };
 
         /// @brief call operator non-const version
         /// @param row row index
         /// @param col column index
         /// @return a proxy to the matrix element at (row, col)
-        Proxy<T,S> operator()(size_t row, size_t col)
+        Proxy<T, S> operator()(size_t row, size_t col)
         {
             return matrix(col, row);
         };
@@ -39,35 +53,25 @@ namespace algebra
         {
             return matrix(col, row);
         };
-        
-        /// @brief  get the matrix
-        /// @return the matrix
-        Matrix<T, S> &get_matrix() const
-        {
-            return matrix;
-        };
-
-        /// @brief check if the matrix is in a compressed format
-        /// @return true if the matrix is compressed, false otherwise
-        bool is_compressed() const { return matrix.is_compressed(); };
 
         /// @brief get the number of rows
         /// @return number of rows
         size_t get_rows() const { return matrix.get_cols(); };
-        
+
         /// @brief get the number of columns
         /// @return number of columns
         size_t get_cols() const { return matrix.get_rows(); };
 
         /// @brief get the number of non-zero elements
         /// @return number of non-zero elements
-        virtual size_t get_nnz() const { return matrix.get_nnz(); };
+        size_t get_nnz() const { return matrix.get_nnz(); };
 
         /// @brief calculate the norm of the matrix
         /// @tparam N type of the norm (One, Infinity, Frobenius)
         /// @return value of the norm
         template <NormType N>
-        double norm() const{
+        double norm() const
+        {
             if constexpr (N == NormType::One)
             {
                 return matrix.template norm<NormType::Infinity>();
@@ -85,134 +89,221 @@ namespace algebra
         // friend functions
         // multiply with a std::vector
         template <AddMulType U, StorageOrder V>
-        friend std::vector<U> operator*(const MatrixTransposeView<U, V> &m, const std::vector<U> &v);
+        friend std::vector<U> operator*(const TransposeView<U, V> &m, const std::vector<U> &v);
 
         // multiply with another matrix
         template <AddMulType U, StorageOrder V>
-        friend Matrix<U, V> operator*(const MatrixTransposeView<U, V> &m1, const MatrixTransposeView<U, V> &m2);
-        
-        template <AddMulType U, StorageOrder V>
-        friend Matrix<U, V> operator*(const MatrixTransposeView<U, V> &m1, const Matrix<U, V> &m2);
+        friend Matrix<U, V> operator*(const TransposeView<U, V> &m1, const TransposeView<U, V> &m2);
 
         template <AddMulType U, StorageOrder V>
-        friend Matrix<U, V> operator*(const Matrix<U, V> &m1, const MatrixTransposeView<U, V> &m2);
+        friend Matrix<U, V> operator*(const TransposeView<U, V> &m1, const Matrix<U, V> &m2);
 
-        private:
-        Matrix<T, S> &matrix;
+        template <AddMulType U, StorageOrder V>
+        friend Matrix<U, V> operator*(const Matrix<U, V> &m1, const TransposeView<U, V> &m2);
     };
 
     template <AddMulType T, StorageOrder S = StorageOrder::RowMajor>
-    class MatrixDiagonalView 
+    class DiagonalView final : public AbstractMatrix<T, S>
     {
-        public:
-            /// @brief delete default constructor
-            MatrixDiagonalView() = delete;
+    public:
+        // reference to the matrix
+        SquareMatrix<T, S> &matrix;
 
-            /// @brief constructor
-            /// @param matrix the matrix to see as diagonal: all off-diagonal elements are ignored
-            MatrixDiagonalView(SquareMatrix<T, S> &matrix) : matrix(matrix) {}
-        
-            /// @brief call operator non-const version
-            /// @param idx row and column index
-            /// @return a proxy to the matrix element at (idx, idx)
-            Proxy<T,S> operator()(size_t idx)
+        /// @brief delete default constructor
+        DiagonalView() = delete;
+
+        /// @brief constructor
+        /// @param matrix the matrix to see as diagonal: all off-diagonal elements are ignored
+        DiagonalView(SquareMatrix<T, S> &matrix) : matrix(matrix) {}
+
+        /// @brief virtual destructor
+        virtual ~DiagonalView() = default;
+
+        /// @brief set an element in the matrix (dynamic construction of the matrix)
+        /// @param row row index
+        /// @param col column index
+        /// @param value value to set
+        void set(size_t row, size_t col, const T &value)
+        {
+            if (row == col)
             {
-                return matrix(idx, idx);
+                matrix.set(row, col, value);
             }
-
-            /// @brief call operator const version
-            /// @param idx row and column index
-            /// @return the matrix element at (idx, idx)
-            T operator()(size_t idx) const
+            else
             {
-                return matrix(idx, idx);
+                throw std::invalid_argument("Cannot set off-diagonal elements in a diagonal matrix");
             }
+        }
 
-            /// @brief  get the matrix
-            /// @return the matrix
-            SquareMatrix<T, S> &get_matrix() const
+        /// @brief call operator non-const version
+        /// @param idx row and column index
+        /// @return a proxy to the matrix element at (idx, idx)
+        Proxy<T, S> operator()(size_t idx)
+        {
+            return matrix(idx, idx);
+        }
+
+        /// @brief call operator const version
+        /// @param idx row and column index
+        /// @return the matrix element at (idx, idx)
+        T operator()(size_t idx) const
+        {
+            return matrix(idx, idx);
+        }
+
+        /// @brief get the number of rows
+        /// @return number of rows
+        size_t get_rows() const { return matrix.get_rows(); };
+
+        /// @brief get the number of columns
+        /// @return number of columns
+        size_t get_cols() const { return matrix.get_cols(); };
+
+        /// @brief get the number of non-zero elements in the diagonal
+        /// @return number of non-zero elements in the diagonal
+        size_t get_nnz() const
+        {
+            T sum = 0;
+            for (size_t i = 0; i < matrix.get_rows(); i++)
             {
-                return matrix;
+                sum += matrix(i, i);
             }
-            
-            /// @brief check if the matrix is in a compressed format
-            /// @return true if the matrix is compressed, false otherwise
-            bool is_compressed() const { return matrix.is_compressed(); };
+            return sum;
+        };
 
-            /// @brief check if the matrix is in a modified compressed format
-            /// @return true if the matrix is modified compressed, false otherwise 
-            bool is_modified() const { return matrix.is_modified(); };
-
-            /// @brief get the matrix dimension
-            /// @return number of rows or columns (the matrix is square)
-            size_t get_size() const { return matrix.get_rows(); };
-
-            /// @brief get the number of non-zero elements in the diagonal
-            /// @return number of non-zero elements in the diagonal
-            virtual size_t get_nnz() const {
-                T sum = 0;
-                for(size_t i = 0; i < matrix.get_rows(); i++)
+        /// @brief calculate the norm of the matrix
+        /// @tparam N type of the norm (One, Infinity, Frobenius)
+        /// @return value of the norm
+        template <NormType N>
+        double norm() const
+        {
+            if constexpr (N = NormType::Frobenius)
+            {
+                double sum{0};
+                for (size_t i = 0; i < matrix.get_rows(); i++)
                 {
-                    sum += matrix(i,i);
+                    sum += std::abs(matrix(i, i)) * std::abs(matrix(i, i));
                 }
-                return sum;
-            };
-
-            /// @brief calculate the norm of the matrix
-            /// @tparam N type of the norm (One, Infinity, Frobenius)
-            /// @return value of the norm
-            template <NormType N>
-            double norm() const {
-                if constexpr (N = NormType::Frobenius){
-                    double sum{0};
-                    for(size_t i = 0; i < matrix.get_rows(); i++)
-                    {
-                        sum += std::abs(matrix(i,i)) * std::abs(matrix(i,i));
-                    }
-                    return std::sqrt(sum);
+                return std::sqrt(sum);
+            }
+            else
+            { // One or Infinity are equivalent for diagonal matrices
+                std::vector<double> diag(matrix.get_rows(), 0);
+                for (size_t i = 0; i < matrix.get_rows(); i++)
+                {
+                    diag[i] = std::abs(matrix(i, i));
                 }
-                else{ // One or Infinity are equivalent for diagonal matrices
-                    std::vector<double> diag(matrix.get_rows(), 0);
-                    for(size_t i = 0; i < matrix.get_rows(); i++)
-                    {
-                        diag[i] = std::abs(matrix(i,i));
-                    }
-                    return *std::max_element(std::execution::par_unseq, diag.begin(), diag.end());
-                }
-            };
+                return *std::max_element(std::execution::par_unseq, diag.begin(), diag.end());
+            }
+        };
 
-            // friend functions
-            // multiply with a std::vector
-            template <AddMulType U, StorageOrder V>
-            friend std::vector<U> operator*(const MatrixDiagonalView<U, V> &m, const std::vector<U> &v);
-            
-            // multiply with another matrix
-            template <AddMulType U, StorageOrder V>
-            friend SquareMatrix<U, V> operator*(const MatrixDiagonalView<U, V> &m1, const MatrixDiagonalView<U, V> &m2);
+        // friend functions
+        // multiply with a std::vector
+        template <AddMulType U, StorageOrder V>
+        friend std::vector<U> operator*(const DiagonalView<U, V> &m, const std::vector<U> &v);
 
-            template <AddMulType U, StorageOrder V>
-            friend Matrix<U, V> operator*(const Matrix<U, V> &m1, const MatrixDiagonalView<U, V> &m2);
+        // multiply with another matrix
+        template <AddMulType U, StorageOrder V>
+        friend SquareMatrix<U, V> operator*(const DiagonalView<U, V> &m1, const DiagonalView<U, V> &m2);
 
-            template <AddMulType U, StorageOrder V>
-            friend Matrix<U, V> operator*(const MatrixDiagonalView<U, V> &m1, const Matrix<U, V> &m2);
+        template <AddMulType U, StorageOrder V>
+        friend Matrix<U, V> operator*(const Matrix<U, V> &m1, const DiagonalView<U, V> &m2);
 
-        private:
-            SquareMatrix<T, S> &matrix;
+        template <AddMulType U, StorageOrder V>
+        friend Matrix<U, V> operator*(const DiagonalView<U, V> &m1, const Matrix<U, V> &m2);
     };
-/*
-    //FRIENDS: MULTIPLICATIONS WITH TRANSPOSED VIEWS
-    template <AddMulType T, StorageOrder S>
-    std::vector<T> operator*(const MatrixTransposeView<T, S> &m, const std::vector<T> &v)
-    {
 
-        if (m.rows != v.size())
+    template <AddMulType T, StorageOrder S>
+    std::vector<T> operator*(const TransposeView<T, S> &m, const std::vector<T> &v)
+    {
+        auto matrix = m.matrix;
+        if (matrix.rows != v.size())
         {
             throw std::invalid_argument("Matrix and vector dimensions do not match for multiplication");
         }
-        std::vector<T> result(m.cols, 0);
-        if (not m.is_compressed())
+        std::vector<T> result(matrix.cols, 0);
+        if (typeid(matrix) == typeid(SquareMatrix<T, S>))
         {
-            for (const auto &it : m.uncompressed_format)
+            auto this_square = static_cast<const SquareMatrix<T, S> *>(&matrix);
+            if (this_square->is_modified())
+            {
+                if constexpr (S == StorageOrder::ColumnMajor)
+                {
+                    size_t col, start, end;
+
+                    // off-diagonal elements
+                    for (col = 0; col < m.cols - 1; ++col)
+                    {
+                        // iterate over non-zero elements in the column "col" of m
+                        start = m.compressed_format_mod.bind[col];
+                        end = m.compressed_format_mod.bind[col + 1];
+                        for (size_t j = start; j < end; ++j)
+                        {
+                            // row index of the non-zero element
+                            size_t row = m.compressed_format_mod.bind[j];
+                            // add off-diagonal elements
+                            result[col] += m.compressed_format_mod.values[j] * v[row];
+                        }
+                    }
+
+                    // handle last column
+                    start = m.compressed_format_mod.bind[col];
+                    end = m.compressed_format_mod.values.size();
+                    for (size_t j = start; j < end; ++j)
+                    {
+                        // row index of the non-zero element
+                        size_t row = m.compressed_format_mod.bind[j];
+                        // add off-diagonal elements
+                        result[col] += m.compressed_format_mod.values[j] * v[row];
+                    }
+
+                    // add diagonal elements
+                    for (size_t i = 0; i < m.cols; ++i)
+                    {
+                        result[i] += m.compressed_format_mod.values[i] * v[i];
+                    }
+                }
+                else
+                {
+                    size_t row, start, end;
+
+                    // off-diagonal elements
+                    for (row = 0; row < m.rows - 1; ++row)
+                    {
+                        // iterate over non-zero elements in the row "row" of m
+                        start = m.compressed_format_mod.bind[row];
+                        end = m.compressed_format_mod.bind[row + 1];
+                        for (size_t j = start; j < end; ++j)
+                        {
+                            // col index of the non-zero element
+                            size_t col = m.compressed_format_mod.bind[j];
+                            // add off-diagonal elements
+                            result[col] += m.compressed_format_mod.values[j] * v[row];
+                        }
+                    }
+
+                    // handle last row
+                    start = m.compressed_format_mod.bind[row];
+                    end = m.compressed_format_mod.values.size();
+                    for (size_t j = start; j < end; ++j)
+                    {
+                        // col index of the non-zero element
+                        size_t col = m.compressed_format_mod.bind[j];
+                        // add off-diagonal elements
+                        result[col] += m.compressed_format_mod.values[j] * v[row];
+                    }
+
+                    // add diagonal elements
+                    for (size_t i = 0; i < m.cols; ++i)
+                    {
+                        result[i] += m.compressed_format_mod.values[i] * v[i];
+                    }
+                }
+            }
+        }
+        if (not matrix.is_compressed())
+        {
+            for (const auto &it : matrix.uncompressed_format)
             {
                 result[it.first.col] += it.second * v[it.first.row];
             }
@@ -222,41 +313,41 @@ namespace algebra
             if constexpr (S == StorageOrder::ColumnMajor)
             {
                 size_t start;
-                size_t end = m.compressed_format.inner[0];
+                size_t end = matrix.compressed_format.inner[0];
                 // iterate over columns of m
                 for (size_t col = 0; col < m.cols; col++)
                 {
                     start = end;
-                    end = m.compressed_format.inner[col + 1];
+                    end = matrix.compressed_format.inner[col + 1];
 
-                    // iterate over rows of m that are non-zero in the column "col" of m
+                    // iterate over rows of matrix that are non-zero in the column "col" of m
                     for (size_t j = start; j < end; j++)
                     {
                         // row = row of m that we are currently processing
-                        size_t row = m.compressed_format.outer[j];
+                        size_t row = matrix.compressed_format.outer[j];
 
                         // add the product of the non-zero elements to the "result" vector
-                        result[col] += m.compressed_format.values[j] * v[row];
+                        result[col] += matrix.compressed_format.values[j] * v[row];
                     }
                 }
             }
             else
             {
                 size_t start;
-                size_t end = m.compressed_format.inner[0];
+                size_t end = matrix.compressed_format.inner[0];
                 // iterate over rows of m
-                for (size_t row = 0; row < m.rows; row++)
+                for (size_t row = 0; row < matrix.rows; row++)
                 {
                     start = end;
-                    end = m.compressed_format.inner[row + 1];
+                    end = matrix.compressed_format.inner[row + 1];
                     // iterate over columns of m that are non-zero in the row "row" of m
                     for (size_t j = start; j < end; j++)
                     {
                         // col = column of m that we are currently processing
-                        size_t col = m.compressed_format.outer[j];
+                        size_t col = matrix.compressed_format.outer[j];
 
                         // add the product of the non-zero elements to the "result" vector
-                        result[col] += m.compressed_format.values[j] * v[row];
+                        result[col] += matrix.compressed_format.values[j] * v[row];
                     }
                 }
             }
@@ -264,119 +355,122 @@ namespace algebra
         return result;
     }
 
-    template <AddMulType T, StorageOrder S>
-    Matrix<T, S> operator*(const MatrixTransposeView<T, S> &m1, const MatrixTransposeView<T, S> &m2)
-    {
-        MatrixTransposeView<T,S> result(m2.matrix * m1.matrix);
-        return Matrix<T,S>(result);
-    }
+    /*
+        //FRIENDS: MULTIPLICATIONS WITH TRANSPOSED VIEWS
 
-    template <AddMulType T, StorageOrder S>
-    Matrix<T, S> operator*(const MatrixTransposeView<T, S> &m1, const Matrix<T, S> &m2)
-    {
-        // TO DO
-
-        Matrix<T,S> result(m1.get_rows, m2.get_cols);
-
-        if (m1.get_cols() != m2.get_rows())
+        template <AddMulType T, StorageOrder S>
+        Matrix<T, S> operator*(const TransposeView<T, S> &m1, const TransposeView<T, S> &m2)
         {
-            throw std::invalid_argument("Matrix dimensions do not match for multiplication");
-        }
-        if (m1.is_compressed() != m2.is_compressed())
-        {
-            throw std::invalid_argument("Matrix compression formats do not match");
+            TransposeView<T,S> result(m2.matrix * m1.matrix);
+            return Matrix<T,S>(result);
         }
 
-        if (not m1.is_compressed())
+        template <AddMulType T, StorageOrder S>
+        Matrix<T, S> operator*(const TransposeView<T, S> &m1, const Matrix<T, S> &m2)
         {
-            for (const auto &it1 : m1.uncompressed_format)
+            // TO DO
+
+            Matrix<T,S> result(m1.get_rows, m2.get_cols);
+
+            if (m1.get_cols() != m2.get_rows())
             {
-                for (const auto &it2 : m2.uncompressed_format)
+                throw std::invalid_argument("Matrix dimensions do not match for multiplication");
+            }
+            if (m1.is_compressed() != m2.is_compressed())
+            {
+                throw std::invalid_argument("Matrix compression formats do not match");
+            }
+
+            if (not m1.is_compressed())
+            {
+                for (const auto &it1 : m1.uncompressed_format)
                 {
-                    if (it1.first.col == it2.first.row)
+                    for (const auto &it2 : m2.uncompressed_format)
                     {
-                        result(it1.first.row, it2.first.col) += it1.second * it2.second;
+                        if (it1.first.col == it2.first.row)
+                        {
+                            result(it1.first.row, it2.first.col) += it1.second * it2.second;
+                        }
                     }
                 }
             }
-        }
 
-        return result;
-    }
-
-    template <AddMulType T, StorageOrder S>
-    Matrix<T, S> operator*(const Matrix<T, S> &m1, const MatrixTransposeView<T, S> &m2)
-    {
-        return Matrix<T,S>();
-    }
-
-
-    //FRIENDS: MULTIPLICATIONS WITH DIAGONAL VIEWS
-    template <AddMulType T, StorageOrder S>
-    std::vector<T> operator*(const MatrixDiagonalView<T, S> &m, const std::vector<T> &v)
-    {
-        if (m.get_size() != v.size())
-        {
-            throw std::invalid_argument("Matrix and vector dimensions do not match for multiplication");
-        }
-        std::vector<T> result(m.get_size(), 0);
-
-        if (m.is_modified()){
-            for (size_t i = 0; i < m.get_size(); i++)
-            {
-                result[i] = m.compressed_format_mod.values[i] * v[i];
-            }
             return result;
         }
-        else if (m.is_compressed()){
-            for (size_t i = 0; i < m.get_size(); i++)
-            {
-                // for this format the call operator is the best option, we are forced to go by each stored row/column
-                result[i] = m(i, i) * v[i];
-            }
-            return result;
-        }
-        else{
-            for (size_t i = 0; i < m.get_size(); i++)
-            {
-                result[i] = m.uncompressed_format[{i,i}] * v[i];
-            }
-            return result;
-        }
-    };
 
-    template <AddMulType T, StorageOrder S>
-    SquareMatrix<T, S> operator*(const MatrixDiagonalView<T, S> &m1, const MatrixDiagonalView<T, S> &m2)
-    {
-        if (m1.get_size() != m2.get_size())
+        template <AddMulType T, StorageOrder S>
+        Matrix<T, S> operator*(const Matrix<T, S> &m1, const TransposeView<T, S> &m2)
         {
-            throw std::invalid_argument("Matrix dimensions do not match for multiplication");
+            return Matrix<T,S>();
         }
-        if ((m1.is_modified() != m2.is_modified()) || (m1.is_compressed() != m2.is_compressed()))
+
+
+        //FRIENDS: MULTIPLICATIONS WITH DIAGONAL VIEWS
+        template <AddMulType T, StorageOrder S>
+        std::vector<T> operator*(const DiagonalView<T, S> &m, const std::vector<T> &v)
         {
-            throw std::invalid_argument("Matrix compression formats do not match");
-        }
+            if (m.get_size() != v.size())
+            {
+                throw std::invalid_argument("Matrix and vector dimensions do not match for multiplication");
+            }
+            std::vector<T> result(m.get_size(), 0);
 
-        SquareMatrix<T, S> result(m1.get_size());
+            if (m.is_modified()){
+                for (size_t i = 0; i < m.get_size(); i++)
+                {
+                    result[i] = m.compressed_format_mod.values[i] * v[i];
+                }
+                return result;
+            }
+            else if (m.is_compressed()){
+                for (size_t i = 0; i < m.get_size(); i++)
+                {
+                    // for this format the call operator is the best option, we are forced to go by each stored row/column
+                    result[i] = m(i, i) * v[i];
+                }
+                return result;
+            }
+            else{
+                for (size_t i = 0; i < m.get_size(); i++)
+                {
+                    result[i] = m.uncompressed_format[{i,i}] * v[i];
+                }
+                return result;
+            }
+        };
 
-        if (m1.is_modified())
-        
+        template <AddMulType T, StorageOrder S>
+        SquareMatrix<T, S> operator*(const DiagonalView<T, S> &m1, const DiagonalView<T, S> &m2)
+        {
+            if (m1.get_size() != m2.get_size())
+            {
+                throw std::invalid_argument("Matrix dimensions do not match for multiplication");
+            }
+            if ((m1.is_modified() != m2.is_modified()) || (m1.is_compressed() != m2.is_compressed()))
+            {
+                throw std::invalid_argument("Matrix compression formats do not match");
+            }
 
-        return result;
+            SquareMatrix<T, S> result(m1.get_size());
 
-    };
+            if (m1.is_modified())
 
-    template <AddMulType T, StorageOrder S>
-    Matrix<T, S> operator*(const Matrix<T, S> &m1, const MatrixDiagonalView<T, S> &m2)
-    {
 
-    };
-    
-    template <AddMulType T, StorageOrder S>
-    Matrix<T, S> operator*(const MatrixDiagonalView<T, S> &m1, const Matrix<T, S> &m2)  
-    {
+            return result;
 
-    };
-*/
+        };
+
+        template <AddMulType T, StorageOrder S>
+        Matrix<T, S> operator*(const Matrix<T, S> &m1, const DiagonalView<T, S> &m2)
+        {
+
+        };
+
+        template <AddMulType T, StorageOrder S>
+        Matrix<T, S> operator*(const DiagonalView<T, S> &m1, const Matrix<T, S> &m2)
+        {
+
+        };
+    */
 }
 #endif // MATRIX_VIEWS_HPP

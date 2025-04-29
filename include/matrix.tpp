@@ -10,19 +10,132 @@
 #include <cassert>
 
 namespace algebra
-{/*
+{
+    /// @brief constructor from a TransposeView
+    /// @note the constructed matrix is in uncompressed format
+    /// @param view transposed view of matrix to copy
     template <AddMulType T, StorageOrder S>
-    Matrix<T, S>::Matrix(const MatrixTransposeView<T, S> &matrixView) : rows(matrixView.get_rows()), cols(matrix.get_cols()){
-        for (size_t i = 0; i < rows; ++i)
+    Matrix<T, S>::Matrix(const TransposeView<T, S> &view)
+    {
+        auto matrix = view.matrix;
+        if (matrix.is_compressed())
         {
-            for (size_t j = 0; j < cols; ++j)
+            if constexpr (S == StorageOrder::ColumnMajor)
             {
-                uncompressed_format[{i, j}] = matrixView(i, j);
+                for (size_t col = 0; col < matrix.get_cols(); col++)
+                {
+                    size_t start = matrix.compressed_format.inner[col];
+                    size_t end = matrix.compressed_format.inner[col + 1];
+                    for (size_t j = start; j < end; j++)
+                    {
+                        size_t row = matrix.compressed_format.outer[j];
+                        T value = matrix.compressed_format.values[j];
+                        this->set(col, row, value);
+                    }
+                }
             }
+            else
+            {
+                for (size_t row = 0; row < matrix.get_rows(); row++)
+                {
+                    size_t start = matrix.compressed_format.inner[row];
+                    size_t end = matrix.compressed_format.inner[row + 1];
+                    for (size_t j = start; j < end; j++)
+                    {
+                        size_t col = matrix.compressed_format.outer[j];
+                        T value = matrix.compressed_format.values[j];
+                        this->set(col, row, value);
+                    }
+                }
+            }
+            // set the number of rows and columns
+            this->rows = matrix.get_cols();
+            this->cols = matrix.get_rows();
+            // set the compressed flag
+            this->compressed = true;
         }
-        this->compressed = false;
-    };
-*/
+        else
+        {
+            for (const auto &it : matrix.uncompressed_format)
+            {
+                // set the element in the matrix
+                this->set(it.first.col, it.first.row, it.second);
+            }
+            // set the number of rows and columns
+            this->rows = matrix.get_cols();
+            this->cols = matrix.get_rows();
+            // set the compressed flag
+            this->compressed = false;
+        }
+    }
+
+    /// @brief constructor from a DiagonalView
+    /// @note the constructed matrix is in uncompressed format
+    /// @param view diagonal view of matrix to copy
+    template <AddMulType T, StorageOrder S>
+    Matrix<T, S>::Matrix(const DiagonalView<T, S> &view)
+    {
+        auto matrix = view.matrix;
+        if (matrix.is_compressed())
+        {
+            if constexpr (S == StorageOrder::ColumnMajor)
+            {
+                for (size_t col = 0; col < matrix.get_cols(); col++)
+                {
+                    size_t start = matrix.compressed_format.inner[col];
+                    size_t end = matrix.compressed_format.inner[col + 1];
+                    for (size_t j = start; j < end; j++)
+                    {
+                        size_t row = matrix.compressed_format.outer[j];
+                        if (row == col)
+                        {
+                            T value = matrix.compressed_format.values[j];
+                            this->set(row, col, value);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for (size_t row = 0; row < matrix.get_rows(); row++)
+                {
+                    size_t start = matrix.compressed_format.inner[row];
+                    size_t end = matrix.compressed_format.inner[row + 1];
+                    for (size_t j = start; j < end; j++)
+                    {
+                        size_t col = matrix.compressed_format.outer[j];
+                        if (row == col)
+                        {
+                            T value = matrix.compressed_format.values[j];
+                            this->set(row, col, value);
+                        }
+                    }
+                }
+            }
+            // set the number of rows and columns
+            this->rows = matrix.get_rows();
+            this->cols = matrix.get_cols();
+            // set the compressed flag
+            this->compressed = true;
+        }
+        else
+        {
+            for (const auto &it : matrix.uncompressed_format)
+            {
+                if (it.first.row == it.first.col)
+                {
+                    // set the element in the matrix
+                    this->set(it.first.row, it.first.col, it.second);
+                }
+            }
+            // set the number of rows and columns
+            this->rows = matrix.get_rows();
+            this->cols = matrix.get_cols();
+            // set the compressed flag
+            this->compressed = false;
+        }
+    }
+
     template <AddMulType T, StorageOrder S>
     void Matrix<T, S>::set(size_t row, size_t col, const T &value)
     {
@@ -686,7 +799,6 @@ namespace algebra
             return uncompressed_format.size();
         }
     };
-
 }
 
 #endif // MATRIX_TPP

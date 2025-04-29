@@ -18,11 +18,19 @@ namespace algebra
     Matrix<T, S>::Matrix(const TransposeView<T, S> &view)
     {
         auto matrix = view.matrix;
+
+        // set the number of rows and columns
+        this->rows = matrix.get_cols();
+        this->cols = matrix.get_rows();
+        // set the compressed flag
+        this->compressed = false; 
+        
         if (matrix.is_compressed())
         {
+            
             if constexpr (S == StorageOrder::ColumnMajor)
             {
-                for (size_t col = 0; col < matrix.get_cols(); col++)
+                for (size_t col = 0; col < matrix.get_cols(); ++col)
                 {
                     size_t start = matrix.compressed_format.inner[col];
                     size_t end = matrix.compressed_format.inner[col + 1];
@@ -36,7 +44,7 @@ namespace algebra
             }
             else
             {
-                for (size_t row = 0; row < matrix.get_rows(); row++)
+                for (size_t row = 0; row < matrix.get_rows(); ++row)
                 {
                     size_t start = matrix.compressed_format.inner[row];
                     size_t end = matrix.compressed_format.inner[row + 1];
@@ -48,11 +56,6 @@ namespace algebra
                     }
                 }
             }
-            // set the number of rows and columns
-            this->rows = matrix.get_cols();
-            this->cols = matrix.get_rows();
-            // set the compressed flag
-            this->compressed = true;
         }
         else
         {
@@ -61,11 +64,6 @@ namespace algebra
                 // set the element in the matrix
                 this->set(it.first.col, it.first.row, it.second);
             }
-            // set the number of rows and columns
-            this->rows = matrix.get_cols();
-            this->cols = matrix.get_rows();
-            // set the compressed flag
-            this->compressed = false;
         }
     }
 
@@ -76,6 +74,13 @@ namespace algebra
     Matrix<T, S>::Matrix(const DiagonalView<T, S> &view)
     {
         auto matrix = view.matrix;
+
+        // set the number of rows and columns
+        this->rows = matrix.get_rows();
+        this->cols = matrix.get_cols();
+        // set the compressed flag
+        this->compressed = false;
+        
         if (matrix.is_compressed())
         {
             if constexpr (S == StorageOrder::ColumnMajor)
@@ -112,11 +117,6 @@ namespace algebra
                     }
                 }
             }
-            // set the number of rows and columns
-            this->rows = matrix.get_rows();
-            this->cols = matrix.get_cols();
-            // set the compressed flag
-            this->compressed = true;
         }
         else
         {
@@ -128,11 +128,6 @@ namespace algebra
                     this->set(it.first.row, it.first.col, it.second);
                 }
             }
-            // set the number of rows and columns
-            this->rows = matrix.get_rows();
-            this->cols = matrix.get_cols();
-            // set the compressed flag
-            this->compressed = false;
         }
     }
 

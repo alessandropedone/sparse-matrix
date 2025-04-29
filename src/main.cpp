@@ -24,7 +24,7 @@ int main()
     test5x5(tv);
 
     // Run the tests on all matrices provided in the json file for both storage orders
-    /* json data = read_json(static_cast<std::string>("data/data.json"));
+    json data = read_json(static_cast<std::string>("data/data.json"));
     const std::vector<std::string> matrix_names = data["matrix_name"];
     const std::array<StorageOrder, 2> storage_orders = {StorageOrder::RowMajor, StorageOrder::ColumnMajor};
     for (const auto &storage_order : storage_orders)
@@ -49,7 +49,7 @@ int main()
             std::cout << "------------------------------------" << std::endl;
             test<StorageOrder::ColumnMajor>(matrix_names);
         }
-    } */
+    } 
 
     return 0;
 }

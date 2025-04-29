@@ -342,11 +342,16 @@ namespace algebra
             std::cout << "Test with SquareMatrix class" << std::endl;
             std::cout << "------------------------------------" << std::endl;
             execute_test(testSquareMatrix, matrix_name);
+
+            std::cout << "------------------------------------" << std::endl;
+            std::cout << "Test with TransposeView class" << std::endl;
+            std::cout << "------------------------------------" << std::endl;
+            execute_test(testTransposeView, matrix_name);
         };
     }
 
     template <StorageOrder S>
-    void execute_test(Matrix<double, S> &testMatrix, const std::string &matrix_name)
+    void execute_test(AbstractMatrix<double, S> &testMatrix, const std::string &matrix_name)
     {
         // Import matrix
         testMatrix.reader(static_cast<std::string>("data/" + matrix_name));
@@ -384,10 +389,11 @@ namespace algebra
         std::string filename = "data/execution_time.json";
         json time_info = read_json(filename);
 
-        // matrix - vector product in compressed format
+
         if (typeid(testMatrix) == typeid(SquareMatrix<double, S>))
         {
             auto testSquareMatrix = static_cast<SquareMatrix<double, S> &>(testMatrix);
+
             testSquareMatrix.compress_mod();
 
             start = MyClock::now();
@@ -401,38 +407,121 @@ namespace algebra
             stop = MyClock::now();
             auto time_span_n = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
             time_info[matrix_name + " (compressed_format_matrix_vector_product_ns)"] = time_span_n.count();
+
+            testSquareMatrix.uncompress();
+
+            start = MyClock::now();
+            res2 = testSquareMatrix * testSquareMatrix;
+            stop = MyClock::now();
+            auto time_span_mu_uncompressed = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+            time_info[matrix_name + " (uncompressed_format_matrix_matrix_product_mus)"] = time_span_mu_uncompressed.count();
+
+            start = MyClock::now();
+            res4 = testSquareMatrix * vec;
+            stop = MyClock::now();
+            auto time_span_n_uncompressed = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
+            time_info[matrix_name + " (uncompressed_format_matrix_vector_product_ns)"] = time_span_n_uncompressed.count();
+        }
+        else if (typeid(testMatrix) == typeid(TransposeView<double, S>))
+        {
+            auto testTransposeView = static_cast<TransposeView<double, S> &>(testMatrix);
+
+            testTransposeView.compress();
+
+            start = MyClock::now();
+            res1 = testTransposeView * testTransposeView;
+            stop = MyClock::now();
+            auto time_span_mu = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+            time_info[matrix_name + " (compressed_format_transpose_matrix_matrix_product_mus)"] = time_span_mu.count();
+
+            start = MyClock::now();
+            res3 = testTransposeView * vec;
+            stop = MyClock::now();
+            auto time_span_n = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
+            time_info[matrix_name + " (compressed_format_transpose_matrix_vector_product_ns)"] = time_span_n.count();
+
+            testTransposeView.uncompress();
+
+            start = MyClock::now();
+            res2 = testTransposeView * testTransposeView;
+            stop = MyClock::now();
+            auto time_span_mu_uncompressed = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+            time_info[matrix_name + " (uncompressed_format_transpose_matrix_matrix_product_mus)"] = time_span_mu_uncompressed.count();
+
+            start = MyClock::now();
+            res4 = testTransposeView * vec;
+            stop = MyClock::now();
+            auto time_span_n_uncompressed = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
+            time_info[matrix_name + " (uncompressed_format_transpose_matrix_vector_product_ns)"] = time_span_n_uncompressed.count();
+        }
+        else if (typeid(testMatrix) == typeid(DiagonalView<double, S>))
+        {
+            auto testDiagonalView = static_cast<DiagonalView<double, S> &>(testMatrix);
+
+            testDiagonalView.compress();
+
+            start = MyClock::now();
+            res1 = testDiagonalView * testDiagonalView;
+            stop = MyClock::now();
+            auto time_span_mu = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+            time_info[matrix_name + " (compressed_format_diagonal_matrix_matrix_product_mus)"] = time_span_mu.count();
+
+            start = MyClock::now();
+            res3 = testDiagonalView * vec;
+            stop = MyClock::now();
+            auto time_span_n = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
+            time_info[matrix_name + " (compressed_format_diagonal_matrix_vector_product_ns)"] = time_span_n.count();
+
+            testDiagonalView.uncompress();
+
+            start = MyClock::now();
+            res2 = testDiagonalView * testDiagonalView;
+            stop = MyClock::now();
+            auto time_span_mu_uncompressed = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+            time_info[matrix_name + " (uncompressed_format_diagonal_matrix_matrix_product_mus)"] = time_span_mu_uncompressed.count();
+
+            start = MyClock::now();
+            res4 = testDiagonalView * vec;
+            stop = MyClock::now();
+            auto time_span_n_uncompressed = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
+            time_info[matrix_name + " (uncompressed_format_diagonal_matrix_vector_product_ns)"] = time_span_n_uncompressed.count();
         }
         else
         {
-            testMatrix.compress();
+            auto dynamicMatrix = dynamic_cast<Matrix<double, S> *>(&testMatrix);
+            if (!dynamicMatrix)
+            {
+                throw std::runtime_error("No matrix type found to perform the test");
+            }
+
+            dynamicMatrix->compress();
 
             start = MyClock::now();
-            res1 = testMatrix * testMatrix;
+            res1 = (*dynamicMatrix) * (*dynamicMatrix);
             stop = MyClock::now();
             auto time_span_mu = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
             time_info[matrix_name + " (compressed_format_matrix_matrix_product_mus)"] = time_span_mu.count();
 
             start = MyClock::now();
-            res3 = testMatrix * vec;
+            res3 = (*dynamicMatrix) * vec;
             stop = MyClock::now();
             auto time_span_n = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
-            time_info[matrix_name + " (compressed_format_matrix_vector_product_ns) "] = time_span_n.count();
+            time_info[matrix_name + " (compressed_format_matrix_vector_product_ns)"] = time_span_n.count();
+
+            dynamicMatrix->uncompress();
+
+            start = MyClock::now();
+            res2 = (*dynamicMatrix) * (*dynamicMatrix);
+            stop = MyClock::now();
+            auto time_span_mu_uncompressed = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+            time_info[matrix_name + " (uncompressed_format_matrix_matrix_product_mus)"] = time_span_mu_uncompressed.count();
+
+            start = MyClock::now();
+            res4 = (*dynamicMatrix) * vec;
+            stop = MyClock::now();
+            auto time_span_n_uncompressed = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
+            time_info[matrix_name + " (uncompressed_format_matrix_vector_product_ns)"] = time_span_n_uncompressed.count();
         }
-
-        // matrix - vector product in uncompressed format
-        testMatrix.uncompress();
-
-        start = MyClock::now();
-        res2 = testMatrix * testMatrix;
-        stop = MyClock::now();
-        auto time_span_mu = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-        time_info[matrix_name + " (uncompressed_format_matrix_matrix_product_mus)"] = time_span_mu.count();
-
-        start = MyClock::now();
-        res4 = testMatrix * vec;
-        stop = MyClock::now();
-        auto time_span_n = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
-        time_info[matrix_name + " (uncompressed_format_matrix_vector_product_ns)"] = time_span_n.count();
 
         // save json
         save_json(filename, time_info);

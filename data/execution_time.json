@@ -1,12 +1,16 @@
 {
-    "e20r0000.mtx (compressed_format_matrix_matrix_product_mus)": 135523,
-    "e20r0000.mtx (compressed_format_matrix_vector_product_ns)": 1808414,
+    "e20r0000.mtx (compressed_format_matrix_matrix_product_mus)": 135395,
+    "e20r0000.mtx (compressed_format_matrix_vector_product_ns)": 1493622,
     "e20r0000.mtx (compressed_format_matrix_vector_product_ns) ": 1237437,
-    "e20r0000.mtx (uncompressed_format_matrix_matrix_product_mus)": 5921241,
-    "e20r0000.mtx (uncompressed_format_matrix_vector_product_ns)": 1930445,
-    "lnsp_131.mtx (compressed_format_matrix_matrix_product_mus)": 631,
-    "lnsp_131.mtx (compressed_format_matrix_vector_product_ns)": 19627,
+    "e20r0000.mtx (uncompressed_format_matrix_matrix_product_mus)": 5065956,
+    "e20r0000.mtx (uncompressed_format_matrix_vector_product_ns)": 1429173,
+    "lnsp_131.mtx (compressed_format_matrix_matrix_product_mus)": 727,
+    "lnsp_131.mtx (compressed_format_matrix_vector_product_ns)": 23826,
     "lnsp_131.mtx (compressed_format_matrix_vector_product_ns) ": 22251,
-    "lnsp_131.mtx (uncompressed_format_matrix_matrix_product_mus)": 1734,
-    "lnsp_131.mtx (uncompressed_format_matrix_vector_product_ns)": 20873
+    "lnsp_131.mtx (compressed_format_transpose_matrix_matrix_product_mus)": 695,
+    "lnsp_131.mtx (compressed_format_transpose_matrix_vector_product_ns)": 38892,
+    "lnsp_131.mtx (uncompressed_format_matrix_matrix_product_mus)": 2019,
+    "lnsp_131.mtx (uncompressed_format_matrix_vector_product_ns)": 20289,
+    "lnsp_131.mtx (uncompressed_format_transpose_matrix_matrix_product_mus)": 1936,
+    "lnsp_131.mtx (uncompressed_format_transpose_matrix_vector_product_ns)": 56227
 }

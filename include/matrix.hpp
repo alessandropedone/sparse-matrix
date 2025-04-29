@@ -35,7 +35,7 @@ namespace algebra
     /// @tparam T type of the matrix elements
     /// @tparam S storage order of the matrix (RowMajor or ColumnMajor)
     template <AddMulType T, StorageOrder S = StorageOrder::RowMajor>
-    class Matrix
+    class Matrix : public AbstractMatrix<T, S>
     {
     public:
         // delete default constructor

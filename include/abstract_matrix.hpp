@@ -17,10 +17,6 @@ namespace algebra
         /// @param value value to set
         virtual void set(size_t row, size_t col, const T &value) = 0;
 
-        /// @brief check if the matrix is in a compressed format
-        /// @return true if the matrix is compressed, false otherwise
-        virtual bool is_compressed() = 0;
-
         /// @brief call operator() const version
         /// @param row row index
         /// @param col column index

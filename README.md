@@ -5,6 +5,12 @@
 Views:
 - implement all products
 - test transpose and diagonal products
+- move semantic for 
+
+```cpp
+template <AddMulType T, StorageOrder S>
+Matrix<T, S> operator*(const TransposeView<T, S> &m1, const TransposeView<T, S> &m2)
+```
 
 Optimization
 - optimize compression in modified format (remove unnecessary ifs and avoid push_back)

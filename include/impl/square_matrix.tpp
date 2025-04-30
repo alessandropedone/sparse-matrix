@@ -420,7 +420,7 @@ namespace algebra
             // fill the uncompressed matrix
             if constexpr (S == StorageOrder::ColumnMajor)
             {
-                for (size_t col_idx = 0; col_idx < this->cols; ++col_idx)
+                for (size_t col_idx = 0; col_idx < this->cols - 1; ++col_idx)
                 {
                     // add diagonal element
                     if (compressed_format_mod.values[col_idx] != 0)
@@ -429,18 +429,30 @@ namespace algebra
                     }
                     size_t start = compressed_format_mod.bind[col_idx];
                     size_t end = compressed_format_mod.bind[col_idx + 1];
-                    if (col_idx + 1 == this->cols)
-                        end = compressed_format_mod.values.size();
                     for (size_t j = start; j < end; ++j)
                     {
                         size_t row_idx = compressed_format_mod.bind[j];
                         this->uncompressed_format[{row_idx, col_idx}] = compressed_format_mod.values[j];
                     }
                 }
+                // handle last column
+                size_t col_idx = this->cols - 1;
+                // add diagonal element
+                if (compressed_format_mod.values[col_idx] != 0)
+                {
+                    this->uncompressed_format[{col_idx, col_idx}] = compressed_format_mod.values[col_idx];
+                }
+                size_t start = compressed_format_mod.bind[col_idx];
+                size_t end = compressed_format_mod.values.size();
+                for (size_t j = start; j < end; ++j)
+                {
+                    size_t row_idx = compressed_format_mod.bind[j];
+                    this->uncompressed_format[{row_idx, col_idx}] = compressed_format_mod.values[j];
+                }
             }
             else
             {
-                for (size_t row_idx = 0; row_idx < this->rows; ++row_idx)
+                for (size_t row_idx = 0; row_idx < this->rows - 1; ++row_idx)
                 {
                     // add diagonal element
                     if (compressed_format_mod.values[row_idx] != 0)
@@ -449,15 +461,30 @@ namespace algebra
                     }
                     size_t start = compressed_format_mod.bind[row_idx];
                     size_t end = compressed_format_mod.bind[row_idx + 1];
-                    if (row_idx + 1 == this->rows)
-                        end = compressed_format_mod.values.size();
                     for (size_t j = start; j < end; ++j)
                     {
                         size_t col_idx = compressed_format_mod.bind[j];
                         this->uncompressed_format[{row_idx, col_idx}] = compressed_format_mod.values[j];
                     }
                 }
+                // handle last row
+                size_t row_idx = this->rows - 1;
+                // add diagonal element
+                if (compressed_format_mod.values[row_idx] != 0)
+                {
+                    this->uncompressed_format[{row_idx, row_idx}] = compressed_format_mod.values[row_idx];
+                }
+                size_t start = compressed_format_mod.bind[row_idx];
+                size_t end = compressed_format_mod.values.size();
+                for (size_t j = start; j < end; ++j)
+                {
+                    size_t col_idx = compressed_format_mod.bind[j];
+                    this->uncompressed_format[{row_idx, col_idx}] = compressed_format_mod.values[j];
+                }
             }
+            // clear the modified compressed matrix
+            compressed_format_mod.values.clear();
+            compressed_format_mod.bind.clear();
             modified = false;
             return;
         }

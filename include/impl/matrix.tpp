@@ -179,7 +179,11 @@ namespace algebra
             compressed_format.inner.resize(rows + 1);
         }
         std::fill(compressed_format.inner.begin(), compressed_format.inner.end(), 0);
-
+/*      this->compressed_format.outer.resize(this->get_nnz());
+        std::fill(std::execution::par_unseq, this->compressed_format.outer.begin(), this->compressed_format.outer.end(), 0);
+        this->compressed_format.values.resize(this->get_nnz());
+        std::fill(std::execution::par_unseq, this->compressed_format.values.begin(), this->compressed_format.values.end(), 0);
+ */
         // fill the compressed matrix
         size_t index = 0;
         for (const auto &it : uncompressed_format)

@@ -22,4 +22,4 @@ README.md (
     explain why parallel implementation of compress is slower, put a test about this [keep compress_parallel in order to see the parallelization overhead]
     please run multiple times,
     results interpretation,
-    strucutre of the code and the output)
+    structure of the code and the output)

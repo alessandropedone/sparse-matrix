@@ -332,6 +332,7 @@ namespace algebra
             Matrix<double, S> testMatrix(0, 0);
             SquareMatrix<double, S> testSquareMatrix(0);
             TransposeView<double, S> testTransposeView(0, 0);
+            DiagonalView<double, S> testDiagonalView(0, 0);
 
             std::cout << "------------------------------------" << std::endl;
             std::cout << "Test with Matrix class" << std::endl;
@@ -343,10 +344,15 @@ namespace algebra
             std::cout << "------------------------------------" << std::endl;
             execute_test(testSquareMatrix, matrix_name);
 
-            std::cout << "------------------------------------" << std::endl;
+/*             std::cout << "------------------------------------" << std::endl;
             std::cout << "Test with TransposeView class" << std::endl;
             std::cout << "------------------------------------" << std::endl;
-            execute_test(testTransposeView, matrix_name);
+            execute_test(testTransposeView, matrix_name); */
+
+            std::cout << "------------------------------------" << std::endl;
+            std::cout << "Test with DiagonalView class" << std::endl;
+            std::cout << "------------------------------------" << std::endl;
+            execute_test(testDiagonalView, matrix_name);
         };
     }
 

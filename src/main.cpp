@@ -22,6 +22,8 @@ int main()
     test5x5(sm);
     TransposeView<double, StorageOrder::ColumnMajor> tv(0, 0);
     test5x5(tv);
+    DiagonalView<double, StorageOrder::ColumnMajor> dv(0, 0);
+    test5x5(dv);
 
     // Run the tests on all matrices provided in the json file for both storage orders
     json data = read_json(static_cast<std::string>("data/data.json"));

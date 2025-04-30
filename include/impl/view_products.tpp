@@ -415,7 +415,7 @@ namespace algebra
 
         if (matrix2.is_modified())
         {
-            if (auto square_matrix = dynamic_cast<SquareMatrix<T, S> *>(&m1))
+            if (auto square_matrix = dynamic_cast<const SquareMatrix<T, S> *>(&m1))
             {
                 auto &matrix1 = *square_matrix;
                 if (matrix1.is_modified())
@@ -496,7 +496,7 @@ namespace algebra
         }
         else
         {
-            if (auto square_matrix = dynamic_cast<SquareMatrix<T, S> *>(&m1))
+            if (auto square_matrix = dynamic_cast<const SquareMatrix<T, S> *>(&m1))
             {
                 auto &matrix1 = *square_matrix;
                 if (matrix1.is_modified())
@@ -536,7 +536,7 @@ namespace algebra
 
         if (matrix1.is_modified())
         {
-            if (auto square_matrix = dynamic_cast<SquareMatrix<T, S> *>(&m2))
+            if (auto square_matrix = dynamic_cast<const SquareMatrix<T, S> *>(&m2))
             {
                 auto &matrix2 = *square_matrix;
                 if (matrix2.is_modified())
@@ -617,7 +617,7 @@ namespace algebra
         }
         else
         {
-            if (auto square_matrix = dynamic_cast<SquareMatrix<T, S> *>(&m2))
+            if (auto square_matrix = dynamic_cast<const SquareMatrix<T, S> *>(&m2))
             {
                 auto &matrix2 = *square_matrix;
                 if (matrix2.is_modified())

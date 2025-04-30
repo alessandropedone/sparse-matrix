@@ -29,7 +29,7 @@ namespace algebra
         /// @param matrix the matrix to transpose
         TransposeView(Matrix<T, S> &matrix) : matrix(matrix) {};
 
-                /// @brief clone method
+        /// @brief clone method
         /// @return a pointer to the cloned object
         virtual std::unique_ptr<AbstractMatrix<T, S>> clone() const override
         {
@@ -55,7 +55,11 @@ namespace algebra
         /// @param row row index
         /// @param col column index
         /// @return the matrix element at (row, col)
-        T operator()(size_t row, size_t col) const override { const auto temp = matrix; return temp(col, row); };
+        T operator()(size_t row, size_t col) const override
+        {
+            const auto temp = matrix;
+            return temp(col, row);
+        };
 
         /// @brief check if the matrix is in a compressed format
         virtual bool is_compressed() const override { return matrix.is_compressed(); };
@@ -117,11 +121,11 @@ namespace algebra
         /// @brief initializing constructor
         /// @param rows number of rows
         /// @param cols number of columns
-        DiagonalView(size_t rows, size_t cols) : matrix(*new SquareMatrix<T, S>(rows, cols))
+        DiagonalView(size_t rows, size_t cols) : matrix(*new SquareMatrix<T, S>(rows))
         {
             if (rows != cols)
             {
-                throw std::invalid_argument("Matrix is not square");
+                throw std::invalid_argument("Matrix must be square");
             }
         };
 
@@ -188,7 +192,7 @@ namespace algebra
             }
             else
             {
-                throw std::invalid_argument("Cannot get off-diagonal elements in a diagonal matrix");
+                return T(0);
             }
         };
 

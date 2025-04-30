@@ -255,19 +255,13 @@ namespace algebra
             size_t index = 0; // keeps track of nnz elements
             if constexpr (S == StorageOrder::ColumnMajor)
             {
-                for (size_t i = 0; i < this->cols; ++i)
+                for (size_t i = 0; i < this->cols -1; ++i)
                 {
                     // std::cout << "Col: " << i << std::endl;
                     bool flag = 0; // flag to check if the diagonal element has been inserted
                     size_t start = compressed_format_mod.bind[i];
                     // std::cout << "Col pointer start: " << start << std::endl;
                     size_t end = compressed_format_mod.bind[i + 1];
-                    // handle last column
-                    if (i + 1 == this->cols)
-                    {
-                        // std::cout << "Last column\n" << std::endl;
-                        end = compressed_format_mod.values.size();
-                    }
                     // std::cout << "Col pointer end: " << end << std::endl;
                     for (size_t j = start; j < end; ++j)
                     {
@@ -302,19 +296,44 @@ namespace algebra
                     // std::cout << "Index of nnz elements for now: " << index << std::endl;
                     this->compressed_format.inner[i + 1] = index;
                 }
+                // handle last column (i == this->cols - 1)
+                bool flag = 0; // flag to check if the diagonal element has been inserted
+                size_t start = compressed_format_mod.bind[i];
+                size_t end = compressed_format_mod.values.size();
+                for (size_t j = start; j < end; ++j)
+                {
+                    size_t rowidx = compressed_format_mod.bind[j];
+                    // Insert diagonal element if it is not already inserted, !0 and I am after the diagonal
+                    if (not flag and compressed_format_mod.values[i] != 0 and rowidx > i)
+                    {
+                        this->compressed_format.values[index] = compressed_format_mod.values[i];
+                        this->compressed_format.outer[index] = i;
+                        ++index;
+                        flag = true;
+                    }
+
+                    // Add off-diagonal elements
+                    this->compressed_format.values[index] = compressed_format_mod.values[j];
+                    this->compressed_format.outer[index] = rowidx;
+                    ++index;
+                }
+                if (not flag and compressed_format_mod.values[i] != 0)
+                {
+                    this->compressed_format.values[index] = compressed_format_mod.values[i];
+                    this->compressed_format.outer[index] = i;
+                    ++index;
+                    // updating the flag is useless here
+                }
+                this->compressed_format.inner[i + 1] = index;
             }
             else
             { // ROWORDER
-                for (size_t i = 0; i < this->rows; ++i)
+                for (size_t i = 0; i < this->rows - 1; ++i)
                 {
                     bool flag = 0; // flag to check if the diagonal element has been inserted
                     size_t start = compressed_format_mod.bind[i];
                     size_t end = compressed_format_mod.bind[i + 1];
-                    // handle last row
-                    if (i + 1 == this->rows)
-                    {
-                        end = compressed_format_mod.values.size();
-                    }
+                    
                     for (size_t j = start; j < end; ++j)
                     {
                         size_t colidx = compressed_format_mod.bind[j];
@@ -342,6 +361,36 @@ namespace algebra
                     }
                     this->compressed_format.inner[i + 1] = index;
                 }
+                // handle last row
+                bool flag = 0; // flag to check if the diagonal element has been inserted
+                size_t start = compressed_format_mod.bind[i];
+                size_t end = compressed_format_mod.values.size();
+                for (size_t j = start; j < end; ++j)
+                {
+                    size_t colidx = compressed_format_mod.bind[j];
+
+                    // Insert diagonal element if it is not already inserted, !0 and I am after the diagonal
+                    if (not flag and compressed_format_mod.values[i] != 0 and colidx > i)
+                    {
+                        this->compressed_format.values[index] = compressed_format_mod.values[i];
+                        this->compressed_format.outer[index] = i;
+                        ++index;
+                        flag = true;
+                    }
+
+                    // Add off-diagonal elements
+                    this->compressed_format.values[index] = compressed_format_mod.values[j];
+                    this->compressed_format.outer[index] = colidx;
+                    ++index;
+                }
+                // if there are no other elements in the row, add the diagonal element
+                if (not flag and compressed_format_mod.values[i] != 0)
+                {
+                    this->compressed_format.values[index] = compressed_format_mod.values[i];
+                    this->compressed_format.outer[index] = i;
+                    ++index;
+                }
+                this->compressed_format.inner[i + 1] = index;
             }
 
             // clear the modified compressed matrix

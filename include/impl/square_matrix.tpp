@@ -296,7 +296,8 @@ namespace algebra
                     // std::cout << "Index of nnz elements for now: " << index << std::endl;
                     this->compressed_format.inner[i + 1] = index;
                 }
-                // handle last column (i == this->cols - 1)
+                // handle last column
+                size_t i = this->cols - 1;
                 bool flag = 0; // flag to check if the diagonal element has been inserted
                 size_t start = compressed_format_mod.bind[i];
                 size_t end = compressed_format_mod.values.size();
@@ -362,6 +363,7 @@ namespace algebra
                     this->compressed_format.inner[i + 1] = index;
                 }
                 // handle last row
+                size_t i = this->rows - 1;
                 bool flag = 0; // flag to check if the diagonal element has been inserted
                 size_t start = compressed_format_mod.bind[i];
                 size_t end = compressed_format_mod.values.size();

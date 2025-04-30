@@ -593,25 +593,34 @@ namespace algebra
                 if constexpr (S == StorageOrder::ColumnMajor)
                 {
                     std::vector<double> col_sums(this->cols, 0);
-                    for (size_t i = 0; i < this->cols; ++i)
+                    for (size_t i = 0; i < this->cols - 1; ++i)
                     {
                         size_t start = compressed_format_mod.bind[i];
-                        size_t end = (i != this->cols - 1) ? compressed_format_mod.bind[i + 1] : compressed_format_mod.values.size();
+                        size_t end = compressed_format_mod.bind[i + 1];
                         for (size_t j = start; j < end; ++j)
                         {
                             col_sums[i] += std::abs(compressed_format_mod.values[j]);
                         }
                         col_sums[i] += std::abs(compressed_format_mod.values[i]);
                     }
+                    // handle last column
+                    size_t i = this->cols - 1;
+                    size_t start = compressed_format_mod.bind[i];
+                    size_t end =  compressed_format_mod.values.size();
+                    for (size_t j = start; j < end; ++j)
+                    {
+                        col_sums[i] += std::abs(compressed_format_mod.values[j]);
+                    }
+                    col_sums[i] += std::abs(compressed_format_mod.values[i]);
                     return *std::max_element(std::execution::par_unseq, col_sums.begin(), col_sums.end());
                 }
                 else
                 {
                     std::vector<double> col_sums(this->cols, 0);
-                    for (size_t i = 0; i < this->rows; ++i)
+                    for (size_t i = 0; i < this->rows - 1; ++i)
                     {
                         size_t start = compressed_format_mod.bind[i];
-                        size_t end = (i != this->rows - 1) ? compressed_format_mod.bind[i + 1] : compressed_format_mod.values.size();
+                        size_t end = compressed_format_mod.bind[i + 1];
                         for (size_t j = start; j < end; ++j)
                         {
                             size_t col = compressed_format_mod.bind[j];
@@ -619,6 +628,16 @@ namespace algebra
                         }
                         col_sums[i] += std::abs(compressed_format_mod.values[i]);
                     }
+                    // handle last row
+                    size_t i = this->rows - 1;
+                    size_t start = compressed_format_mod.bind[i];
+                    size_t end = compressed_format_mod.values.size();
+                    for (size_t j = start; j < end; ++j)
+                    {
+                        size_t col = compressed_format_mod.bind[j];
+                        col_sums[col] += std::abs(compressed_format_mod.values[j]);
+                    }
+                    col_sums[i] += std::abs(compressed_format_mod.values[i]);
                     return *std::max_element(std::execution::par_unseq, col_sums.begin(), col_sums.end());
                 }
             }
@@ -627,10 +646,10 @@ namespace algebra
                 if constexpr (S == StorageOrder::ColumnMajor)
                 {
                     std::vector<double> row_sums(this->rows, 0);
-                    for (size_t i = 0; i < this->cols; ++i)
+                    for (size_t i = 0; i < this->cols - 1; ++i)
                     {
                         size_t start = compressed_format_mod.bind[i];
-                        size_t end = (i != this->cols - 1) ? compressed_format_mod.bind[i + 1] : compressed_format_mod.values.size();
+                        size_t end = compressed_format_mod.bind[i + 1];
                         for (size_t j = start; j < end; ++j)
                         {
                             size_t row = compressed_format_mod.bind[j];
@@ -638,21 +657,40 @@ namespace algebra
                         }
                         row_sums[i] += std::abs(compressed_format_mod.values[i]);
                     }
+                    // handle last column
+                    size_t i = this->cols - 1;
+                    size_t start = compressed_format_mod.bind[i];
+                    size_t end = compressed_format_mod.values.size();
+                    for (size_t j = start; j < end; ++j)
+                    {
+                        size_t row = compressed_format_mod.bind[j];
+                        row_sums[row] += std::abs(compressed_format_mod.values[j]);
+                    }
+                    row_sums[i] += std::abs(compressed_format_mod.values[i]);
                     return *std::max_element(std::execution::par_unseq, row_sums.begin(), row_sums.end());
                 }
                 else
                 {
                     std::vector<double> row_sums(this->rows, 0);
-                    for (size_t i = 0; i < this->rows; ++i)
+                    for (size_t i = 0; i < this->rows - 1; ++i)
                     {
                         size_t start = compressed_format_mod.bind[i];
-                        size_t end = (i != this->rows - 1) ? compressed_format_mod.bind[i + 1] : compressed_format_mod.values.size();
+                        size_t end = compressed_format_mod.bind[i + 1];
                         for (size_t j = start; j < end; ++j)
                         {
                             row_sums[i] += std::abs(compressed_format_mod.values[j]);
                         }
                         row_sums[i] += std::abs(compressed_format_mod.values[i]);
                     }
+                    // handle last row
+                    size_t i = this->rows - 1;
+                    size_t start = compressed_format_mod.bind[i];
+                    size_t end = compressed_format_mod.values.size();
+                    for (size_t j = start; j < end; ++j)
+                    {
+                        row_sums[i] += std::abs(compressed_format_mod.values[j]);
+                    }
+                    row_sums[i] += std::abs(compressed_format_mod.values[i]);
                     return *std::max_element(std::execution::par_unseq, row_sums.begin(), row_sums.end());
                 }
             }

@@ -67,7 +67,7 @@ namespace algebra
         {
             for (size_t j = 0; j < m1.get_cols(); j++)
             {
-                if (std::abs(m1(i, j) - m2(i, j)) > std::numeric_limits<T>::epsilon())
+                if (std::abs(m1(i, j) - m2(i, j)) > std::numeric_limits<double>::epsilon())
                 {
                     return false;
                 }

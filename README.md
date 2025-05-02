@@ -39,14 +39,32 @@ Be aware of the fact that _TBB library_ is required to compile and execute the c
 
 ## Implementation
 We implemented the following class-structure:
-- **Abstract matrix**: base template class that allows greater polymorphism among derived classes' methods
-    - **Matrix**: template class than encodes two data structures for a matrix (particularly a sparse matrix)-> **COO Map** and **CSR/CSC**
+- **Abstract matrix**: base abstract template class that allows greater polymorphism among derived classes
+    - **Matrix**: template class than encodes two data structures for a matrix, in particular a sparse matrix → **COO Map** and **CSR/CSC** formats
         - **SquareMatrix**: template class specialized for square matrices, that encodes the **MSR/MSC** format
-    - **Views**: **TransposeView** and **Diagonal view**-> template classes that grant specific views of a matrix
-    
+    - **Views** → **TransposeView** and **Diagonal view**: template classes that stand for specific views of a matrix
+
+### Main features section?
 
 ## Test case
 The code has been checked out on three different matrices:
-- 5x5 Matrix:
+- 5x5 Matrix: 'read_test_5x5.mtx', user-defined
 - 131x131 Matrix: ['lnsp_131.mtx'](https://math.nist.gov/MatrixMarket/data/Harwell-Boeing/lns/lnsp_131.html)
 - 1182x1182 Matrix: ['e20r0000.mtx'](https://math.nist.gov/MatrixMarket/data/SPARSKIT/drivcav/e20r0000.html)
+
+For each of those, the following processes were tested, for both storage orders:
+- compress(), uncompress(), compress_mod() (only for SquareMatrix)
+--------- aggiungiamo compression_test ad execute_test?
+- norm<<N>>()
+- multiplication with:
+    - std::vector<<T>>
+    - Matrix<<T, S>>
+    - TransposeView<<T, S>>
+    - DiagonalView<<T, S>>
+    Note:
+        - times of execution are obtained through std::chrono functions and printed on screen
+        - operations are implemented for matrices of the same format
+        - each format is examined and they are compared, as the compressed format determines a speedup
+        - the execution data is saved in 'execution_time.json'
+    
+

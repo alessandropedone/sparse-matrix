@@ -315,6 +315,7 @@ namespace algebra
             // Print the result
             print_result(m2, result);
         }
+        m.uncompress();
     }
 
     /// @brief test the execution time of matrix-matrix and matrix-vector products
@@ -331,8 +332,10 @@ namespace algebra
             std::cout << std::endl;
             Matrix<double, S> testMatrix(0, 0);
             SquareMatrix<double, S> testSquareMatrix(0);
-            TransposeView<double, S> testTransposeView(0, 0);
-            DiagonalView<double, S> testDiagonalView(0, 0);
+            Matrix<double, S> temp(0, 0);
+            SquareMatrix<double, S> temp2(0);
+            TransposeView<double, S> testTransposeView(temp);
+            DiagonalView<double, S> testDiagonalView(temp2);
 
             std::cout << "------------------------------------" << std::endl;
             std::cout << "Test with Matrix class" << std::endl;

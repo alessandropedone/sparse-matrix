@@ -15,7 +15,7 @@ using namespace json_utility;
 
 int main()
 {
-    // Import matrix
+    // Test with a 5x5 matrix
     Matrix<double, StorageOrder::ColumnMajor> m(0, 0);
     test5x5(m);
     SquareMatrix<double, StorageOrder::ColumnMajor> sm(0);
@@ -51,7 +51,7 @@ int main()
             std::cout << "------------------------------------" << std::endl;
             test<StorageOrder::ColumnMajor>(matrix_names);
         }
-    } 
+    }
 
     return 0;
 }

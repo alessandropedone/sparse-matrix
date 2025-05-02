@@ -33,7 +33,18 @@ namespace algebra
         /// @return a pointer to the cloned object
         virtual std::unique_ptr<AbstractMatrix<T, S>> clone() const override
         {
-            return std::make_unique<TransposeView<T, S>>(*this);
+            if (typeid(matrix) == typeid(SquareMatrix<T, S>))
+            {
+                auto &square_matrix = static_cast<SquareMatrix<T, S> &>(matrix);
+                auto cloned_matrix = square_matrix.clone();
+                return std::make_unique<TransposeView<T, S>>(*static_cast<SquareMatrix<T, S> *>(cloned_matrix.release()));
+            }
+            else
+            {
+                auto &general_matrix = static_cast<Matrix<T, S> &>(matrix);
+                auto cloned_matrix = general_matrix.clone();
+                return std::make_unique<TransposeView<T, S>>(*static_cast<Matrix<T, S> *>(cloned_matrix.release()));
+            }
         };
 
         /// @brief virtual destructor
@@ -136,8 +147,9 @@ namespace algebra
         /// @brief clone method
         /// @return a pointer to the cloned object
         virtual std::unique_ptr<AbstractMatrix<T, S>> clone() const override
-        {
-            return std::make_unique<DiagonalView<T, S>>(*this);
+        {   
+            auto cloned_matrix = matrix.clone();
+            return std::make_unique<DiagonalView<T, S>>(*static_cast<SquareMatrix<T, S> *>(cloned_matrix.release()));
         };
 
         /// @brief virtual destructor

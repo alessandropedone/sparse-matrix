@@ -189,7 +189,7 @@ namespace algebra
     void norm_test(const AbstractMatrix<T, S> &m)
     {
         // Read matrix
-        std::cout << "Norm test" << std::endl;
+        std::cout << "Matrix norms" << std::endl;
         std::cout << "One norm:       " << std::setw(14) << m.template norm<NormType::One>() << std::endl;
         std::cout << "Infinity norm:  " << std::setw(14) << m.template norm<NormType::Infinity>() << std::endl;
         std::cout << "Frobenius norm: " << std::setw(14) << m.template norm<NormType::Frobenius>() << std::endl;
@@ -344,10 +344,10 @@ namespace algebra
             std::cout << "------------------------------------" << std::endl;
             execute_test(testSquareMatrix, matrix_name);
 
-/*             std::cout << "------------------------------------" << std::endl;
+            std::cout << "------------------------------------" << std::endl;
             std::cout << "Test with TransposeView class" << std::endl;
             std::cout << "------------------------------------" << std::endl;
-            execute_test(testTransposeView, matrix_name); */
+            execute_test(testTransposeView, matrix_name);
 
             std::cout << "------------------------------------" << std::endl;
             std::cout << "Test with DiagonalView class" << std::endl;
@@ -364,9 +364,6 @@ namespace algebra
 
         std::cout << "Test matrix " << matrix_name << std::endl;
         std::cout << std::endl;
-
-        // Test compression
-        test_compression_matrix(testMatrix);
 
         // Test norm
         norm_test(testMatrix);
@@ -395,7 +392,6 @@ namespace algebra
         std::string filename = "data/execution_time.json";
         json time_info = read_json(filename);
 
-
         if (typeid(testMatrix) == typeid(SquareMatrix<double, S>))
         {
             auto testSquareMatrix = static_cast<SquareMatrix<double, S> &>(testMatrix);
@@ -406,13 +402,13 @@ namespace algebra
             res1 = testSquareMatrix * testSquareMatrix;
             stop = MyClock::now();
             auto time_span_mu = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-            time_info[matrix_name + " (compressed_format_matrix_matrix_product_mus)"] = time_span_mu.count();
+            time_info[matrix_name + " " + typeid(testMatrix).name() + " (compressed_format_matrix_matrix_product_mus)"] = time_span_mu.count();
 
             start = MyClock::now();
             res3 = testSquareMatrix * vec;
             stop = MyClock::now();
             auto time_span_n = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
-            time_info[matrix_name + " (compressed_format_matrix_vector_product_ns)"] = time_span_n.count();
+            time_info[matrix_name + " " + typeid(testMatrix).name() + " (compressed_format_matrix_vector_product_ns)"] = time_span_n.count();
 
             testSquareMatrix.uncompress();
 
@@ -420,31 +416,31 @@ namespace algebra
             res2 = testSquareMatrix * testSquareMatrix;
             stop = MyClock::now();
             auto time_span_mu_uncompressed = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-            time_info[matrix_name + " (uncompressed_format_matrix_matrix_product_mus)"] = time_span_mu_uncompressed.count();
+            time_info[matrix_name + " " + typeid(testMatrix).name() + " (uncompressed_format_matrix_matrix_product_mus)"] = time_span_mu_uncompressed.count();
 
             start = MyClock::now();
             res4 = testSquareMatrix * vec;
             stop = MyClock::now();
             auto time_span_n_uncompressed = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
-            time_info[matrix_name + " (uncompressed_format_matrix_vector_product_ns)"] = time_span_n_uncompressed.count();
+            time_info[matrix_name + " " + typeid(testMatrix).name() + " (uncompressed_format_matrix_vector_product_ns)"] = time_span_n_uncompressed.count();
         }
         else if (typeid(testMatrix) == typeid(TransposeView<double, S>))
         {
             auto testTransposeView = static_cast<TransposeView<double, S> &>(testMatrix);
-
+            
             testTransposeView.compress();
 
             start = MyClock::now();
             res1 = testTransposeView * testTransposeView;
             stop = MyClock::now();
             auto time_span_mu = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-            time_info[matrix_name + " (compressed_format_transpose_matrix_matrix_product_mus)"] = time_span_mu.count();
+            time_info[matrix_name + " " + typeid(testMatrix).name() + " (compressed_format_matrix_matrix_product_mus)"] = time_span_mu.count();
 
             start = MyClock::now();
             res3 = testTransposeView * vec;
             stop = MyClock::now();
             auto time_span_n = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
-            time_info[matrix_name + " (compressed_format_transpose_matrix_vector_product_ns)"] = time_span_n.count();
+            time_info[matrix_name + " " + typeid(testMatrix).name() + " (compressed_format_matrix_vector_product_ns)"] = time_span_n.count();
 
             testTransposeView.uncompress();
 
@@ -452,13 +448,13 @@ namespace algebra
             res2 = testTransposeView * testTransposeView;
             stop = MyClock::now();
             auto time_span_mu_uncompressed = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-            time_info[matrix_name + " (uncompressed_format_transpose_matrix_matrix_product_mus)"] = time_span_mu_uncompressed.count();
+            time_info[matrix_name + " " + typeid(testMatrix).name() + " (uncompressed_format_matrix_matrix_product_mus)"] = time_span_mu_uncompressed.count();
 
             start = MyClock::now();
             res4 = testTransposeView * vec;
             stop = MyClock::now();
             auto time_span_n_uncompressed = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
-            time_info[matrix_name + " (uncompressed_format_transpose_matrix_vector_product_ns)"] = time_span_n_uncompressed.count();
+            time_info[matrix_name + " " + typeid(testMatrix).name() + " (uncompressed_format_matrix_vector_product_ns)"] = time_span_n_uncompressed.count();
         }
         else if (typeid(testMatrix) == typeid(DiagonalView<double, S>))
         {
@@ -470,13 +466,13 @@ namespace algebra
             res1 = testDiagonalView * testDiagonalView;
             stop = MyClock::now();
             auto time_span_mu = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-            time_info[matrix_name + " (compressed_format_diagonal_matrix_matrix_product_mus)"] = time_span_mu.count();
+            time_info[matrix_name + " " + typeid(testMatrix).name() + " (compressed_format_matrix_matrix_product_mus)"] = time_span_mu.count();
 
             start = MyClock::now();
             res3 = testDiagonalView * vec;
             stop = MyClock::now();
             auto time_span_n = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
-            time_info[matrix_name + " (compressed_format_diagonal_matrix_vector_product_ns)"] = time_span_n.count();
+            time_info[matrix_name + " " + typeid(testMatrix).name() + " (compressed_format_matrix_vector_product_ns)"] = time_span_n.count();
 
             testDiagonalView.uncompress();
 
@@ -484,13 +480,13 @@ namespace algebra
             res2 = testDiagonalView * testDiagonalView;
             stop = MyClock::now();
             auto time_span_mu_uncompressed = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-            time_info[matrix_name + " (uncompressed_format_diagonal_matrix_matrix_product_mus)"] = time_span_mu_uncompressed.count();
+            time_info[matrix_name + " " + typeid(testMatrix).name() + " (uncompressed_format_matrix_matrix_product_mus)"] = time_span_mu_uncompressed.count();
 
             start = MyClock::now();
             res4 = testDiagonalView * vec;
             stop = MyClock::now();
             auto time_span_n_uncompressed = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
-            time_info[matrix_name + " (uncompressed_format_diagonal_matrix_vector_product_ns)"] = time_span_n_uncompressed.count();
+            time_info[matrix_name + " " + typeid(testMatrix).name() + " (uncompressed_format_matrix_vector_product_ns)"] = time_span_n_uncompressed.count();
         }
         else
         {
@@ -506,13 +502,13 @@ namespace algebra
             res1 = (*dynamicMatrix) * (*dynamicMatrix);
             stop = MyClock::now();
             auto time_span_mu = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-            time_info[matrix_name + " (compressed_format_matrix_matrix_product_mus)"] = time_span_mu.count();
+            time_info[matrix_name + " " + typeid(testMatrix).name() + " (compressed_format_matrix_matrix_product_mus)"] = time_span_mu.count();
 
             start = MyClock::now();
             res3 = (*dynamicMatrix) * vec;
             stop = MyClock::now();
             auto time_span_n = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
-            time_info[matrix_name + " (compressed_format_matrix_vector_product_ns)"] = time_span_n.count();
+            time_info[matrix_name + " " + typeid(testMatrix).name() + " (compressed_format_matrix_vector_product_ns)"] = time_span_n.count();
 
             dynamicMatrix->uncompress();
 
@@ -520,13 +516,13 @@ namespace algebra
             res2 = (*dynamicMatrix) * (*dynamicMatrix);
             stop = MyClock::now();
             auto time_span_mu_uncompressed = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-            time_info[matrix_name + " (uncompressed_format_matrix_matrix_product_mus)"] = time_span_mu_uncompressed.count();
+            time_info[matrix_name + " " + typeid(testMatrix).name() + " (uncompressed_format_matrix_matrix_product_mus)"] = time_span_mu_uncompressed.count();
 
             start = MyClock::now();
             res4 = (*dynamicMatrix) * vec;
             stop = MyClock::now();
             auto time_span_n_uncompressed = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
-            time_info[matrix_name + " (uncompressed_format_matrix_vector_product_ns)"] = time_span_n_uncompressed.count();
+            time_info[matrix_name + " " + typeid(testMatrix).name() + " (uncompressed_format_matrix_vector_product_ns)"] = time_span_n_uncompressed.count();
         }
 
         // save json
@@ -535,8 +531,8 @@ namespace algebra
         // Print execution times and speedups
         std::cout << std::endl;
 
-        int compressed_matrix_vector_time = time_info[matrix_name + " (compressed_format_matrix_vector_product_ns)"];
-        int uncompressed_matrix_vector_time = time_info[matrix_name + " (uncompressed_format_matrix_vector_product_ns)"];
+        int compressed_matrix_vector_time = time_info[matrix_name + " " + typeid(testMatrix).name() + " (compressed_format_matrix_vector_product_ns)"];
+        int uncompressed_matrix_vector_time = time_info[matrix_name + " " + typeid(testMatrix).name() + " (uncompressed_format_matrix_vector_product_ns)"];
 
         std::cout << "Compressed format matrix-vector product time: " << compressed_matrix_vector_time << " ns" << std::endl;
         std::cout << "Uncompressed format matrix-vector product time: " << uncompressed_matrix_vector_time << " ns" << std::endl;
@@ -545,8 +541,8 @@ namespace algebra
 
         std::cout << std::endl;
 
-        int compressed_matrix_matrix_time = time_info[matrix_name + " (compressed_format_matrix_matrix_product_mus)"];
-        int uncompressed_matrix_matrix_time = time_info[matrix_name + " (uncompressed_format_matrix_matrix_product_mus)"];
+        int compressed_matrix_matrix_time = time_info[matrix_name + " " + typeid(testMatrix).name() + " (compressed_format_matrix_matrix_product_mus)"];
+        int uncompressed_matrix_matrix_time = time_info[matrix_name + " " + typeid(testMatrix).name() + " (uncompressed_format_matrix_matrix_product_mus)"];
 
         std::cout << "Compressed format matrix-matrix product time: " << compressed_matrix_matrix_time << " µs" << std::endl;
         std::cout << "Uncompressed format matrix-matrix product time: " << uncompressed_matrix_matrix_time << " µs" << std::endl;

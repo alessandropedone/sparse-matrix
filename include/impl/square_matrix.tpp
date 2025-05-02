@@ -38,6 +38,32 @@ namespace algebra
         this->modified = false;
     }
 
+    /// @brief move constructor
+    /// @param other matrix to move
+    template <AddMulType T, StorageOrder S>
+    SquareMatrix<T, S>::SquareMatrix(SquareMatrix &&other) noexcept : Matrix<T, S>(std::move(other))
+    {
+        this->modified = other.modified;
+        this->compressed_format_mod = std::move(other.compressed_format_mod);
+        other.modified = false;
+    };
+
+    /// @brief move assignment operator
+    /// @param other matrix to move
+    /// @return reference to the moved matrix
+    template <AddMulType T, StorageOrder S>
+    SquareMatrix<T, S> &SquareMatrix<T, S>::operator=(SquareMatrix &&other) noexcept
+    {
+        if (this != &other)
+        {
+            Matrix<T, S>::operator=(std::move(other));
+            this->modified = other.modified;
+            this->compressed_format_mod = std::move(other.compressed_format_mod);
+            other.modified = false;
+        }
+        return *this;
+    };
+
     template <AddMulType T, StorageOrder S>
     const size_t SquareMatrix<T, S>::get_mod_size() const
     {
@@ -250,12 +276,11 @@ namespace algebra
             this->compressed_format.values.resize(this->get_nnz());
             std::fill(std::execution::par_unseq, this->compressed_format.values.begin(), this->compressed_format.values.end(), 0);
 
-
             // fill the compressed matrix
             size_t index = 0; // keeps track of nnz elements
             if constexpr (S == StorageOrder::ColumnMajor)
             {
-                for (size_t i = 0; i < this->cols -1; ++i)
+                for (size_t i = 0; i < this->cols - 1; ++i)
                 {
                     // std::cout << "Col: " << i << std::endl;
                     bool flag = 0; // flag to check if the diagonal element has been inserted
@@ -334,7 +359,7 @@ namespace algebra
                     bool flag = 0; // flag to check if the diagonal element has been inserted
                     size_t start = compressed_format_mod.bind[i];
                     size_t end = compressed_format_mod.bind[i + 1];
-                    
+
                     for (size_t j = start; j < end; ++j)
                     {
                         size_t colidx = compressed_format_mod.bind[j];
@@ -606,7 +631,7 @@ namespace algebra
                     // handle last column
                     size_t i = this->cols - 1;
                     size_t start = compressed_format_mod.bind[i];
-                    size_t end =  compressed_format_mod.values.size();
+                    size_t end = compressed_format_mod.values.size();
                     for (size_t j = start; j < end; ++j)
                     {
                         col_sums[i] += std::abs(compressed_format_mod.values[j]);

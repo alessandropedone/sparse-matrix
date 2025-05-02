@@ -62,6 +62,15 @@ namespace algebra
         /// @brief default destructor
         virtual ~Matrix() = default;
 
+        /// @brief move constructor
+        /// @param other matrix to move
+        Matrix(Matrix &&other) noexcept;
+
+        /// @brief move assignment operator
+        /// @param other matrix to move
+        /// @return reference to the moved matrix
+        Matrix &operator=(Matrix &&other) noexcept;
+
         /// @brief set an element in the matrix (dynamic construction of the matrix)
         /// @param row row index
         /// @param col column index

@@ -76,6 +76,15 @@ namespace algebra
         /// @brief default destructor
         virtual ~SquareMatrix() = default;
 
+        /// @brief move constructor
+        /// @param other matrix to move
+        SquareMatrix(SquareMatrix &&other) noexcept;
+
+        /// @brief move assignment operator
+        /// @param other matrix to move
+        /// @return reference to the moved matrix
+        SquareMatrix &operator=(SquareMatrix &&other) noexcept;
+
         /// @brief check if the matrix is in a modified compressed format
         /// @return true if the matrix is (modified) compressed, false otherwise
         virtual bool is_modified() const { return modified; };

@@ -23,11 +23,11 @@ namespace algebra
         this->rows = matrix.get_cols();
         this->cols = matrix.get_rows();
         // set the compressed flag
-        this->compressed = false; 
-        
+        this->compressed = false;
+
         if (matrix.is_compressed())
         {
-            
+
             if constexpr (S == StorageOrder::ColumnMajor)
             {
                 for (size_t col = 0; col < matrix.get_cols(); ++col)
@@ -80,7 +80,7 @@ namespace algebra
         this->cols = matrix.get_cols();
         // set the compressed flag
         this->compressed = false;
-        
+
         if (matrix.is_compressed())
         {
             if constexpr (S == StorageOrder::ColumnMajor)
@@ -131,6 +131,42 @@ namespace algebra
         }
     }
 
+    /// @brief move constructor
+    /// @param other matrix to move
+    template <AddMulType T, StorageOrder S>
+    Matrix<T, S>::Matrix(Matrix &&other) noexcept
+        : rows(other.rows), cols(other.cols), compressed(other.compressed),
+          uncompressed_format(std::move(other.uncompressed_format)),
+          compressed_format(std::move(other.compressed_format))
+    {
+        other.rows = 0;
+        other.cols = 0;
+        other.compressed = false;
+    };
+    /// @brief move assignment operator
+    /// @param other matrix to move
+    /// @return reference to the moved matrix
+    template <AddMulType T, StorageOrder S>
+    Matrix<T, S> &Matrix<T, S>::operator=(Matrix &&other) noexcept
+    {
+        if (this != &other)
+        {
+            rows = other.rows;
+            cols = other.cols;
+            compressed = other.compressed;
+            uncompressed_format = std::move(other.uncompressed_format);
+            compressed_format = std::move(other.compressed_format);
+            other.rows = 0;
+            other.cols = 0;
+            other.compressed = false;
+        }
+        return *this;
+    };
+
+    /// @brief set an element in the matrix (dynamic construction of the matrix)
+    /// @param row row index
+    /// @param col column index
+    /// @param value value to set
     template <AddMulType T, StorageOrder S>
     void Matrix<T, S>::set(size_t row, size_t col, const T &value)
     {
@@ -158,6 +194,7 @@ namespace algebra
         }
     }
 
+    /// @brief compress the matrix if it is in an uncompressed format
     template <AddMulType T, StorageOrder S>
     void Matrix<T, S>::compress()
     {
@@ -179,11 +216,11 @@ namespace algebra
             compressed_format.inner.resize(rows + 1);
         }
         std::fill(compressed_format.inner.begin(), compressed_format.inner.end(), 0);
-/*      this->compressed_format.outer.resize(this->get_nnz());
-        std::fill(std::execution::par_unseq, this->compressed_format.outer.begin(), this->compressed_format.outer.end(), 0);
-        this->compressed_format.values.resize(this->get_nnz());
-        std::fill(std::execution::par_unseq, this->compressed_format.values.begin(), this->compressed_format.values.end(), 0);
- */
+        /*      this->compressed_format.outer.resize(this->get_nnz());
+                std::fill(std::execution::par_unseq, this->compressed_format.outer.begin(), this->compressed_format.outer.end(), 0);
+                this->compressed_format.values.resize(this->get_nnz());
+                std::fill(std::execution::par_unseq, this->compressed_format.values.begin(), this->compressed_format.values.end(), 0);
+         */
         // fill the compressed matrix
         size_t index = 0;
         for (const auto &it : uncompressed_format)
@@ -251,6 +288,7 @@ namespace algebra
         compressed = true;
     };
 
+    /// @brief compress the matrix in parallel if it is in an uncompressed format
     template <AddMulType T, StorageOrder S>
     void Matrix<T, S>::compress_parallel()
     {
@@ -351,6 +389,7 @@ namespace algebra
         compressed = true;
     }
 
+    /// @brief uncompress the matrix if it is in a compressed format
     template <AddMulType T, StorageOrder S>
     void Matrix<T, S>::uncompress()
     {

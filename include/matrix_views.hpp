@@ -141,6 +141,9 @@ namespace algebra
         /// @brief delete default constructor
         DiagonalView() = delete;
 
+        /// @brief initializing constructor
+        /// @param rows number of rows
+        /// @param cols number of columns
         DiagonalView(size_t rows, size_t cols) : matrix(*new SquareMatrix<T, S>(rows))
         {
             if (rows != cols)

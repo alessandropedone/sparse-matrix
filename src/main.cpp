@@ -20,16 +20,12 @@ int main()
     test5x5(m);
     SquareMatrix<double, StorageOrder::ColumnMajor> sm(0);
     test5x5(sm);
-    SquareMatrix<double, StorageOrder::ColumnMajor> m2(0);
-    TransposeView<double, StorageOrder::ColumnMajor> tv(m2);
+    TransposeView<double, StorageOrder::ColumnMajor> tv(0, 0);
     test5x5(tv);
-    SquareMatrix<double, StorageOrder::ColumnMajor> m3(0);
-    DiagonalView<double, StorageOrder::ColumnMajor> dv(m3);
+    DiagonalView<double, StorageOrder::ColumnMajor> dv(0, 0);
     test5x5(dv);
 
-
-
-   /*  // Run the tests on all matrices provided in the json file for both storage orders
+    // Run the tests on all matrices provided in the json file for both storage orders
     json data = read_json(static_cast<std::string>("data/data.json"));
     const std::vector<std::string> matrix_names = data["matrix_name"];
     const std::array<StorageOrder, 2> storage_orders = {StorageOrder::RowMajor, StorageOrder::ColumnMajor};
@@ -55,7 +51,7 @@ int main()
             std::cout << "------------------------------------" << std::endl;
             test<StorageOrder::ColumnMajor>(matrix_names);
         }
-    } */
+    }
 
     return 0;
 }

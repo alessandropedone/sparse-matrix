@@ -167,14 +167,14 @@ namespace algebra
         // move semantic
         Matrix<T, S> result(m1.get_rows(), m2.get_cols());
 
-        const auto* square_matrix1 = dynamic_cast<const SquareMatrix<T, S>*>(&m1.matrix);
-        const auto* square_matrix2 = dynamic_cast<const SquareMatrix<T, S>*>(&m2.matrix);
+        const auto *square_matrix1 = dynamic_cast<const SquareMatrix<T, S> *>(&m1.matrix);
+        const auto *square_matrix2 = dynamic_cast<const SquareMatrix<T, S> *>(&m2.matrix);
         if (square_matrix1 && square_matrix2)
         {
             if (square_matrix1->is_modified() && square_matrix2->is_modified())
             {
-                auto matrix1 = static_cast<const SquareMatrix<T, S> &>(m1);
-                auto matrix2 = static_cast<const SquareMatrix<T, S> &>(m2);
+                auto matrix1 = static_cast<const SquareMatrix<T, S> &>(m1.matrix);
+                auto matrix2 = static_cast<const SquareMatrix<T, S> &>(m2.matrix);
                 if constexpr (S == StorageOrder::ColumnMajor)
                 {
                     size_t col;
@@ -536,44 +536,7 @@ namespace algebra
         return result;
     }
 
-    template <AddMulType T, StorageOrder S>
-    Matrix<T, S> operator*(const TransposeView<T, S> &m1, const Matrix<T, S> &m2)
-    {
-        // TO DO
 
-        Matrix<T, S> result(m1.get_rows, m2.get_cols);
-
-        if (m1.get_cols() != m2.get_rows())
-        {
-            throw std::invalid_argument("Matrix dimensions do not match for multiplication");
-        }
-        if (m1.is_compressed() != m2.is_compressed())
-        {
-            throw std::invalid_argument("Matrix compression formats do not match");
-        }
-
-        if (not m1.is_compressed())
-        {
-            for (const auto &it1 : m1.uncompressed_format)
-            {
-                for (const auto &it2 : m2.uncompressed_format)
-                {
-                    if (it1.first.col == it2.first.row)
-                    {
-                        result(it1.first.row, it2.first.col) += it1.second * it2.second;
-                    }
-                }
-            }
-        }
-
-        return result;
-    }
-
-    template <AddMulType T, StorageOrder S>
-    Matrix<T, S> operator*(const Matrix<T, S> &m1, const TransposeView<T, S> &m2)
-    {
-        return Matrix<T, S>(m1.get_rows(), m2.get_cols());
-    }
 
     // FRIENDS: MULTIPLICATIONS WITH DIAGONAL VIEWS
 

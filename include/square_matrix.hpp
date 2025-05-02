@@ -168,12 +168,6 @@ namespace algebra
         template <AddMulType U, StorageOrder V>
         friend Matrix<U, V> operator*(const TransposeView<U, V> &m1, const TransposeView<U, V> &m2);
 
-        template <AddMulType U, StorageOrder V>
-        friend Matrix<U, V> operator*(const TransposeView<U, V> &m1, const Matrix<U, V> &m2);
-
-        template <AddMulType U, StorageOrder V>
-        friend Matrix<U, V> operator*(const Matrix<U, V> &m1, const TransposeView<U, V> &m2);
-
         // diagonal view products friend functions
         template <AddMulType U, StorageOrder V>
         friend std::vector<U> operator*(const DiagonalView<U, V> &m, const std::vector<U> &v);

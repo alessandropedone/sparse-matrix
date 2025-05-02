@@ -68,8 +68,20 @@ namespace algebra
         /// @return the matrix element at (row, col)
         T operator()(size_t row, size_t col) const override
         {
-            const auto temp = matrix;
-            return temp(col, row);
+            if (typeid(matrix) == typeid(SquareMatrix<T, S>))
+            {
+                const auto &square_matrix = static_cast<const SquareMatrix<T, S> &>(matrix);
+                return square_matrix(col, row);
+            }
+            else if (typeid(matrix) == typeid(Matrix<T, S>))
+            {
+                const auto &general_matrix = static_cast<const Matrix<T, S> &>(matrix);
+                return general_matrix(col, row);
+            }
+            else
+            {
+                throw std::invalid_argument("Matrix type not supported");
+            }
         };
 
         /// @brief check if the matrix is in a compressed format
@@ -147,7 +159,7 @@ namespace algebra
         /// @brief clone method
         /// @return a pointer to the cloned object
         virtual std::unique_ptr<AbstractMatrix<T, S>> clone() const override
-        {   
+        {
             auto cloned_matrix = matrix.clone();
             return std::make_unique<DiagonalView<T, S>>(*static_cast<SquareMatrix<T, S> *>(cloned_matrix.release()));
         };

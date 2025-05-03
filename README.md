@@ -24,7 +24,7 @@ README.md (
     results interpretation,
     structure of the code and the output)
 
-//Final version of readme
+----------------------------------------------------------------------//Final version of readme
 
 # Matrix class
 
@@ -46,34 +46,38 @@ We implemented the following class-structure:
 
 ### Main features section
 We implemented all requested methods, as:
-- 
+
 
 
 ## Test case
-The code has been checked out on three different matrices:
-- 5x5 Matrix: 'read_test_5x5.mtx', user-defined
-- 131x131 Matrix: ['lnsp_131.mtx'](https://math.nist.gov/MatrixMarket/data/Harwell-Boeing/lns/lnsp_131.html)
-- 1182x1182 Matrix: ['e20r0000.mtx'](https://math.nist.gov/MatrixMarket/data/SPARSKIT/drivcav/e20r0000.html)
+The code has been checked out on different matrices:
+- 5x5 Matrix: `read_test_5x5.mtx`, user-defined
+- The matrices in `data.json`:
+  - 131x131 Matrix: [`lnsp_131.mtx`](https://math.nist.gov/MatrixMarket/data/Harwell-Boeing/lns/lnsp_131.html)
+  - 1182x1182 Matrix: [`e20r0000.mtx`](https://math.nist.gov/MatrixMarket/data/SPARSKIT/drivcav/e20r0000.html) <br>
+
+One can decide either to remove a matrix from the data file or to add one, just saving its file in MatrixMarket format.
 
 For each of those, the following processes were tested, for both storage orders S (column major and row major):
 - compress(), uncompress(), compress_mod() (only for SquareMatrix)
-- norm<<N>>(), where N is in {'Infinity', 'One', 'Frobenius'}
+- norm\<N>(), where N is in {'Infinity', 'One', 'Frobenius'}
 - multiplication with:
-    - std::vector<<double>>
-    - Matrix<<double, S>>
-    - TransposeView<<double, S>>
-    - DiagonalView<<double, S>>
-    Note:
-        - operations are implemented for matrices of the same format
-        - each format is examined and they are compared, as the compressed format determines a speedup
-        - times of execution are obtained through std::chrono functions and printed on screen
-        - the execution data is saved in 'execution_time.json'
+    - std::vector\<double>
+    - Matrix<double, S>
+    - TransposeView<double, S>
+    - DiagonalView<double, S><br>
+    
+**Note**:
+- operations are implemented for matrices of the same format
+- each format is examined and they are compared, as the compressed format determines a speedup
+- times of execution are obtained through _std::chrono_ functions and printed on screen
+- the execution data is saved in `execution_time.json`
 
 ## Design choises
-- Data formats and associated components are defined in 'Storage.hpp'
+- Data formats and associated components are defined in `Storage.hpp`
 - For the dynamic storage techniques, among COO format and COOmap, we opted for the latter, since it provides access to random elements with O(log(N)) average complexity and it yields an easy and fast way to insert the elements in order
-- 'Proxy.hpp' was conceived in order to concede restricted control on private data
+- `Proxy.hpp` was conceived in order to concede restricted control on private data
 
 ### Parallelization 
 - Many methods include parallel execution policies, to accelerate certain procedure, as maximum search or vector filling
-- We retained the method compress_parallel(), tailored to perform the switch from *uncompressed_format* to *compressed_format* explotiting a parallel approach, but we didn't make use of it since it involves high overhead costs, due to the employment od std::iota function
+- We retained the method compress_parallel(), tailored to perform the switch from *uncompressed_format* to *compressed_format* explotiting a parallel approach, but we didn't make use of it since it involves high overhead costs, due to the employment of _std::iota_ function

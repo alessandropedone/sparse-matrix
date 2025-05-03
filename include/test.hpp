@@ -368,6 +368,9 @@ namespace algebra
         std::cout << "Test matrix " << matrix_name << std::endl;
         std::cout << std::endl;
 
+        // Test compression
+        test_compression(testMatrix);
+
         // Test norm
         norm_test(testMatrix);
 

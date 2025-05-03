@@ -17,9 +17,9 @@ Optimization
 - review normal algorithms and add parallel execution policies where possibile
   
 README.md (
-    need of TBB, 
-    we didn't implement COO since COOmap is clearly more efficient, 
-    explain why parallel implementation of compress is slower, put a test about this [keep compress_parallel in order to see the parallelization overhead]
+    need of TBB, V
+    we didn't implement COO since COOmap is clearly more efficient, V
+    explain why parallel implementation of compress is slower, ~~put a test about this~~ [keep compress_parallel in order to see the parallelization overhead]
     please run multiple times,
     results interpretation,
     structure of the code and the output)
@@ -42,9 +42,12 @@ We implemented the following class-structure:
 - **Abstract matrix**: base abstract template class that allows greater polymorphism among derived classes
     - **Matrix**: template class than encodes two data structures for a matrix, in particular a sparse matrix → **COO Map** and **CSR/CSC** formats
         - **SquareMatrix**: template class specialized for square matrices, that encodes the **MSR/MSC** format
-    - **Views** → **TransposeView** and **Diagonal view**: template classes that stand for specific views of a matrix
+    - **Views** → **TransposeView** and **DiagonalView**: template classes that stand for specific views of a matrix
 
-### Main features section?
+### Main features section
+We implemented all requested methods, as:
+- 
+
 
 ## Test case
 The code has been checked out on three different matrices:
@@ -52,19 +55,25 @@ The code has been checked out on three different matrices:
 - 131x131 Matrix: ['lnsp_131.mtx'](https://math.nist.gov/MatrixMarket/data/Harwell-Boeing/lns/lnsp_131.html)
 - 1182x1182 Matrix: ['e20r0000.mtx'](https://math.nist.gov/MatrixMarket/data/SPARSKIT/drivcav/e20r0000.html)
 
-For each of those, the following processes were tested, for both storage orders:
+For each of those, the following processes were tested, for both storage orders S (column major and row major):
 - compress(), uncompress(), compress_mod() (only for SquareMatrix)
---------- aggiungiamo compression_test ad execute_test?
-- norm<<N>>()
+- norm<<N>>(), where N is in {'Infinity', 'One', 'Frobenius'}
 - multiplication with:
-    - std::vector<<T>>
-    - Matrix<<T, S>>
-    - TransposeView<<T, S>>
-    - DiagonalView<<T, S>>
+    - std::vector<<double>>
+    - Matrix<<double, S>>
+    - TransposeView<<double, S>>
+    - DiagonalView<<double, S>>
     Note:
-        - times of execution are obtained through std::chrono functions and printed on screen
         - operations are implemented for matrices of the same format
         - each format is examined and they are compared, as the compressed format determines a speedup
+        - times of execution are obtained through std::chrono functions and printed on screen
         - the execution data is saved in 'execution_time.json'
-    
 
+## Design choises
+- Data formats and associated components are defined in 'Storage.hpp'
+- For the dynamic storage techniques, among COO format and COOmap, we opted for the latter, since it provides access to random elements with O(log(N)) average complexity and it yields an easy and fast way to insert the elements in order
+- 'Proxy.hpp' was conceived in order to concede restricted control on private data
+
+### Parallelization 
+- Many methods include parallel execution policies, to accelerate certain procedure, as maximum search or vector filling
+- We retained the method compress_parallel(), tailored to perform the switch from *uncompressed_format* to *compressed_format* explotiting a parallel approach, but we didn't make use of it since it involves high overhead costs, due to the employment od std::iota function

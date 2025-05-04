@@ -210,7 +210,7 @@ namespace algebra
     void generateRandomVector(std::vector<T> &vec)
     {
         std::random_device seed;
-        unsigned int constant_seed = 41; // Set a constant seed for reproducibility
+        unsigned int constant_seed = 3; // Set a constant seed for reproducibility
         std::default_random_engine gen(constant_seed);
 
         if constexpr (std::is_floating_point<T>::value)

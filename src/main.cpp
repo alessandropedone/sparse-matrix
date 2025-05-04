@@ -9,6 +9,7 @@
 #include <random>
 #include <iostream>
 #include <chrono>
+#include <complex>
 
 using namespace algebra;
 using namespace json_utility;
@@ -16,14 +17,31 @@ using namespace json_utility;
 int main()
 {
     // Test with a 5x5 matrix
+    std::cout << "------------------------------------" << std::endl;
+    std::cout << "Test with a 5x5 real matrix" << std::endl;
+    std::cout << "------------------------------------" << std::endl;
+    std::string filename = "real_test_5x5.mtx";
     Matrix<double, StorageOrder::ColumnMajor> m(0, 0);
-    test5x5(m);
+    test5x5(m, filename);
     SquareMatrix<double, StorageOrder::ColumnMajor> sm(0);
-    test5x5(sm);
+    test5x5(sm, filename);
     TransposeView<double, StorageOrder::ColumnMajor> tv(0, 0);
-    test5x5(tv);
+    test5x5(tv, filename);
     DiagonalView<double, StorageOrder::ColumnMajor> dv(0, 0);
-    test5x5(dv);
+    test5x5(dv, filename);
+
+    std::cout << "------------------------------------" << std::endl;
+    std::cout << "Test with a 5x5 complex matrix" << std::endl;
+    std::cout << "------------------------------------" << std::endl;
+    std::string filename2 = "complex_test_5x5.mtx";
+    Matrix<std::complex<double>, StorageOrder::ColumnMajor> cm(0, 0);
+    test5x5(cm, filename2);
+    SquareMatrix<std::complex<double>, StorageOrder::ColumnMajor> csm(0);
+    test5x5(csm, filename2);
+    TransposeView<std::complex<double>, StorageOrder::ColumnMajor> ctv(0, 0);
+    test5x5(ctv, filename2);
+    DiagonalView<std::complex<double>, StorageOrder::ColumnMajor> cdv(0, 0);
+    test5x5(cdv, filename2);
 
     // Run the tests on all matrices provided in the json file for both storage orders
     json data = read_json(static_cast<std::string>("data/data.json"));
@@ -39,7 +57,7 @@ int main()
             std::cout << "---------------------------------" << std::endl;
             std::cout << "Test with storage order: RowMajor" << std::endl;
             std::cout << "---------------------------------" << std::endl;
-            test<StorageOrder::RowMajor>(matrix_names);
+            test<double, StorageOrder::RowMajor>(matrix_names);
         }
         else
         {
@@ -49,7 +67,7 @@ int main()
             std::cout << "------------------------------------" << std::endl;
             std::cout << "Test with storage order: ColumnMajor" << std::endl;
             std::cout << "------------------------------------" << std::endl;
-            test<StorageOrder::ColumnMajor>(matrix_names);
+            test<double, StorageOrder::ColumnMajor>(matrix_names);
         }
     }
 

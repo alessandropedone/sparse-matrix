@@ -7,6 +7,7 @@
 #include <map>
 #include <iostream>
 #include <concepts>
+#include <complex>
 
 namespace algebra
 {
@@ -17,11 +18,38 @@ namespace algebra
         ColumnMajor
     };
 
+    // Primary template: false for all types
+    template <typename T>
+    struct is_complex : std::false_type
+    {
+    };
+
+    // Specialization: true for std::complex<U>
+    template <typename U>
+    struct is_complex<std::complex<U>> : std::true_type
+    {
+    };
+
+    template <typename T>
+    struct AbsReturnType
+    {
+        using type = T;
+    };
+
+    template <typename T>
+    struct AbsReturnType<std::complex<T>>
+    {
+        using type = T;
+    };
+
+    template <typename T>
+    using AbsReturnType_t = typename AbsReturnType<T>::type;
+
     template <typename T>
     concept AddMulType = requires(T a, T b) {
         { a + b } -> std::convertible_to<T>;
         { a * b } -> std::convertible_to<T>;
-        { std::abs(a) };
+        { std::abs(a) } -> std::convertible_to<AbsReturnType_t<T>>;
     };
 
     /// @brief matrix storage in compressed format
@@ -39,7 +67,7 @@ namespace algebra
     template <AddMulType T>
     struct ModifiedCompressedStorage
     {
-        //let nnz = number of non-zero elements, considering the whole principal diagonal NON-zero
+        // let nnz = number of non-zero elements, considering the whole principal diagonal NON-zero
         std::vector<T> values;
         // from 0 to n-1-> diagonal elements
         // from n to nnz-1 -> off-diagonal elements in row or column major order
@@ -51,7 +79,8 @@ namespace algebra
     };
 
     /// @brief alias for the index of the matrix
-    struct Index {
+    struct Index
+    {
         size_t row;
         size_t col;
     };

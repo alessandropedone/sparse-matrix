@@ -180,7 +180,7 @@ namespace algebra
             std::cout << "Matrix is compressed, uncompressing..." << std::endl;
             uncompress();
         }
-        if (value != 0)
+        if (value != T(0))
         {
             uncompressed_format[{row, col}] = value;
         }
@@ -672,13 +672,27 @@ namespace algebra
         while (std::getline(file, line))
         {
             std::istringstream iss(line);
-            T value;
-            size_t row, col;
-            iss >> row >> col >> value;
-            assert(row <= rows and col <= cols);
-            // I traslate the row and column indices to 0-based format and set the element
-            //  in the matrix
-            set(row - 1, col - 1, value);
+            if constexpr (is_complex<T>::value)
+            {
+                typename T::value_type real, imag;
+                size_t row, col;
+                iss >> row >> col >> real >> imag;
+                assert(row <= rows and col <= cols);
+                T value(real, imag);
+                // I traslate the row and column indices to 0-based format and set the element
+                //  in the matrix
+                set(row - 1, col - 1, value);
+            }
+            else
+            {
+                T value;
+                size_t row, col;
+                iss >> row >> col >> value;
+                assert(row <= rows and col <= cols);
+                // I traslate the row and column indices to 0-based format and set the element
+                //  in the matrix
+                set(row - 1, col - 1, value);
+            }
         }
 
         file.close();
@@ -691,7 +705,7 @@ namespace algebra
         {
             throw std::invalid_argument("Matrix and vector dimensions do not match for multiplication");
         }
-        std::vector<T> result(m.rows, 0);
+        std::vector<T> result(m.rows, T(0));
         if (not m.is_compressed())
         {
             for (const auto &it : m.uncompressed_format)

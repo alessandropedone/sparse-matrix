@@ -27,7 +27,7 @@ namespace algebra
     {
         for (size_t i = 0; i < v.size(); i++)
         {
-            std::cout << std::setw(15) << v[i] << std::endl;
+            std::cout << std::setw(20) << v[i] << std::endl;
         }
         std::cout << std::endl;
     }
@@ -43,7 +43,7 @@ namespace algebra
         {
             for (size_t j = 0; j < m.get_cols(); j++)
             {
-                std::cout << std::setw(15) << m(i, j) << " ";
+                std::cout << std::setw(20) << m(i, j) << " ";
             }
             std::cout << std::endl;
         }
@@ -67,7 +67,7 @@ namespace algebra
         {
             for (size_t j = 0; j < m1.get_cols(); j++)
             {
-                if (std::abs(m1(i, j) - m2(i, j)) > std::numeric_limits<double>::epsilon())
+                if (abs(m1(i, j) - m2(i, j)) > std::numeric_limits<AbsReturnType_t<T>>::epsilon())
                 {
                     return false;
                 }
@@ -198,7 +198,7 @@ namespace algebra
     }
 
     template <AddMulType T, StorageOrder S>
-    void print_result(const AbstractMatrix<T, S> &m, const std::vector<double> &v)
+    void print_result(const AbstractMatrix<T, S> &m, const std::vector<T> &v)
     {
         std::cout << "M*v" << std::endl;
         print(v);
@@ -206,13 +206,52 @@ namespace algebra
         print(m);
     }
 
+    template <AddMulType T>
+    void generateRandomVector(std::vector<T> &vec)
+    {
+        std::random_device seed;
+        unsigned int constant_seed = 41; // Set a constant seed for reproducibility
+        std::default_random_engine gen(constant_seed);
+
+        if constexpr (std::is_floating_point<T>::value)
+        {
+            std::uniform_real_distribution<T> distr(-1.0, 1.0);
+            for (auto &val : vec)
+            {
+                val = distr(gen);
+            }
+        }
+        else if constexpr (std::is_integral<T>::value)
+        {
+            std::uniform_int_distribution<T> distr(-1, 1);
+            for (auto &val : vec)
+            {
+                val = distr(gen);
+            }
+        }
+        else if constexpr (is_complex<T>::value)
+        {
+            using RealType = typename T::value_type; // Get the underlying type of the complex number
+            std::uniform_real_distribution<RealType> distr(-1.0, 1.0);
+            for (auto &val : vec)
+            {
+                val.real(distr(gen)); // Generate random value for the real part
+                val.imag(distr(gen)); // Generate random value for the imaginary part
+            }
+        }
+        else
+        {
+            static_assert(std::is_arithmetic<T>::value, "Unsupported type T for testing");
+        }
+    }
+
     /// @brief 5x5 matrix for testing
     /// @tparam T type of the matrix elements
     /// @tparam S type of the storage order (RowMajor or ColumnMajor)
     template <AddMulType T, StorageOrder S>
-    void test5x5(AbstractMatrix<T, S> &m)
+    void test5x5(AbstractMatrix<T, S> &m, const std::string &name)
     {
-        m.reader(static_cast<std::string>("data/read_test_5x5.mtx"));
+        m.reader(static_cast<std::string>("data/" + name));
 
         if (typeid(m) == typeid(SquareMatrix<T, S>))
         {
@@ -249,15 +288,8 @@ namespace algebra
         norm_test(m);
 
         // Initialize a vector
-        std::vector<double> v(m.get_cols(), 0);
-        std::random_device seed;
-        unsigned int constant_seed = 41; // Set a constant seed for reproducibility
-        std::default_random_engine gen(constant_seed);
-        std::uniform_real_distribution<double> distr(-1., 1.);
-        for (auto &val : v)
-        {
-            val = distr(gen);
-        }
+        std::vector<T> v(m.get_cols(), T(0));
+        generateRandomVector(v);
 
         // Print the vector
         std::cout << "Test vector" << std::endl;
@@ -322,7 +354,7 @@ namespace algebra
     /// @tparam S type of the storage order (RowMajor or ColumnMajor)
     /// @param matrix_names vector of matrix names
     /// @note the matrix names must be in the data.json file inside the data folder
-    template <StorageOrder S>
+    template <AddMulType T, StorageOrder S>
     void test(const std::vector<std::string> &matrix_names)
     {
 
@@ -330,12 +362,12 @@ namespace algebra
         {
 
             std::cout << std::endl;
-            Matrix<double, S> testMatrix(0, 0);
-            SquareMatrix<double, S> testSquareMatrix(0);
-            Matrix<double, S> temp(0, 0);
-            SquareMatrix<double, S> temp2(0);
-            TransposeView<double, S> testTransposeView(temp);
-            DiagonalView<double, S> testDiagonalView(temp2);
+            Matrix<T, S> testMatrix(0, 0);
+            SquareMatrix<T, S> testSquareMatrix(0);
+            Matrix<T, S> temp(0, 0);
+            SquareMatrix<T, S> temp2(0);
+            TransposeView<T, S> testTransposeView(temp);
+            DiagonalView<T, S> testDiagonalView(temp2);
 
             std::cout << "------------------------------------" << std::endl;
             std::cout << "Test with Matrix class" << std::endl;
@@ -359,8 +391,8 @@ namespace algebra
         };
     }
 
-    template <StorageOrder S>
-    void execute_test(AbstractMatrix<double, S> &testMatrix, const std::string &matrix_name)
+    template <AddMulType T, StorageOrder S>
+    void execute_test(AbstractMatrix<T, S> &testMatrix, const std::string &matrix_name)
     {
         // Import matrix
         testMatrix.reader(static_cast<std::string>("data/" + matrix_name));
@@ -377,30 +409,22 @@ namespace algebra
         // Test excution time of products
         std::cout << "Test for execution time of products" << std::endl;
 
-        // Initialize random distribution to create a random filled vector
-        std::random_device seed;
-        std::default_random_engine gen(seed());
-        std::uniform_real_distribution<double> distr(-1., 1.);
-
         // Generate vector to perform the matrix - vector product
-        std::vector<double> vec(testMatrix.get_cols(), 0);
-        for (auto &val : vec)
-        {
-            val = distr(gen);
-        }
+        std::vector<T> vec(testMatrix.get_cols(), T(0));
+        generateRandomVector(vec);
 
-        Matrix<double, S> res1(testMatrix.get_rows(), testMatrix.get_cols());
-        Matrix<double, S> res2(testMatrix.get_rows(), testMatrix.get_cols());
-        std::vector<double> res3(testMatrix.get_rows(), 0);
-        std::vector<double> res4(testMatrix.get_rows(), 0);
+        Matrix<T, S> res1(testMatrix.get_rows(), testMatrix.get_cols());
+        Matrix<T, S> res2(testMatrix.get_rows(), testMatrix.get_cols());
+        std::vector<T> res3(testMatrix.get_rows(), 0);
+        std::vector<T> res4(testMatrix.get_rows(), 0);
 
         MyTimePoint start, stop;
         std::string filename = "data/execution_time.json";
         json time_info = read_json(filename);
 
-        if (typeid(testMatrix) == typeid(SquareMatrix<double, S>))
+        if (typeid(testMatrix) == typeid(SquareMatrix<T, S>))
         {
-            auto testSquareMatrix = static_cast<SquareMatrix<double, S> &>(testMatrix);
+            auto testSquareMatrix = static_cast<SquareMatrix<T, S> &>(testMatrix);
 
             testSquareMatrix.compress_mod();
 
@@ -430,10 +454,10 @@ namespace algebra
             auto time_span_n_uncompressed = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
             time_info[matrix_name + " " + typeid(testMatrix).name() + " (uncompressed_format_matrix_vector_product_ns)"] = time_span_n_uncompressed.count();
         }
-        else if (typeid(testMatrix) == typeid(TransposeView<double, S>))
+        else if (typeid(testMatrix) == typeid(TransposeView<T, S>))
         {
-            auto testTransposeView = static_cast<TransposeView<double, S> &>(testMatrix);
-            
+            auto testTransposeView = static_cast<TransposeView<T, S> &>(testMatrix);
+
             testTransposeView.compress();
 
             start = MyClock::now();
@@ -462,9 +486,9 @@ namespace algebra
             auto time_span_n_uncompressed = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
             time_info[matrix_name + " " + typeid(testMatrix).name() + " (uncompressed_format_matrix_vector_product_ns)"] = time_span_n_uncompressed.count();
         }
-        else if (typeid(testMatrix) == typeid(DiagonalView<double, S>))
+        else if (typeid(testMatrix) == typeid(DiagonalView<T, S>))
         {
-            auto testDiagonalView = static_cast<DiagonalView<double, S> &>(testMatrix);
+            auto testDiagonalView = static_cast<DiagonalView<T, S> &>(testMatrix);
 
             testDiagonalView.compress();
 
@@ -496,7 +520,7 @@ namespace algebra
         }
         else
         {
-            auto dynamicMatrix = dynamic_cast<Matrix<double, S> *>(&testMatrix);
+            auto dynamicMatrix = dynamic_cast<Matrix<T, S> *>(&testMatrix);
             if (!dynamicMatrix)
             {
                 throw std::runtime_error("No matrix type found to perform the test");

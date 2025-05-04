@@ -43,6 +43,22 @@ namespace algebra
             return uncompressed_format[{row, col}];
         }
 
+        /// @brief friend abs function
+        /// @param proxy the proxy object
+        /// @return the absolute value of the matrix at (row, col)
+        friend AbsReturnType_t<T> abs(const Proxy &proxy)
+        {
+            // find the value in the uncompressed format
+            auto it = proxy.uncompressed_format.find({proxy.row, proxy.col});
+            if (it == proxy.uncompressed_format.end())
+            {
+                // if the value is not found, return 0
+                return AbsReturnType_t<T>(0);
+            }
+            // if the value is found, return it
+            return std::abs(proxy.uncompressed_format[{proxy.row, proxy.col}]);
+        }
+
         /// @brief assignment operator
         /// @param val the value to assign
         /// @return the proxy

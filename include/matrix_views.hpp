@@ -253,7 +253,7 @@ namespace algebra
             size_t sum{0};
             for (size_t i = 0; i < matrix.get_rows(); i++)
             {
-                sum += std::abs(matrix(i, i)) > std::numeric_limits<double>::epsilon();
+                sum += abs(matrix(i, i)) > std::numeric_limits<AbsReturnType_t<T>>::epsilon();
             }
             return sum;
         };
@@ -269,7 +269,7 @@ namespace algebra
                 double sum{0};
                 for (size_t i = 0; i < matrix.get_rows(); i++)
                 {
-                    sum += std::abs(matrix(i, i)) * std::abs(matrix(i, i));
+                    sum += abs(matrix(i, i)) * abs(matrix(i, i));
                 }
                 return std::sqrt(sum);
             }
@@ -278,7 +278,7 @@ namespace algebra
                 std::vector<double> diag(matrix.get_rows(), 0);
                 for (size_t i = 0; i < matrix.get_rows(); i++)
                 {
-                    diag[i] = std::abs(matrix(i, i));
+                    diag[i] = abs(matrix(i, i));
                 }
                 return *std::max_element(std::execution::par_unseq, diag.begin(), diag.end());
             }

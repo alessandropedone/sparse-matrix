@@ -17,7 +17,7 @@ namespace algebra
         {
             throw std::invalid_argument("Matrix and vector dimensions do not match for multiplication");
         }
-        std::vector<T> result(m.matrix.get_cols(), 0);
+        std::vector<T> result(m.matrix.get_cols(), T(0));
         if (typeid(m.matrix) == typeid(SquareMatrix<T, S>))
         {
             auto matrix = static_cast<const SquareMatrix<T, S> &>(m.matrix);
@@ -547,7 +547,7 @@ namespace algebra
         {
             throw std::invalid_argument("Matrix and vector dimensions do not match for multiplication");
         }
-        std::vector<T> result(m.get_rows(), 0);
+        std::vector<T> result(m.get_rows(), T(0));
         auto &matrix = m.matrix;
         if (matrix.is_modified())
         {

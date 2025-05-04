@@ -70,7 +70,7 @@ namespace algebra
         size_t size = 0;
         for (size_t i = 0; i < this->rows; ++i)
         {
-            if ((*this)(i, i) == 0)
+            if ((*this)(i, i) == T(0))
             {
                 ++size;
             }
@@ -94,7 +94,7 @@ namespace algebra
         const size_t size = get_mod_size(); // nnz + extra space for possible zero diagonal elements
         compressed_format_mod.values.resize(size);
         compressed_format_mod.bind.resize(size);
-        std::fill(std::execution::par_unseq, compressed_format_mod.values.begin(), compressed_format_mod.values.end(), 0);
+        std::fill(std::execution::par_unseq, compressed_format_mod.values.begin(), compressed_format_mod.values.end(), T(0));
         std::fill(std::execution::par_unseq, compressed_format_mod.bind.begin(), compressed_format_mod.bind.end(), 0);
 
         // to store correctly the pointers in the bind vector (that doesn't account for the diagonal elements)
@@ -274,7 +274,7 @@ namespace algebra
             this->compressed_format.outer.resize(this->get_nnz());
             std::fill(std::execution::par_unseq, this->compressed_format.outer.begin(), this->compressed_format.outer.end(), 0);
             this->compressed_format.values.resize(this->get_nnz());
-            std::fill(std::execution::par_unseq, this->compressed_format.values.begin(), this->compressed_format.values.end(), 0);
+            std::fill(std::execution::par_unseq, this->compressed_format.values.begin(), this->compressed_format.values.end(), T(0));
 
             // fill the compressed matrix
             size_t index = 0; // keeps track of nnz elements
@@ -294,7 +294,7 @@ namespace algebra
                         // std::cout << "Row index: " << rowidx << std::endl;
 
                         // Insert diagonal element if it is not already inserted, !0 and I am after the diagonal
-                        if (not flag and compressed_format_mod.values[i] != 0 and rowidx > i)
+                        if (not flag and compressed_format_mod.values[i] != T(0) and rowidx > i)
                         {
                             // std::cout << "Adding diagonal element: " << compressed_format_mod.values[i] << std::endl;
                             this->compressed_format.values[index] = compressed_format_mod.values[i];
@@ -310,7 +310,7 @@ namespace algebra
                         // std::cout << "Adding off-diagonal element after diagonal: " << compressed_format_mod.values[j] << std::endl;
                     }
                     // if there are no other elements in the col or no elements after the diagonal one, add the diagonal element
-                    if (not flag and compressed_format_mod.values[i] != 0)
+                    if (not flag and compressed_format_mod.values[i] != T(0))
                     {
                         // std::cout << "Adding diagonal element: " << compressed_format_mod.values[i] << std::endl;
                         this->compressed_format.values[index] = compressed_format_mod.values[i];
@@ -330,7 +330,7 @@ namespace algebra
                 {
                     size_t rowidx = compressed_format_mod.bind[j];
                     // Insert diagonal element if it is not already inserted, !0 and I am after the diagonal
-                    if (not flag and compressed_format_mod.values[i] != 0 and rowidx > i)
+                    if (not flag and compressed_format_mod.values[i] != T(0) and rowidx > i)
                     {
                         this->compressed_format.values[index] = compressed_format_mod.values[i];
                         this->compressed_format.outer[index] = i;
@@ -343,7 +343,7 @@ namespace algebra
                     this->compressed_format.outer[index] = rowidx;
                     ++index;
                 }
-                if (not flag and compressed_format_mod.values[i] != 0)
+                if (not flag and compressed_format_mod.values[i] != T(0))
                 {
                     this->compressed_format.values[index] = compressed_format_mod.values[i];
                     this->compressed_format.outer[index] = i;
@@ -365,7 +365,7 @@ namespace algebra
                         size_t colidx = compressed_format_mod.bind[j];
 
                         // Insert diagonal element if it is not already inserted, !0 and I am after the diagonal
-                        if (not flag and compressed_format_mod.values[i] != 0 and colidx > i)
+                        if (not flag and compressed_format_mod.values[i] != T(0) and colidx > i)
                         {
                             this->compressed_format.values[index] = compressed_format_mod.values[i];
                             this->compressed_format.outer[index] = i;
@@ -379,7 +379,7 @@ namespace algebra
                         ++index;
                     }
                     // if there are no other elements in the row, add the diagonal element
-                    if (not flag and compressed_format_mod.values[i] != 0)
+                    if (not flag and compressed_format_mod.values[i] != T(0))
                     {
                         this->compressed_format.values[index] = compressed_format_mod.values[i];
                         this->compressed_format.outer[index] = i;
@@ -397,7 +397,7 @@ namespace algebra
                     size_t colidx = compressed_format_mod.bind[j];
 
                     // Insert diagonal element if it is not already inserted, !0 and I am after the diagonal
-                    if (not flag and compressed_format_mod.values[i] != 0 and colidx > i)
+                    if (not flag and compressed_format_mod.values[i] != T(0) and colidx > i)
                     {
                         this->compressed_format.values[index] = compressed_format_mod.values[i];
                         this->compressed_format.outer[index] = i;
@@ -411,7 +411,7 @@ namespace algebra
                     ++index;
                 }
                 // if there are no other elements in the row, add the diagonal element
-                if (not flag and compressed_format_mod.values[i] != 0)
+                if (not flag and compressed_format_mod.values[i] != T(0))
                 {
                     this->compressed_format.values[index] = compressed_format_mod.values[i];
                     this->compressed_format.outer[index] = i;
@@ -448,7 +448,7 @@ namespace algebra
                 for (size_t col_idx = 0; col_idx < this->cols - 1; ++col_idx)
                 {
                     // add diagonal element
-                    if (compressed_format_mod.values[col_idx] != 0)
+                    if (compressed_format_mod.values[col_idx] != T(0))
                     {
                         this->uncompressed_format[{col_idx, col_idx}] = compressed_format_mod.values[col_idx];
                     }
@@ -463,7 +463,7 @@ namespace algebra
                 // handle last column
                 size_t col_idx = this->cols - 1;
                 // add diagonal element
-                if (compressed_format_mod.values[col_idx] != 0)
+                if (compressed_format_mod.values[col_idx] != T(0))
                 {
                     this->uncompressed_format[{col_idx, col_idx}] = compressed_format_mod.values[col_idx];
                 }
@@ -480,7 +480,7 @@ namespace algebra
                 for (size_t row_idx = 0; row_idx < this->rows - 1; ++row_idx)
                 {
                     // add diagonal element
-                    if (compressed_format_mod.values[row_idx] != 0)
+                    if (compressed_format_mod.values[row_idx] != T(0))
                     {
                         this->uncompressed_format[{row_idx, row_idx}] = compressed_format_mod.values[row_idx];
                     }
@@ -495,7 +495,7 @@ namespace algebra
                 // handle last row
                 size_t row_idx = this->rows - 1;
                 // add diagonal element
-                if (compressed_format_mod.values[row_idx] != 0)
+                if (compressed_format_mod.values[row_idx] != T(0))
                 {
                     this->uncompressed_format[{row_idx, row_idx}] = compressed_format_mod.values[row_idx];
                 }
@@ -778,13 +778,27 @@ namespace algebra
         while (std::getline(file, line))
         {
             std::istringstream iss(line);
-            T value;
-            size_t row, col;
-            iss >> row >> col >> value;
-            assert(row <= this->rows and col <= this->cols);
-            // I traslate the row and column indices to 0-based format and set the element
-            //  in the matrix
-            set(row - 1, col - 1, value);
+            if constexpr (is_complex<T>::value)
+            {
+                typename T::value_type real, imag;
+                size_t row, col;
+                iss >> row >> col >> real >> imag;
+                assert(row <= this->rows and col <= this->cols);
+                T value(real, imag);
+                // I traslate the row and column indices to 0-based format and set the element
+                //  in the matrix
+                set(row - 1, col - 1, value);
+            }
+            else
+            {
+                T value;
+                size_t row, col;
+                iss >> row >> col >> value;
+                assert(row <= this->rows and col <= this->cols);
+                // I traslate the row and column indices to 0-based format and set the element
+                //  in the matrix
+                set(row - 1, col - 1, value);
+            }
         }
 
         file.close();
@@ -798,7 +812,7 @@ namespace algebra
             size_t size = compressed_format_mod.values.size(); // this doesn't account for zeros in the diagonal
             for (size_t i = 0; i < this->rows; ++i)
             {
-                if (compressed_format_mod.values[i] == 0)
+                if (compressed_format_mod.values[i] == T(0))
                 {
                     --size;
                 }
@@ -826,7 +840,7 @@ namespace algebra
             {
                 throw std::invalid_argument("Matrix and vector dimensions do not match");
             }
-            std::vector<T> result(m.rows, 0);
+            std::vector<T> result(m.rows, T(0));
             if constexpr (S == StorageOrder::ColumnMajor)
             {
                 size_t col, start, end;

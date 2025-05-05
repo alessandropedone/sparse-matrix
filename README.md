@@ -1,11 +1,3 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/HlQKP7Zu)
-
-*This is our final commit, made before 23:59 CEST, in accordance with the deadline indicated in the email communication (from WeBeep), which stated: "Deadline: 5th of May, at midnight."*
-*This information matched what was specified in the content of the link provided in this Markdown file.*\
-*This afternoon, while we were finalizing the last details (including this README, as can be seen from the commit history), we opened the link and realized that the deadline had been moved earlier, something we had not noticed before.*\
-*We did not receive any communication regarding this change and are unsure whether this may be an error.*\
-*In any case, we hope this does not cause any inconvenience and we apologize.*
-
 # Sparse matrix 
 
 # Matrix class

@@ -1,3 +1,22 @@
+/**
+ * @file test.hpp
+ * @brief Utility functions for testing and benchmarking matrix classes and operations.
+ *
+ * This header provides a collection of templated utility functions for:
+ * - Printing vectors and matrices.
+ * - Comparing matrices for equality.
+ * - Testing compression and decompression of matrices (including SquareMatrix, Matrix, TransposeView, DiagonalView).
+ * - Computing matrix norms (One, Infinity, Frobenius).
+ * - Generating random vectors for testing.
+ * - Running comprehensive tests on 5x5 matrices, including matrix-vector and matrix-matrix products.
+ * - Measuring and reporting execution times for matrix operations in both compressed and uncompressed formats.
+ * - Saving timing results to JSON files for further analysis.
+ *
+ * The utilities are designed to work with custom matrix types and storage orders, supporting both real and complex types.
+ * 
+ * @author 
+ * @date 
+ */
 #ifndef TEST_HPP
 #define TEST_HPP
 

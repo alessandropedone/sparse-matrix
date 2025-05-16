@@ -1,0 +1,26 @@
+digraph "/home/ale/sparse-matrix/json/tests"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  compound=true
+  subgraph clusterdir_324bfb8aa525ab5f73bcc4531b7e0708 {
+    graph [ bgcolor="#edf0f7", pencolor="grey25", label="json", fontname=Helvetica,fontsize=10 style="filled,dashed", URL="dir_324bfb8aa525ab5f73bcc4531b7e0708.html",tooltip=""]
+  subgraph clusterdir_47933e5da5f5e742ee846a12493ced92 {
+    graph [ bgcolor="#edf0f7", pencolor="grey25", label="", fontname=Helvetica,fontsize=10 style="filled,bold", URL="dir_47933e5da5f5e742ee846a12493ced92.html",tooltip=""]
+    dir_47933e5da5f5e742ee846a12493ced92 [shape=plaintext, label="tests"];
+  dir_637808d67dcd6fb0508f7fc3b478b380 [label="abi", fillcolor="#a2b4d6", color="grey25", style="filled", URL="dir_637808d67dcd6fb0508f7fc3b478b380.html",tooltip=""];
+  dir_2b68137acdb45f9be6e4ce8b5605b69a [label="benchmarks", fillcolor="#a2b4d6", color="grey25", style="filled", URL="dir_2b68137acdb45f9be6e4ce8b5605b69a.html",tooltip=""];
+  dir_1b41b4305a7129718f7ee814b51a0fc5 [label="cmake_add_subdirectory", fillcolor="#a2b4d6", color="grey25", style="filled", URL="dir_1b41b4305a7129718f7ee814b51a0fc5.html",tooltip=""];
+  dir_081717572348a296929681a467b75135 [label="cmake_fetch_content", fillcolor="#a2b4d6", color="grey25", style="filled", URL="dir_081717572348a296929681a467b75135.html",tooltip=""];
+  dir_7e996c9e7b7ab9d71e0ea17100a2059f [label="cmake_fetch_content2", fillcolor="#a2b4d6", color="grey25", style="filled", URL="dir_7e996c9e7b7ab9d71e0ea17100a2059f.html",tooltip=""];
+  dir_e89312d0b1aa9ae7dc899c42a088d548 [label="cmake_import", fillcolor="#a2b4d6", color="grey25", style="filled", URL="dir_e89312d0b1aa9ae7dc899c42a088d548.html",tooltip=""];
+  dir_feca136cb6d4e75d319dde6b225d5f07 [label="cmake_import_minver", fillcolor="#a2b4d6", color="grey25", style="filled", URL="dir_feca136cb6d4e75d319dde6b225d5f07.html",tooltip=""];
+  dir_f56a3b6b7272a9e58614ef15aecd8b23 [label="cmake_target_include\l_directories", fillcolor="#a2b4d6", color="grey25", style="filled", URL="dir_f56a3b6b7272a9e58614ef15aecd8b23.html",tooltip=""];
+  dir_7dbccfb48b5fc2a7b8a0073d68fcaa01 [label="reports", fillcolor="#a2b4d6", color="grey25", style="filled", URL="dir_7dbccfb48b5fc2a7b8a0073d68fcaa01.html",tooltip=""];
+  dir_68b444406fb1af581c34a23ffe958287 [label="src", fillcolor="#a2b4d6", color="grey25", style="filled", URL="dir_68b444406fb1af581c34a23ffe958287.html",tooltip=""];
+  dir_985003d3743bf95308ae6c2d7f5db369 [label="thirdparty", fillcolor="#a2b4d6", color="grey25", style="filled", URL="dir_985003d3743bf95308ae6c2d7f5db369.html",tooltip=""];
+  }
+  }
+}

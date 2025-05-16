@@ -82,5 +82,5 @@
         "complex": "cpp"
     },
     "C_Cpp.default.compilerPath": "/usr/bin/g++",
-    "cmake.sourceDirectory": "/home/ale/challenge2-male/json/tests/benchmarks"
+    "cmake.sourceDirectory": "/home/ale/sparse-matrix/json/tests/benchmarks"
 }

@@ -1,0 +1,12 @@
+digraph "/home/ale/sparse-matrix/json/tests/thirdparty/imapdl"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  compound=true
+  subgraph clusterdir_985003d3743bf95308ae6c2d7f5db369 {
+    graph [ bgcolor="#edf0f7", pencolor="grey50", label="thirdparty", fontname=Helvetica,fontsize=10 style="filled,dashed", URL="dir_985003d3743bf95308ae6c2d7f5db369.html",tooltip=""]
+  dir_820675dcbc9d4c9d9a7fa5acd6f9963a [label="imapdl", fillcolor="#edf0f7", color="grey25", style="filled,bold", URL="dir_820675dcbc9d4c9d9a7fa5acd6f9963a.html",tooltip=""];
+  }
+}

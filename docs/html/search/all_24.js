@@ -1,0 +1,7 @@
+var searchData=
+[
+  ['yaml_20tt_0',['yaml tt',['../md__2home_2ale_2sparse-matrix_2json_2FILES.html#autotoc_md1864',1,'&lt;tt&gt;.github/ISSUE_TEMPLATE/bug.yaml&lt;/tt&gt;'],['../md__2home_2ale_2sparse-matrix_2json_2FILES.html#autotoc_md1865',1,'&lt;tt&gt;.github/ISSUE_TEMPLATE/config.yaml&lt;/tt&gt;']]],
+  ['yields_20arrays_1',['Brace initialization yields arrays',['../md__2home_2ale_2sparse-matrix_2json_2docs_2mkdocs_2docs_2home_2faq.html#autotoc_md1638',1,'']]],
+  ['yml_20tt_2',['yml tt',['../md__2home_2ale_2sparse-matrix_2json_2FILES.html#autotoc_md1854',1,'&lt;tt&gt;.cirrus.yml&lt;/tt&gt;'],['../md__2home_2ale_2sparse-matrix_2json_2FILES.html#autotoc_md1860',1,'&lt;tt&gt;.github/config.yml&lt;/tt&gt;'],['../md__2home_2ale_2sparse-matrix_2json_2FILES.html#autotoc_md1862',1,'&lt;tt&gt;.github/dependabot.yml&lt;/tt&gt;'],['../md__2home_2ale_2sparse-matrix_2json_2FILES.html#autotoc_md1855',1,'&lt;tt&gt;.github/external_ci/appveyor.yml&lt;/tt&gt;'],['../md__2home_2ale_2sparse-matrix_2json_2FILES.html#autotoc_md1863',1,'&lt;tt&gt;.github/FUNDING.yml&lt;/tt&gt;'],['../md__2home_2ale_2sparse-matrix_2json_2FILES.html#autotoc_md1866',1,'&lt;tt&gt;.github/labeler.yml&lt;/tt&gt;']]],
+  ['your_20life_20with_20macros_3',['your life with macros',['../md__2home_2ale_2sparse-matrix_2json_2docs_2mkdocs_2docs_2features_2arbitrary__types.html#autotoc_md1383',1,'Simplify your life with macros'],['../md__2home_2ale_2sparse-matrix_2json_2README.html#autotoc_md1903',1,'Simplify your life with macros']]]
+];

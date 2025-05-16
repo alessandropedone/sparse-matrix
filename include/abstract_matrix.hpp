@@ -1,3 +1,17 @@
+/**
+ * @file abstract_matrix.hpp
+ * @brief Defines the AbstractMatrix interface for algebraic matrix operations.
+ *
+ * This file contains the definition of the AbstractMatrix class template, which serves as an abstract base class
+ * for various matrix types in the algebra namespace. It provides a common interface for matrix operations,
+ * including element access, modification, norm calculation, compression, and file I/O.
+ *
+ * The file also includes forward declarations for related matrix types and an enumeration for supported norm types.
+ *
+ * @author 
+ * @date 
+ */
+
 #ifndef ABSTRACT_MATRIX_HPP
 #define ABSTRACT_MATRIX_HPP
 
@@ -9,7 +23,15 @@
 namespace algebra
 {
 
-    /// @brief type of norm
+    /**
+     * @enum NormType
+     * @brief Enumeration of supported matrix norm types.
+     *
+     * This enum defines the types of norms that can be calculated for a matrix:
+     * - One:      The maximum absolute column sum of the matrix.
+     * - Infinity: The maximum absolute row sum of the matrix.
+     * - Frobenius: The square root of the sum of the absolute squares of its elements.
+     */
     enum class NormType
     {
         One,
@@ -32,6 +54,16 @@ namespace algebra
     class DiagonalView;
 
 
+    /**
+     * @brief Abstract base class for matrix representations.
+     * 
+     * This class defines the interface for matrix-like objects, supporting dynamic construction,
+     * element access, norm calculation, compression, and file I/O. It is intended to be subclassed
+     * by concrete matrix implementations such as Matrix, SquareMatrix, DiagonalView, and TransposeView.
+     * 
+     * @tparam T The type of the matrix elements (must satisfy AddMulType concept).
+     * @tparam S The storage order of the matrix (default is StorageOrder::RowMajor).
+     */
     template <AddMulType T, StorageOrder S = StorageOrder::RowMajor>
     class AbstractMatrix
     {

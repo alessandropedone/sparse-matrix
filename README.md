@@ -5,9 +5,40 @@
 ## Set up
 Clone the repository with the command: 
 ```bash
-git clone --recurse-submodules git@github.com:PACS-24-25/challenge2-male.git
+git clone --recurse-submodules git@github.com:martapignatelli/sparse-matrix.git
 ```
 Be aware of the fact that _TBB_ library is required to compile and execute the code.
+
+## Code structure
+
+```bash
+sparse-matrix
+├── LICENSE
+├── Makefile
+├── README.md
+├── data
+│   ├── complex_test_5x5.mtx
+│   ├── data.json
+│   ├── e20r0000.mtx
+│   ├── execution_time.json
+│   ├── lnsp_131.mtx
+│   └── real_test_5x5.mtx
+├── docs
+├── include
+│   ├── abstract_matrix.hpp
+│   ├── impl
+│   ├── json_utility.hpp
+│   ├── matrix.hpp
+│   ├── matrix_views.hpp
+│   ├── proxy.hpp
+│   ├── square_matrix.hpp
+│   ├── storage.hpp
+│   └── test.hpp
+├── json
+│   └── (...)
+└── src
+    └── main.cpp
+```
 
 ## Implementation
 We implemented all the methods requested and we built the following class-structure:

@@ -1,3 +1,20 @@
+/**
+ * @file proxy.hpp
+ * @author 
+ * @brief Defines the Proxy class for sparse matrix element access and modification.
+ * 
+ * This file contains the declaration and implementation of the algebra::Proxy class template,
+ * which provides a proxy object for accessing and modifying elements in a sparse matrix.
+ * The Proxy enforces sparse storage rules by ensuring that zero values are not explicitly stored
+ * in the underlying uncompressed storage format. Assignments and arithmetic operations are
+ * intercepted to insert, update, or erase elements as appropriate.
+ * 
+ * @copyright
+ * Copyright (c) 2024
+ * 
+ * @see algebra::Proxy
+ * @see algebra::UncompressedStorage
+ */
 #ifndef PROXY_HPP
 #define PROXY_HPP
 
@@ -5,17 +22,27 @@
 
 namespace algebra
 {
-    /// @brief A little proxy that “wraps” a T& and checks assignments and sums to make sure that the value is not zero
-    /// @tparam T type of the matrix elements
-    /// @tparam S storage order of the matrix (RowMajor or ColumnMajor)
-    /// @note this is used to prevent zero values in the matrix
+    /**
+     * @brief Proxy class for matrix elements that enforces sparse storage rules.
+     * 
+     * This proxy wraps access to a matrix element and ensures that zero values are not explicitly stored
+     * in the underlying uncompressed storage. Assignments and arithmetic operations are intercepted:
+     * - Assigning zero removes the element from storage.
+     * - Assigning a nonzero value inserts or updates the element.
+     * - Addition and subtraction update or erase the element as appropriate.
+     * 
+     * @tparam T Type of the matrix elements.
+     * @tparam S Storage order of the matrix (RowMajor or ColumnMajor).
+     * 
+     * @note Used internally to prevent explicit storage of zero values in sparse matrices.
+     */
     template <AddMulType T, StorageOrder S = StorageOrder::RowMajor>
     class Proxy
     {
     private:
-        UncompressedStorage<T, S> &uncompressed_format;
-        size_t row;
-        size_t col;
+        UncompressedStorage<T, S> &uncompressed_format; /// reference to the uncompressed storage
+        size_t row; /// row index
+        size_t col; /// column index
 
     public:
 
@@ -109,6 +136,6 @@ namespace algebra
             return *this;
         }
     };
-}
+};
 
 #endif // PROXY_HPP

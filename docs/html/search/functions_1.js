@@ -1,0 +1,7 @@
+var searchData=
+[
+  ['clone_0',['clone',['../classalgebra_1_1AbstractMatrix.html#aa8f29bae5967958c8d241f3ab9856199',1,'algebra::AbstractMatrix::clone()'],['../classalgebra_1_1Matrix.html#a59557ed326d82a428d9e83570eb6be81',1,'algebra::Matrix::clone()'],['../classalgebra_1_1TransposeView.html#acc820b469295fc4c75248c1eeb43c939',1,'algebra::TransposeView::clone()'],['../classalgebra_1_1DiagonalView.html#a95afa2e3f78b3eabc9f3b91c8f77d8ba',1,'algebra::DiagonalView::clone()'],['../classalgebra_1_1SquareMatrix.html#ac4d357af93caffc0c9148f596bdcbdaf',1,'algebra::SquareMatrix::clone()']]],
+  ['compress_1',['compress',['../classalgebra_1_1AbstractMatrix.html#a6fab238a93894f6296fff5f0fff53f51',1,'algebra::AbstractMatrix::compress()'],['../classalgebra_1_1Matrix.html#ad795a07a713b9c7b08dd0a1dd0fb48f3',1,'algebra::Matrix::compress()'],['../classalgebra_1_1TransposeView.html#a91870a4ec07e4713be39d1c07df423ab',1,'algebra::TransposeView::compress()'],['../classalgebra_1_1DiagonalView.html#adcca3614a89d05e078dc79264f60144e',1,'algebra::DiagonalView::compress()'],['../classalgebra_1_1SquareMatrix.html#aae8c0446df4d6d9575ff3cc798a41c74',1,'algebra::SquareMatrix::compress() override']]],
+  ['compress_5fmod_2',['compress_mod',['../classalgebra_1_1SquareMatrix.html#a5a31ca7f38388d04b91eac3534902265',1,'algebra::SquareMatrix']]],
+  ['compress_5fparallel_3',['compress_parallel',['../classalgebra_1_1Matrix.html#a3e623fa8d0a7fbf6e0aa229ba7081ea3',1,'algebra::Matrix']]]
+];

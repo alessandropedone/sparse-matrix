@@ -1,10 +1,35 @@
+/**
+ * @file square_matrix.hpp
+ * @brief Defines the SquareMatrix class for square matrices with advanced storage and operations.
+ *
+ * This header provides the declaration of the SquareMatrix class template, which extends the Matrix class
+ * to specifically handle square matrices (matrices with the same number of rows and columns). It supports
+ * various storage formats, including compressed and modified compressed formats, and provides efficient
+ * operations such as multiplication, norm calculation, and resizing. The file also includes forward
+ * declarations for TransposeView and DiagonalView classes, which enable efficient matrix views and
+ * operations without unnecessary data copying.
+ *
+ * Key features:
+ * - Enforces square dimensions at construction.
+ * - Supports both compressed and uncompressed storage formats, with conversion methods.
+ * - Provides friend functions for efficient multiplication with vectors, matrices, and views.
+ * - Offers norm calculations (One, Infinity, Frobenius) and matrix market file reading.
+ * - Integrates with proxy classes for efficient element access and modification.
+ *
+ * @author [Your Name]
+ * @date [Date]
+ * @version 1.0
+ *
+ * @see Matrix
+ * @see TransposeView
+ * @see DiagonalView
+ */
 #ifndef SQUARE_MATRIX_HPP
 #define SQUARE_MATRIX_HPP
 
 #include "storage.hpp"
 #include "matrix.hpp"
 #include "proxy.hpp"
-// #include "matrix_views.hpp"
 
 #include <vector>
 #include <iostream>
@@ -25,9 +50,25 @@ namespace algebra
     template <AddMulType T, StorageOrder S>
     class DiagonalView;
 
-    /// @brief Square Matrix class, child of Matrix class
-    /// @tparam T type of the matrix elements
-    /// @tparam S storage order of the matrix (RowMajor or ColumnMajor)
+    /**
+     * @class SquareMatrix
+     * @brief Represents a square matrix with support for various storage formats and operations.
+     *
+     * This class extends the Matrix class to specifically handle square matrices (same number of rows and columns).
+     * It provides constructors for different views (transpose, diagonal), supports modified compressed storage,
+     * and offers a variety of matrix operations such as multiplication, norm calculation, and resizing.
+     *
+     * @tparam T Type of the matrix elements (must satisfy AddMulType concept).
+     * @tparam S Storage order of the matrix (default is StorageOrder::RowMajor).
+     *
+     * @note The SquareMatrix class disables the default constructor to enforce square dimensions.
+     * @note Provides friend functions for efficient multiplication with vectors, matrices, and views.
+     * @note Supports both compressed and uncompressed storage formats, with methods to convert between them.
+     *
+     * @see Matrix
+     * @see TransposeView
+     * @see DiagonalView
+     */
     template <AddMulType T, StorageOrder S = StorageOrder::RowMajor>
     class SquareMatrix : public Matrix<T, S>
     {
@@ -161,31 +202,65 @@ namespace algebra
         template <AddMulType U, StorageOrder V>
         friend SquareMatrix<U, V> operator*(const SquareMatrix<U, V> &m1, const SquareMatrix<U, V> &m2);
 
-        // transpose view products friend functions
+        /// @brief multiply a TransposeView with a std::vector
+        /// @tparam U type of the vector elements
+        /// @tparam V type of the storage order
+        /// @param m matrix
+        /// @param v vector
+        /// @return the result of the multiplication
         template <AddMulType U, StorageOrder V>
         friend std::vector<U> operator*(const TransposeView<U, V> &m, const std::vector<U> &v);
 
+        /// @brief multiply two TransposeViews
+        /// @tparam U type of the matrix elements
+        /// @tparam V type of the storage order
+        /// @param m1 first matrix
+        /// @param m2 second matrix
+        /// @return the result of the multiplication
         template <AddMulType U, StorageOrder V>
         friend Matrix<U, V> operator*(const TransposeView<U, V> &m1, const TransposeView<U, V> &m2);
 
-        // diagonal view products friend functions
+        /// @brief multiply a DiagonalView with a std::vector
+        /// @tparam U type of the vector elements
+        /// @tparam V type of the storage order
+        /// @param m matrix
+        /// @param v vector
+        /// @return the result of the multiplication
         template <AddMulType U, StorageOrder V>
         friend std::vector<U> operator*(const DiagonalView<U, V> &m, const std::vector<U> &v);
 
+        /// @brief multiply two DiagonalViews
+        /// @tparam U type of the matrix elements
+        /// @tparam V type of the storage order
+        /// @param m1 first matrix
+        /// @param m2 second matrix
+        /// @return the result of the multiplication
         template <AddMulType U, StorageOrder V>
         friend SquareMatrix<U, V> operator*(const DiagonalView<U, V> &m1, const DiagonalView<U, V> &m2);
 
+        /// @brief multiply a DiagonalView with a Matrix
+        /// @tparam U type of the matrix elements
+        /// @tparam V type of the storage order
+        /// @param m1 first matrix
+        /// @param m2 second matrix
+        /// @return the result of the multiplication
         template <AddMulType U, StorageOrder V>
         friend Matrix<U, V> operator*(const Matrix<U, V> &m1, const DiagonalView<U, V> &m2);
 
+        /// @brief multiply a DiagonalView with a Matrix
+        /// @tparam U type of the matrix elements
+        /// @tparam V type of the storage order
+        /// @param m1 first matrix
+        /// @param m2 second matrix
+        /// @return the result of the multiplication
         template <AddMulType U, StorageOrder V>
         friend Matrix<U, V> operator*(const DiagonalView<U, V> &m1, const Matrix<U, V> &m2);
 
     private:
-        bool modified = false; // flag to check if the matrix is in modified compressed format
+        bool modified = false; /// flag to check if the matrix is in modified compressed format
 
         // storage for the matrix
-        ModifiedCompressedStorage<T> compressed_format_mod; // MSR or MSC format
+        ModifiedCompressedStorage<T> compressed_format_mod; /// MSR or MSC format
     };
 
 };

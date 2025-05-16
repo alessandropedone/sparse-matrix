@@ -1,3 +1,23 @@
+/**
+ * @file matrix_views.hpp
+ * @brief Provides view classes for matrix operations such as transpose and diagonal extraction.
+ *
+ * This header defines the `TransposeView` and `DiagonalView` classes, which are lightweight wrappers
+ * around existing matrix objects to provide alternative views (such as the transpose or diagonal) without
+ * copying or modifying the underlying data. These views inherit from `AbstractMatrix` and can be used
+ * interchangeably with other matrix types in the algebra namespace.
+ *
+ * - `TransposeView` allows access to the transpose of a matrix, redirecting element access and modification
+ *   to the corresponding transposed indices of the original matrix.
+ * - `DiagonalView` provides a view of only the diagonal elements of a square matrix, treating all off-diagonal
+ *   elements as zero and preventing their modification.
+ *
+ * Both classes support cloning, norm calculation, and compressed storage operations, and are compatible
+ * with the matrix interface defined in `AbstractMatrix`.
+ *
+ * @author
+ * @date
+ */
 #ifndef MATRIX_VIEWS_HPP
 #define MATRIX_VIEWS_HPP
 
@@ -10,12 +30,28 @@
 
 namespace algebra
 {
+    /**
+     * @brief A view that represents the transpose of a given matrix.
+     *
+     * The TransposeView class provides a transposed view of a matrix without copying its data.
+     * All operations are redirected to the underlying matrix with row and column indices swapped.
+     * This class supports both general and square matrices, and transparently handles compressed formats.
+     *
+     * @tparam T The type of the matrix elements.
+     * @tparam S The storage type or additional matrix traits.
+     *
+     * @note The TransposeView does not own the underlying matrix unless constructed with dimensions,
+     *       in which case it creates a new matrix.
+     *
+     * @see AbstractMatrix
+     * @see Matrix
+     * @see SquareMatrix
+     */
     template <AddMulType T, StorageOrder S = StorageOrder::RowMajor>
     class TransposeView final : public AbstractMatrix<T, S>
     {
     public:
-        // reference to the matrix
-        Matrix<T, S> &matrix;
+        Matrix<T, S> &matrix; /// reference to the matrix
 
         /// @brief delete default constructor
         TransposeView() = delete;
@@ -131,12 +167,28 @@ namespace algebra
         };
     };
 
+    /**
+     * @brief A view that represents the diagonal of a square matrix.
+     *
+     * The DiagonalView class provides a view of the diagonal elements of a square matrix,
+     * treating all off-diagonal elements as zero. This class supports both general and square
+     * matrices, and transparently handles compressed formats.
+     *
+     * @tparam T The type of the matrix elements.
+     * @tparam S The storage type or additional matrix traits.
+     *
+     * @note The DiagonalView does not own the underlying matrix unless constructed with dimensions,
+     *       in which case it creates a new matrix.
+     *
+     * @see AbstractMatrix
+     * @see Matrix
+     * @see SquareMatrix
+     */
     template <AddMulType T, StorageOrder S = StorageOrder::RowMajor>
     class DiagonalView final : public AbstractMatrix<T, S>
     {
     public:
-        // reference to the matrix
-        SquareMatrix<T, S> &matrix;
+        SquareMatrix<T, S> &matrix; /// reference to the matrix
 
         /// @brief delete default constructor
         DiagonalView() = delete;

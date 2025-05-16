@@ -1,3 +1,26 @@
+/**
+ * @file main.cpp
+ * @brief Entry point for testing various matrix types and storage orders.
+ *
+ * This program performs a series of tests on different matrix classes, including real and complex matrices,
+ * square matrices, and matrix views (transpose and diagonal). It reads matrix data from files and a JSON
+ * configuration, and runs tests for both row-major and column-major storage orders.
+ *
+ * The following matrix types are tested:
+ * - Matrix<double, StorageOrder::ColumnMajor>
+ * - SquareMatrix<double, StorageOrder::ColumnMajor>
+ * - TransposeView<double, StorageOrder::ColumnMajor>
+ * - DiagonalView<double, StorageOrder::ColumnMajor>
+ * - Matrix<std::complex<double>, StorageOrder::ColumnMajor>
+ * - SquareMatrix<std::complex<double>, StorageOrder::ColumnMajor>
+ * - TransposeView<std::complex<double>, StorageOrder::ColumnMajor>
+ * - DiagonalView<std::complex<double>, StorageOrder::ColumnMajor>
+ *
+ * The program also reads a list of matrix names from a JSON file and runs tests on all matrices for both
+ * row-major and column-major storage orders.
+ *
+ * @return int Returns 0 upon successful completion.
+ */
 #include "abstract_matrix.hpp"
 #include "matrix.hpp"
 #include "square_matrix.hpp"

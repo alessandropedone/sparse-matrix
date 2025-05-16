@@ -24,6 +24,8 @@ sparse-matrix
 │   ├── lnsp_131.mtx
 │   └── real_test_5x5.mtx
 ├── docs
+│   ├── Doxyfile
+│   └── html
 ├── include
 │   ├── abstract_matrix.hpp
 │   ├── impl
@@ -36,6 +38,7 @@ sparse-matrix
 │   └── test.hpp
 ├── json
 │   └── (...)
+├── main
 └── src
     └── main.cpp
 ```
